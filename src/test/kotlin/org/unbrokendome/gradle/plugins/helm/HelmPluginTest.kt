@@ -4,6 +4,7 @@ import assertk.assert
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import assertk.assertions.prop
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.spek.api.Spek
@@ -12,6 +13,7 @@ import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.testutil.containsItem
 import org.unbrokendome.gradle.plugins.helm.testutil.hasExtension
@@ -30,6 +32,14 @@ object HelmPluginTest : Spek({
 
             it("should have a helm DSL extension") {
                 assert(project, name = "project").hasExtension<HelmExtension>("helm")
+            }
+
+
+            it("should have a helm.charts DSL extension") {
+                assert(project, name = "project")
+                        .hasExtension<HelmExtension>("helm") {
+                            it.hasExtension<NamedDomainObjectContainer<HelmChart>>("charts")
+                        }
             }
 
 

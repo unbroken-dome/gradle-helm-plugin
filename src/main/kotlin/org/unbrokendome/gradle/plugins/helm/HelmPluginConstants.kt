@@ -21,6 +21,12 @@ const val HELM_LINT_EXTENSION_NAME = "lint"
 
 
 /**
+ * The name of the `charts` DSL sub-extension.
+ */
+const val HELM_CHARTS_EXTENSION_NAME = "charts"
+
+
+/**
  * The name of the `filtering` DSL extension.
  */
 const val HELM_FILTERING_EXTENSION_NAME = "filtering"

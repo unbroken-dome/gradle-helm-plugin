@@ -1,6 +1,10 @@
 package org.unbrokendome.gradle.plugins.helm.dsl
 
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.unbrokendome.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 
 
@@ -15,11 +19,18 @@ val Project.helm: HelmExtension
  * Gets the [Linting] sub-extension.
  */
 internal val HelmExtension.lint: Linting
-    get() = requiredExtension("lint")
+    get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
+
+
+/**
+ * Gets the `charts` sub-extension.
+ */
+internal val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
+    get() = requiredExtension(HELM_CHARTS_EXTENSION_NAME)
 
 
 /**
  * Gets the [Filtering] sub-extension.
  */
 internal val HelmExtension.filtering: Filtering
-    get() = requiredExtension("filtering")
+    get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)

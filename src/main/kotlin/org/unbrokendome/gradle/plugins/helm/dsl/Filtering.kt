@@ -25,7 +25,7 @@ interface Filtering {
 }
 
 
-internal interface FilteringInternal : Filtering, Hierarchical<Filtering>
+private interface FilteringInternal : Filtering, Hierarchical<Filtering>
 
 
 private open class DefaultFiltering
@@ -48,7 +48,7 @@ private open class DefaultFiltering
 }
 
 
-internal fun createFiltering(objectFactory: ObjectFactory, parent: Filtering? = null): FilteringInternal =
+internal fun createFiltering(objectFactory: ObjectFactory, parent: Filtering? = null): Filtering =
         objectFactory.newInstance(DefaultFiltering::class.java)
                 .apply {
                     parent?.let(this::setParent)
