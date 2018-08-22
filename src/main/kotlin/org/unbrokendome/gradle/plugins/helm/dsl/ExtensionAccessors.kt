@@ -34,3 +34,17 @@ internal val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
  */
 internal val HelmExtension.filtering: Filtering
     get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
+
+
+/**
+ * Gets the chart's [Linting] extension.
+ */
+internal val HelmChart.lint: Linting
+    get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
+
+
+/**
+ * Gets the chart's [Filtering] extension.
+ */
+internal val HelmChart.filtering: Filtering
+    get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
