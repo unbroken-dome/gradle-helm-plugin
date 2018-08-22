@@ -19,8 +19,7 @@ class HelmCommandsPlugin
         val helmExtension = createHelmExtension(project)
         project.extensions.add(HelmExtension::class.java, HELM_EXTENSION_NAME, helmExtension)
 
-        (helmExtension as ExtensionAware).extensions.run {
-            add(Linting::class.java, HELM_LINT_EXTENSION_NAME, createLinting(project.objects))
-        }
+        (helmExtension as ExtensionAware).extensions
+                .add(Linting::class.java, HELM_LINT_EXTENSION_NAME, createLinting(project.objects))
     }
 }
