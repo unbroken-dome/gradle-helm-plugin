@@ -143,7 +143,7 @@ internal class DefaultHelmRunner(
     private var assertSuccess: Boolean = true
 
     init {
-        environment("HELM_HOME", globalOptions.helmHome)
+        environment("HELM_HOME", globalOptions.home)
         flag("--debug", globalOptions.debug)
     }
 
@@ -217,13 +217,17 @@ internal class DefaultHelmRunner(
 
 
     private fun apply(spec: ExecSpec) {
-        spec.executable = globalOptions.helmExecutable.getOrElse("helm")
+        spec.executable = globalOptions.executable.getOrElse("helm")
         spec.isIgnoreExitValue = !assertSuccess
 
         spec.args(command)
         subcommand?.let { spec.args(it) }
 
         actions.forEach { it.execute(spec) }
+
+        globalOptions.extraArgs.ifPresent { extraArgs ->
+            spec.args(extraArgs)
+        }
     }
 
 
