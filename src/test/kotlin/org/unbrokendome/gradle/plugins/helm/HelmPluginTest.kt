@@ -11,6 +11,7 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
+import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.testutil.containsItem
 import org.unbrokendome.gradle.plugins.helm.testutil.hasExtension
@@ -29,6 +30,14 @@ object HelmPluginTest : Spek({
 
             it("should have a helm DSL extension") {
                 assert(project, name = "project").hasExtension<HelmExtension>("helm")
+            }
+
+
+            it("should have a helm.filtering DSL extension") {
+                assert(project, name = "project")
+                        .hasExtension<HelmExtension>("helm") {
+                            it.hasExtension<Filtering>("filtering")
+                        }
             }
 
 

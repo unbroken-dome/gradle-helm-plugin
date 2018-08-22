@@ -16,3 +16,10 @@ val Project.helm: HelmExtension
  */
 internal val HelmExtension.lint: Linting
     get() = requiredExtension("lint")
+
+
+/**
+ * Gets the [Filtering] sub-extension.
+ */
+internal val HelmExtension.filtering: Filtering
+    get() = requiredExtension("filtering")

@@ -7,10 +7,12 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.util.extension
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.util.*
 
@@ -81,9 +83,11 @@ open class HelmFilterSources : DefaultTask() {
 
 
     init {
+        val globalFiltering: Filtering? = project.helm.extension(HELM_FILTERING_EXTENSION_NAME)
+
         // we install the "filtering" block as an extension on the task so we get the convenience
         // accessors by Gradle (property, method with closure, Kotlin DSL accessor)
-        createFiltering(project.objects)
+        createFiltering(project.objects, parent = globalFiltering)
                 .apply {
                     values.putFrom("chartName", chartName)
                     values.putFrom("chartVersion", chartVersion)
