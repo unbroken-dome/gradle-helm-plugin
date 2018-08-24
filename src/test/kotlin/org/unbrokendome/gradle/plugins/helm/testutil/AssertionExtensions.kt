@@ -4,11 +4,15 @@ import assertk.Assert
 import assertk.all
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.prop
 import assertk.assertions.support.expected
 import assertk.assertions.support.show
 import org.gradle.api.NamedDomainObjectCollection
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
+import java.io.File
 import kotlin.reflect.KClass
 import assertk.assertions.isInstanceOf as defaultIsInstanceOf
 
@@ -73,4 +77,30 @@ fun <T : Any> Assert<Provider<T>>.hasValueEqualTo(value: T) {
     isPresent {
         it.isEqualTo(value)
     }
+}
+
+
+fun Assert<Provider<RegularFile>>.hasFileValueEqualTo(path: File) {
+    isPresent {
+        it.prop(RegularFile::getAsFile)
+                .isEqualTo(path)
+    }
+}
+
+
+fun Assert<Provider<RegularFile>>.hasFileValueEqualTo(path: String) {
+    hasFileValueEqualTo(File(path))
+}
+
+
+fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: File) {
+    isPresent {
+        it.prop(Directory::getAsFile)
+                .isEqualTo(path)
+    }
+}
+
+
+fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: String) {
+    hasDirValueEqualTo(File(path))
 }

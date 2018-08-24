@@ -8,8 +8,7 @@ import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
 import org.unbrokendome.gradle.plugins.helm.dsl.*
-import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
+import org.unbrokendome.gradle.plugins.helm.rules.*
 
 
 class HelmPlugin
@@ -29,10 +28,7 @@ class HelmPlugin
 
         createFilteringExtension(project)
 
-        val charts = createChartsExtension(project)
-        charts.all { chart ->
-            chart.createExtensions(project)
-        }
+        configureCharts(project)
 
         project.tasks.create(initClientTaskName, HelmInit::class.java) { task ->
             task.clientOnly.set(true)
@@ -59,6 +55,36 @@ class HelmPlugin
                             })
                         }
                     }
+
+
+    /**
+     * Performs modifications on the project related to Helm charts.
+     */
+    private fun configureCharts(project: Project) {
+
+        val charts = createChartsExtension(project)
+
+        charts.all { chart ->
+            chart.createExtensions(project)
+        }
+
+        project.tasks.run {
+            addRule(FilterSourcesTaskRule(this, charts))
+            addRule(BuildDependenciesTaskRule(this, charts))
+            addRule(LintTaskRule(this, charts))
+            addRule(PackageTaskRule(this, charts))
+
+            create("helmPackage") { task ->
+                task.group = HELM_GROUP
+                task.description = "Packages all Helm charts."
+                task.dependsOn(TaskDependency {
+                    charts.map { chart ->
+                        project.tasks.getByName(chart.packageTaskName)
+                    }.toSet()
+                })
+            }
+        }
+    }
 
 
     /**

@@ -25,7 +25,7 @@ interface Filtering {
 }
 
 
-private interface FilteringInternal : Filtering, Hierarchical<Filtering>
+internal interface FilteringInternal : Filtering, Hierarchical<Filtering>
 
 
 private open class DefaultFiltering

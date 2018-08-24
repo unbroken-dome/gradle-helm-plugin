@@ -46,5 +46,5 @@ internal class AddRepositoryTaskRule(
 /**
  * The name of the [HelmAddRepository] task that registers this repository.
  */
-internal val HelmRepository.registerTaskName: String
+val HelmRepository.registerTaskName: String
         get() = AddRepositoryTaskRule.getTaskName(name)
