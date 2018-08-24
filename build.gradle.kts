@@ -56,6 +56,10 @@ gradlePlugin {
             id = "org.unbroken-dome.helm-commands"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin"
         }
+        "helmPlugin" {
+            id = "org.unbroken-dome.helm"
+            implementationClass = "org.unbrokendome.gradle.plugins.helm.HelmPlugin"
+        }
     }
 }
 
@@ -69,6 +73,9 @@ pluginBundle {
     (plugins) {
         "helmCommandsPlugin" {
             displayName = "Helm Commands plugin"
+        }
+        "helmPlugin" {
+            displayName = "Helm plugin"
         }
     }
 }
