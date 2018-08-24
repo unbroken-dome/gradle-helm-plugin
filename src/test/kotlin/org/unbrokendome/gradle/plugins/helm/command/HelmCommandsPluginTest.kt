@@ -2,52 +2,57 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import assertk.assert
 import assertk.assertions.hasSize
-import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.testfixtures.ProjectBuilder
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Test
+import org.unbrokendome.gradle.plugins.helm.AbstractGradleProjectTest
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.testutil.hasExtension
 
 
-object HelmCommandsPluginTest : Spek({
-    given("a Gradle project") {
+class HelmCommandsPluginTest : AbstractGradleProjectTest() {
 
-        val project = ProjectBuilder.builder().build() as ProjectInternal
-        val taskCountBefore = project.tasks.size
+    @Test
+    fun `Project can be evaluated successfully`() {
+        applyPlugin()
 
-        on("applying the plugin") {
-            project.plugins.apply(HelmCommandsPlugin::class.java)
-
-
-            it("should have a helm DSL extension") {
-                assert(project, name = "project").hasExtension<HelmExtension>("helm")
-            }
-
-
-            it("should have a helm.lint DSL extension") {
-                assert(project, name = "project")
-                        .hasExtension<HelmExtension>("helm") {
-                            it.hasExtension<Linting>("lint")
-                        }
-            }
-
-
-            it("should successfully evaluate the project") {
-                println(project.hashCode())
-                project.evaluate()
-            }
-
-
-            it("should not create any tasks") {
-                println(project.hashCode())
-                project.evaluate()
-                assert(project.tasks, name = "tasks")
-                        .hasSize(taskCountBefore)
-            }
+        assertDoesNotThrow {
+            evaluateProject()
         }
     }
-})
+
+
+    @Test
+    fun `Plugin should create a helm DSL extension`() {
+        applyPlugin()
+
+        assert(project, name = "project").hasExtension<HelmExtension>("helm")
+    }
+
+
+    @Test
+    fun `Plugin should create a helm lint DSL extension`() {
+        applyPlugin()
+
+        assert(project, name = "project")
+                .hasExtension<HelmExtension>("helm") {
+                    it.hasExtension<Linting>("lint")
+                }
+    }
+
+
+    @Test
+    fun `Plugin should not create any tasks`() {
+        val taskCountBefore = project.tasks.size
+        applyPlugin()
+        evaluateProject()
+
+        assert(project.tasks, name = "tasks")
+                .hasSize(taskCountBefore)
+    }
+
+
+    private fun applyPlugin() {
+        project.plugins.apply(HelmCommandsPlugin::class.java)
+    }
+}

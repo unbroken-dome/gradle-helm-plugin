@@ -19,15 +19,10 @@ dependencies {
 
     implementation("org.yaml:snakeyaml:1.18")
 
-    testImplementation(kotlin("stdlib-jdk8"))
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.11")
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.11")
-    testImplementation("org.jetbrains.spek:spek-api:1.1.5")
-    testRuntimeOnly("org.jetbrains.spek:spek-junit-platform-engine:1.1.5")
 
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))
@@ -44,9 +39,7 @@ tasks.withType<Test> {
     // always execute tests
     outputs.upToDateWhen { false }
 
-    useJUnitPlatform {
-        includeEngines("spek")
-    }
+    useJUnitPlatform()
 
     // give tests a temporary directory below the build dir so
     // we don't pollute the system temp dir (Gradle tests don't clean up)

@@ -7,36 +7,37 @@ import assertk.assertions.support.show
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
-import java.io.File
 
 
 inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinline block: (Assert<E>) -> Unit = {}) {
     if (actual !is ExtensionAware) {
-        expected("to be ExtensionAware")
+        return expected("to be ExtensionAware")
     }
     val extensions = (actual as ExtensionAware).extensions
 
-    val extension: E? = if (name != null) {
+    @Suppress("USELESS_CAST")
+    val extension: E = if (name != null) {
         extensions.findByName(name)
                 .let {
                     if (it == null) {
-                        expected("to have an extension named \"$name\" of type ${show(E::class)}")
+                        return expected("to have an extension named \"$name\" of type ${show(E::class)}")
                     }
                     if (it !is E) {
-                        expected("to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(it?.javaClass)}")
+                        return expected("to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(it?.javaClass)}")
                     }
                     it as E
                 }
     } else {
         extensions.findByType(E::class.java)
-                .also {
+                .let {
                     if (it == null) {
-                        expected("to have an extension of type ${show(E::class)}")
+                        return expected("to have an extension of type ${show(E::class)}")
                     }
+                    it as E
                 }
     }
 
-    assert(extension!!, name = "extension").all(block)
+    assert(extension, name = "extension " + (name?.let { "\"$it\""} ?: show(E::class))).all(block)
 }
 
 
