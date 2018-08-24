@@ -22,7 +22,7 @@ open class HelmUpdateDependencies : AbstractHelmCommandTask() {
      * The chart directory.
      */
     @get:Internal("Represented as part of other properties")
-    val chartDirectory: DirectoryProperty =
+    val chartDir: DirectoryProperty =
             project.layout.directoryProperty()
 
 
@@ -35,7 +35,7 @@ open class HelmUpdateDependencies : AbstractHelmCommandTask() {
     @get:[InputFiles SkipWhenEmpty]
     @Suppress("unused")
     val requirementsYamlFile: FileCollection =
-            chartDirectory.asFileTree.matching {
+            chartDir.asFileTree.matching {
                 it.include("requirements.yaml")
             }
 
@@ -46,7 +46,7 @@ open class HelmUpdateDependencies : AbstractHelmCommandTask() {
     @get:OutputFile
     @Suppress("unused")
     val requirementsLockFile: Provider<RegularFile> =
-            chartDirectory.file("requirements.lock")
+            chartDir.file("requirements.lock")
 
 
     /**
@@ -55,7 +55,7 @@ open class HelmUpdateDependencies : AbstractHelmCommandTask() {
     @get:OutputDirectory
     @Suppress("unused")
     val subchartsDir: Provider<Directory> =
-            chartDirectory.dir("charts")
+            chartDir.dir("charts")
 
 
     /**
@@ -70,7 +70,7 @@ open class HelmUpdateDependencies : AbstractHelmCommandTask() {
     fun updateDependencies() {
         execHelm("dependency", "update") {
             flag("--skip-refresh", skipRefresh)
-            args(chartDirectory)
+            args(chartDir)
         }
     }
 }
