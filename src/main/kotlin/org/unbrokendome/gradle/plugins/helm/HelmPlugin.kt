@@ -21,6 +21,7 @@ class HelmPlugin
 
         project.plugins.apply(HelmCommandsPlugin::class.java)
 
+        createRepositoriesExtension(project)
         createFilteringExtension(project)
 
         val charts = createChartsExtension(project)
@@ -33,6 +34,17 @@ class HelmPlugin
         }
     }
 }
+
+
+/**
+ * Creates and installs the `helm.repositories` sub-extension.
+ */
+private fun createRepositoriesExtension(project: Project) =
+        helmRepositoryContainer(project)
+                .apply {
+                    (project.helm as ExtensionAware)
+                            .extensions.add(HELM_REPOSITORIES_EXTENSION_NAME, this)
+                }
 
 
 /**

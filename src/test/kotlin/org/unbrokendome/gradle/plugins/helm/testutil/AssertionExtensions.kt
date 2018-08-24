@@ -2,11 +2,15 @@ package org.unbrokendome.gradle.plugins.helm.testutil
 
 import assertk.Assert
 import assertk.all
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
 import assertk.assertions.support.expected
 import assertk.assertions.support.show
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
+import kotlin.reflect.KClass
+import assertk.assertions.isInstanceOf as defaultIsInstanceOf
 
 
 inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinline block: (Assert<E>) -> Unit = {}) {
@@ -15,7 +19,6 @@ inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinli
     }
     val extensions = (actual as ExtensionAware).extensions
 
-    @Suppress("USELESS_CAST")
     val extension: E = if (name != null) {
         extensions.findByName(name)
                 .let {
@@ -23,9 +26,9 @@ inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinli
                         return expected("to have an extension named \"$name\" of type ${show(E::class)}")
                     }
                     if (it !is E) {
-                        return expected("to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(it?.javaClass)}")
+                        return expected("to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(it.javaClass)}")
                     }
-                    it as E
+                    it
                 }
     } else {
         extensions.findByType(E::class.java)
@@ -33,9 +36,9 @@ inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinli
                     if (it == null) {
                         return expected("to have an extension of type ${show(E::class)}")
                     }
-                    it as E
+                    it
                 }
-    }
+    } as E
 
     assert(extension, name = "extension " + (name?.let { "\"$it\""} ?: show(E::class))).all(block)
 }
@@ -43,18 +46,31 @@ inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinli
 
 
 fun <T : Any> Assert<NamedDomainObjectCollection<T>>.containsItem(name: String, block: (Assert<T>) -> Unit = {}) {
-    val item = actual.findByName(name)
-    if (item == null) {
-        expected("to contain an item named \"$name\"")
+    val item = actual.findByName(name) ?: return expected("to contain an item named \"$name\"")
+    assert(item, name = name).all(block)
+}
+
+
+fun <T : Any, S : T> Assert<T?>.isInstanceOf(kclass: KClass<S>, block: (Assert<S>) -> Unit) {
+    isNotNull {
+        it.defaultIsInstanceOf(kclass, block)
     }
-    assert(item!!, name = name).all(block)
 }
 
 
 
 fun <T : Any> Assert<Provider<T>>.isPresent(block: (Assert<T>) -> Unit = {}) {
-    if (!actual.isPresent) {
+    val value = actual.orNull
+    if (value != null) {
+        assert(value, name = name).all(block)
+    } else {
         expected("${show(actual)} to have a value", actual = actual)
     }
-    assert(actual.get()).all(block)
+}
+
+
+fun <T : Any> Assert<Provider<T>>.hasValueEqualTo(value: T) {
+    isPresent {
+        it.isEqualTo(value)
+    }
 }

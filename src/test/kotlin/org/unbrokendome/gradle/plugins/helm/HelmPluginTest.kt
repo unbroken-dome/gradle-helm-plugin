@@ -11,6 +11,7 @@ import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.testutil.containsItem
 import org.unbrokendome.gradle.plugins.helm.testutil.hasExtension
 import org.unbrokendome.gradle.plugins.helm.testutil.isPresent
@@ -34,6 +35,17 @@ class HelmPluginTest : AbstractGradleProjectTest() {
         applyPlugin()
 
         assert(project, name = "project").hasExtension<HelmExtension>("helm")
+    }
+
+
+    @Test
+    fun `Plugin should create a helm repositories DSL extension`() {
+        applyPlugin()
+
+        assert(project, name = "project")
+                .hasExtension<HelmExtension>("helm") {
+                    it.hasExtension<NamedDomainObjectContainer<HelmRepository>>("repositories")
+                }
     }
 
 

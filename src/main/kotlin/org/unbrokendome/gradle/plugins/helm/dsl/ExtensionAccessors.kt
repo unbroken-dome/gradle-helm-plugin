@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.unbrokendome.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_REPOSITORIES_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 
 
@@ -20,6 +21,13 @@ val Project.helm: HelmExtension
  */
 internal val HelmExtension.lint: Linting
     get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
+
+
+/**
+ * Gets the `repositories` sub-extension.
+ */
+internal val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
+    get() = requiredExtension(HELM_REPOSITORIES_EXTENSION_NAME)
 
 
 /**
