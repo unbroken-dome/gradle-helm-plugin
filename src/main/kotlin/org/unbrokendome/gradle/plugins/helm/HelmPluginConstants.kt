@@ -36,3 +36,9 @@ const val HELM_CHARTS_EXTENSION_NAME = "charts"
  * The name of the `filtering` DSL extension.
  */
 const val HELM_FILTERING_EXTENSION_NAME = "filtering"
+
+
+/**
+ * The name of the special "main" chart.
+ */
+const val HELM_MAIN_CHART_NAME = "main"

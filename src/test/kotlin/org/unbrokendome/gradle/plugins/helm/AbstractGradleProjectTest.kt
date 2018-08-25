@@ -3,29 +3,40 @@ package org.unbrokendome.gradle.plugins.helm
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.TestInfo
 
 
 abstract class AbstractGradleProjectTest {
 
-    private var projectBuilderModifier: (ProjectBuilder) -> Unit = { }
     protected lateinit var project: Project
 
 
     @BeforeEach
-    fun createProject() {
+    fun createProject(testInfo: TestInfo) {
+
+        val annotation = testInfo.testMethod
+                .map { it.getAnnotation(GradleProjectName::class.java) }
+                .orElse(null)
+
         project = ProjectBuilder.builder()
-                .also(projectBuilderModifier)
+                .also { builder ->
+                    if (annotation != null) {
+                        builder.withName(annotation.value)
+                    }
+                }
                 .build()
-    }
-
-
-    protected open fun givenProject(spec: ProjectBuilder.() -> Unit) {
-        projectBuilderModifier = { it.spec() }
     }
 
 
     protected fun evaluateProject() {
         (project as ProjectInternal).evaluate()
+    }
+
+
+    @AfterEach
+    fun cleanupProject() {
+        project.projectDir.deleteRecursively()
     }
 }

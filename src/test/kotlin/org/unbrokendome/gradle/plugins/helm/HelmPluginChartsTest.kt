@@ -142,6 +142,35 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     }
 
 
+    @Test
+    @GradleProjectName("awesome")
+    fun `Should create a "main" chart automatically`() {
+
+        project.version = "2.5.9"
+
+        evaluateProject()
+
+        val mainChart = project.helm.charts.findByName("main")
+        assert(mainChart, name = "main chart")
+                .isNotNull {
+                    it.prop(HelmChart::chartName).hasValueEqualTo("awesome")
+                    it.prop(HelmChart::chartVersion).hasValueEqualTo("2.5.9")
+                    it.prop(HelmChart::sourceDir).hasDirValueEqualTo(project.projectDir.resolve("src/main/helm"))
+                }
+    }
+
+
+    @Test
+    fun `Should not create a "main" chart if other charts are configured`() {
+        addChart()
+        evaluateProject()
+
+        assert(project.helm.charts, name = "charts")
+                .prop("main") { it.findByName("main") }
+                .isNull()
+    }
+
+
     private fun addChart(name: String = "myChart", chartName: String = "my-chart") {
         with(project.helm.charts) {
             create(name) { chart ->

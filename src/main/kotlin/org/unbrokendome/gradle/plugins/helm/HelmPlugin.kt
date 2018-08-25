@@ -68,6 +68,8 @@ class HelmPlugin
             chart.createExtensions(project)
         }
 
+        charts.addRule(MainChartRule(project, charts))
+
         project.tasks.run {
             addRule(FilterSourcesTaskRule(this, charts))
             addRule(BuildDependenciesTaskRule(this, charts))
@@ -83,6 +85,11 @@ class HelmPlugin
                     }.toSet()
                 })
             }
+        }
+
+        // Realize the main chart
+        project.afterEvaluate {
+            charts.findByName("main")
         }
     }
 
