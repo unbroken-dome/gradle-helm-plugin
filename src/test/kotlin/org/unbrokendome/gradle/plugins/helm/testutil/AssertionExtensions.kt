@@ -104,3 +104,28 @@ fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: File) {
 fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: String) {
     hasDirValueEqualTo(File(path))
 }
+
+
+
+fun <T> Assert<List<T>>.at(index: Int, block: (Assert<T>) -> Unit = {}) {
+    require(index >= 0)
+    if (index >= actual.size) {
+        return expected("to have an item at index $index but was:${show(actual)}")
+    }
+    val value = actual[index]
+    assert(value, name = "[$index]").all(block)
+}
+
+
+fun <K, V> Assert<Map<K, V>>.hasEntry(key: K, block: (Assert<V>) -> Unit = {}) {
+    val value = actual[key] ?: return expected("to contain an entry for key:${show(key)} but was:${show(actual)}")
+    assert(value, name = "[${show(key)}]").all(block)
+}
+
+
+@Suppress("UNCHECKED_CAST")
+fun <K, V> Assert<*>.isMapOf(block: (Assert<Map<K, V>>) -> Unit = {}) {
+    isInstanceOf(Map::class) {
+        assert(actual as Map<K, V>, name = name).run(block)
+    }
+}

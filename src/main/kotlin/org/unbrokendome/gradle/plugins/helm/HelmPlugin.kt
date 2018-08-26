@@ -8,6 +8,8 @@ import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
 import org.unbrokendome.gradle.plugins.helm.dsl.*
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.createChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.rules.*
 
 
@@ -87,9 +89,22 @@ class HelmPlugin
             }
         }
 
-        // Realize the main chart
+        project.configurations.run {
+            addRule(ChartDirArtifactRule(project, charts))
+            addRule(ChartPackagedArtifactRule(project, charts))
+
+        }
+
         project.afterEvaluate {
+            // Realize the main chart.
             charts.findByName("main")
+
+            // Realize the artifact configurations for each chart, so other project can depend on them
+            // (rules are not evaluated for cross-project dependencies)
+            charts.forEach { chart ->
+                project.configurations.findByName(chart.dirArtifactConfigurationName)
+                project.configurations.findByName(chart.packagedArtifactConfigurationName)
+            }
         }
     }
 
@@ -127,6 +142,7 @@ class HelmPlugin
     private fun HelmChart.createExtensions(project: Project) {
         createFilteringExtension(project.objects, project.helm)
         createLintingExtension(project.objects, project.helm)
+        createDependenciesExtension(project)
     }
 
 
@@ -143,5 +159,13 @@ class HelmPlugin
                 .add(Linting::class.java,
                         "lint",
                         createLinting(objectFactory, parent = helmExtension.lint))
+    }
+
+
+    private fun HelmChart.createDependenciesExtension(project: Project) {
+        (this as ExtensionAware).extensions
+                .add(ChartDependencyHandler::class.java,
+                        "dependencies",
+                        createChartDependencyHandler(this, project))
     }
 }

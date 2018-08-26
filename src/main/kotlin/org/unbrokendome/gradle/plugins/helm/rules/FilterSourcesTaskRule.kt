@@ -34,6 +34,7 @@ internal class FilterSourcesTaskRule(
                     ?.let { chart ->
                         tasks.create(taskName, HelmFilterSources::class.java) { task ->
                             task.description = "Filters the sources for the ${chart.name} chart."
+                            task.configuredChartName.set(chart.name)
                             task.chartName.set(chart.chartName)
                             task.chartVersion.set(chart.chartVersion)
                             task.sourceDir.set(chart.sourceDir)

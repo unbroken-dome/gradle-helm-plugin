@@ -39,6 +39,12 @@ const val HELM_FILTERING_EXTENSION_NAME = "filtering"
 
 
 /**
+ * The name of the `dependencies` DSL extension on a chart.
+ */
+const val HELM_DEPENDENCIES_EXTENSION_NAME = "dependencies"
+
+
+/**
  * The name of the special "main" chart.
  */
 const val HELM_MAIN_CHART_NAME = "main"

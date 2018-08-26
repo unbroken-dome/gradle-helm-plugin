@@ -1,6 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
 import org.gradle.api.plugins.ExtensionAware
+import java.security.cert.Extension
 
 
 /**
@@ -25,3 +26,14 @@ internal fun <T : Any> Any.extension(name: String): T? =
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> Any.requiredExtension(name: String): T =
         (this as ExtensionAware).extensions.getByName(name) as T
+
+
+/**
+ * Gets the extension of the given type, throwing an exception if it does not exist.
+ *
+ * @param <T> the extension type
+ * @throws ClassCastException if the receiver object is not [ExtensionAware]
+ * @throws org.gradle.api.UnknownDomainObjectException if the extension does not exist
+ */
+internal inline fun <reified T : Any> Any.requiredExtension(): T =
+        (this as ExtensionAware).extensions.getByType(T::class.java)

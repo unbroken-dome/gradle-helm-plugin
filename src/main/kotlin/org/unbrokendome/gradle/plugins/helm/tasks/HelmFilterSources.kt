@@ -1,19 +1,31 @@
 package org.unbrokendome.gradle.plugins.helm.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependenciesResolver
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.helmDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
+import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
 import org.unbrokendome.gradle.plugins.helm.util.extension
 import org.unbrokendome.gradle.plugins.helm.util.property
+import java.io.File
+import java.io.Reader
+import java.io.StringReader
 import java.util.*
 
 
@@ -37,6 +49,14 @@ open class HelmFilterSources : DefaultTask() {
     init {
         group = HELM_GROUP
     }
+
+
+    /**
+     * The name of the chart within the `helm.charts` DSL container.
+     */
+    @get:[Input Optional]
+    val configuredChartName: Property<String> =
+            project.objects.property()
 
 
     /**
@@ -82,6 +102,15 @@ open class HelmFilterSources : DefaultTask() {
             baseOutputDir.dir(chartName)
 
 
+    /**
+     * If `true` (the default), filter the requirements.yaml file by resolving dependencies on other charts
+     * in the build.
+     */
+    @get:Input
+    val resolveDependencies: Property<Boolean> =
+            project.objects.property(true)
+
+
     init {
         val globalFiltering: Filtering? = project.helm.extension(HELM_FILTERING_EXTENSION_NAME)
 
@@ -93,6 +122,8 @@ open class HelmFilterSources : DefaultTask() {
                     values.putFrom("chartVersion", chartVersion)
                     extensions.add(Filtering::class.java, "filtering", this)
                 }
+
+        dependsOn(chartRequirementsTaskDependency())
     }
 
 
@@ -110,6 +141,7 @@ open class HelmFilterSources : DefaultTask() {
             spec.from(sourceDir)
             spec.into(targetDir)
             applyFiltering(spec)
+            applyDependencyResolution(spec)
         }
     }
 
@@ -140,6 +172,91 @@ open class HelmFilterSources : DefaultTask() {
                     }
                 }
             }
+        }
+    }
+
+
+    /**
+     * Apply dependency resolution to a [CopySpec].
+     *
+     * This will modify the CopySpec to filter the _requirements.yaml_ file and replace each dependency's
+     * `repository` with the resolved chart directory of the dependency.
+     */
+    private fun applyDependencyResolution(spec: CopySpec) {
+        if (resolveDependencies.get()) {
+
+            val chartDependenciesMap = ChartDependenciesResolver.chartDependenciesMap(
+                    project, configuredChartName.orNull)
+
+
+            spec.filesMatching("requirements.yaml") {
+                it.filter(
+                        mapOf("basePath" to targetDir.get().file(it.path).asFile,
+                                "chartDependenciesMap" to chartDependenciesMap),
+                        RequirementsResolvingFilterReader::class.java)
+            }
+        }
+    }
+
+
+    /**
+     * Returns a [TaskDependency] that represents a dependency on all the tasks that are required to build the
+     * chart dependencies.
+     */
+    private fun chartRequirementsTaskDependency() =
+            TaskDependency { task ->
+                if (resolveDependencies.getOrElse(false)) {
+                    configuredChartName.orNull?.let { configuredChartName ->
+                        project.configurations.findByName(chartDependenciesConfigurationName(configuredChartName))
+                                ?.buildDependencies?.getDependencies(task)
+                                ?: emptySet()
+                    }
+                }
+                emptySet()
+            }
+
+
+    /**
+     * A [java.io.FilterReader] that modifies the _requirements.yaml_ file by resolving the chart dependencies.
+     *
+     * Note: Properties of this class must be `lateinit var` because they are injected by Gradle's
+     * [org.gradle.api.file.ContentFilterable.filter] method.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    internal class RequirementsResolvingFilterReader(input: Reader)
+        : DelegateReader(input) {
+
+        /**
+         * The base path (= the path of the requirements.yaml file to be filtered). Paths to resolved chart
+         * directories will be relative to the containing directory.
+         */
+        lateinit var basePath: File
+
+        /**
+         * A map of chart dependency names to the [File]s pointing to the chart directories.
+         * @see ChartDependenciesResolver.chartDependenciesMap
+         */
+        lateinit var chartDependenciesMap: Map<String, File>
+
+
+        override val delegate: Reader by lazy(LazyThreadSafetyMode.NONE) {
+
+            val resolvedRequirementsYaml = ChartRequirementsYaml.load(`in`)
+                    .withMappedDependencies { dependency ->
+
+                        val resolvedRepository: File? = chartDependenciesMap[dependency.name]
+                                ?: dependency.alias?.let { alias -> chartDependenciesMap[alias] }
+
+                        if (resolvedRepository != null) {
+                            dependency.withRepository(
+                                    "file://" + resolvedRepository.relativeTo(basePath.parentFile).path)
+                        } else {
+                            dependency
+                        }
+                    }
+                    .let { ChartRequirementsYaml.saveToString(it) }
+
+            StringReader(resolvedRequirementsYaml)
         }
     }
 }
