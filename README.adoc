@@ -1,3 +1,52 @@
 = Gradle Helm Plugin
 
 This is a suite of Gradle plugins for building, publishing and managing https://www.helm.sh/[Helm] charts.
+
+== Features
+
+* Gradle task types for common Helm CLI commands
+* Build, package and publish Helm charts using a declarative Gradle DSL
+* Resolve placeholders like `${chartVersion}` from chart source files before packaging
+* Resolve dependencies between charts using Gradle artifact dependencies
+
+
+== Requirements
+
+* Gradle 4.3 or higher
+* JDK 1.8 or higher (for running Gradle)
+* Helm command-line client
+
+
+== Quick Start
+
+Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
+
+.build.gradle
+[source,groovy]
+----
+plugins {
+  id 'org.unbroken-dome.helm' version '0.1.0'
+}
+----
+
+
+Put your Helm chart sources into `src/main/helm`:
+
+----
+📂 (project) root
+    📂 src
+        📂 main
+            📂 helm
+                📂 templates
+                    📄 ...
+                📄 Chart.yaml
+                📄 requirements.yaml
+                📄 values.yaml
+----
+
+Use the `helmPackage` task to build your chart.
+
+
+== Further Documentation
+
+Please refer to the https://github.com/unbroken-dome/gradle-helm-plugin/wiki[Wiki] for full documentation.
