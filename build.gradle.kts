@@ -18,6 +18,7 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
     implementation("org.yaml:snakeyaml:1.18")
+    implementation("org.apache.httpcomponents:httpclient:4.5.6")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
@@ -60,6 +61,10 @@ gradlePlugin {
             id = "org.unbroken-dome.helm"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.HelmPlugin"
         }
+        "helmPublishPlugin" {
+            id = "org.unbroken-dome.helm-publish"
+            implementationClass = "org.unbrokendome.gradle.plugins.helm.publishing.HelmPublishPlugin"
+        }
     }
 }
 
@@ -76,6 +81,9 @@ pluginBundle {
         }
         "helmPlugin" {
             displayName = "Helm plugin"
+        }
+        "helmPublishPlugin" {
+            displayName = "Helm Publish Plugin"
         }
     }
 }

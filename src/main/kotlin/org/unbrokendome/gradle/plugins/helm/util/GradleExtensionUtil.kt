@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
+import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.ExtensionAware
 import java.security.cert.Extension
 
@@ -37,3 +38,14 @@ internal fun <T : Any> Any.requiredExtension(name: String): T =
  */
 internal inline fun <reified T : Any> Any.requiredExtension(): T =
         (this as ExtensionAware).extensions.getByType(T::class.java)
+
+
+/**
+ * Gets the convention of the given type, throwing an exception if it does not exist.
+ *
+ * @param <T> the convention type
+ * @throws ClassCastException if the receiver object does not support conventions
+ * @throws org.gradle.api.UnknownDomainObjectException if the convention does not exist
+ */
+internal inline fun <reified T : Any> Any.requiredConvention(): T =
+        (this as HasConvention).convention.getByType(T::class.java)
