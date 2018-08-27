@@ -135,7 +135,7 @@ internal class DefaultHelmRunner(
                 globalOptions: GlobalHelmOptions,
                 command: String,
                 subcommand: String?)
-    : this(project::exec, globalOptions, command, subcommand)
+    : this({ project.exec(it) }, globalOptions, command, subcommand)
 
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
