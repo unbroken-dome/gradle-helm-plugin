@@ -38,7 +38,7 @@ Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
 [source,groovy]
 ----
 plugins {
-  id 'org.unbroken-dome.helm' version '0.1.0'
+  id 'org.unbroken-dome.helm' version '0.1.2'
 }
 ----
 
