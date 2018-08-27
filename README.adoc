@@ -1,6 +1,19 @@
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
 = Gradle Helm Plugin
 
 This is a suite of Gradle plugins for building, publishing and managing https://www.helm.sh/[Helm] charts.
+
+[IMPORTANT]
+====
+This is still work in progress!
+====
 
 == Features
 
@@ -33,7 +46,7 @@ plugins {
 Put your Helm chart sources into `src/main/helm`:
 
 ----
-📂 (project) root
+📂 (project root)
     📂 src
         📂 main
             📂 helm
