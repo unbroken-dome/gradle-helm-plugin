@@ -10,6 +10,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
 import org.unbrokendome.gradle.plugins.helm.util.MapProperty
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.File
@@ -40,7 +41,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.property(false)
+            project.objects.emptyProperty()
 
 
     /**
@@ -64,7 +65,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val replace: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -72,7 +73,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val timeoutSeconds: Property<Int> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -105,7 +106,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     @TaskAction
@@ -121,7 +122,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
             flag("--replace", replace)
             flag("--dry-run", dryRun)
 
-            option("--timeoutSeconds", timeoutSeconds)
+            option("--timeout", timeoutSeconds)
             flag("--wait", wait)
 
             args(chart)

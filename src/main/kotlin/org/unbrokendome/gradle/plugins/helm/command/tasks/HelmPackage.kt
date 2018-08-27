@@ -9,6 +9,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
@@ -34,7 +35,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Input
     val updateDependencies: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**

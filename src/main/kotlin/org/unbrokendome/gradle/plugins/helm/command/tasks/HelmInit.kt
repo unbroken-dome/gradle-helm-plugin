@@ -4,6 +4,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
@@ -25,7 +26,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val forceUpgrade: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -33,7 +34,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val historyMax: Property<Int> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -41,7 +42,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val replicas: Property<Int> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -57,7 +58,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val skipRefresh: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**

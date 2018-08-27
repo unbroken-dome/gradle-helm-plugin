@@ -5,6 +5,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
 
@@ -53,7 +54,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:Internal
     val failIfExists: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     init {

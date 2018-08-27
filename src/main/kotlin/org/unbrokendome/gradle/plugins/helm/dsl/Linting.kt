@@ -5,6 +5,7 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.util.MapProperty
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import javax.inject.Inject
@@ -47,7 +48,7 @@ private open class DefaultLinting
             objectFactory.property(true)
 
     override val strict: Property<Boolean> =
-            objectFactory.property()
+            objectFactory.emptyProperty()
 
     override val values: MapProperty<String, Any> =
             mapProperty()

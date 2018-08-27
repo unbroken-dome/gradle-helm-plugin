@@ -9,6 +9,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.command.*
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import javax.inject.Inject
@@ -51,7 +52,7 @@ private open class DefaultHelmExtension
 
 
     override val debug: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     override val home: DirectoryProperty =

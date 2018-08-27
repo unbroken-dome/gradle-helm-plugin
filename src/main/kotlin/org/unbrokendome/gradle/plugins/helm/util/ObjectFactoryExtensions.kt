@@ -17,6 +17,19 @@ inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
 
 
 /**
+ * Creates a [Property] to hold values of the given type, initialized to be empty (i.e. holding no value).
+ *
+ * Use this for properties of standard Java data types like [Int], [Boolean] etc. that will get a default value
+ * assigned by Gradle.
+ *
+ * @param T the type of the property
+ * @return the property
+ */
+inline fun <reified T : Any> ObjectFactory.emptyProperty(): Property<T> =
+        property(T::class.java).apply { this.set(null as T?) }
+
+
+/**
  * Creates a [Property] to hold values of the given type, initializing with a value.
  *
  * @param T the type of the property

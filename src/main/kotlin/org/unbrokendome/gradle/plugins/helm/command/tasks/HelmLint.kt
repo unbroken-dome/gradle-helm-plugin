@@ -14,6 +14,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
 import org.unbrokendome.gradle.plugins.helm.util.MapProperty
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -39,7 +40,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val strict: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**

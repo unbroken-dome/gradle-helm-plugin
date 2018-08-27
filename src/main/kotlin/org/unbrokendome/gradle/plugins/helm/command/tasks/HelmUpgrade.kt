@@ -7,6 +7,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
 import org.unbrokendome.gradle.plugins.helm.util.MapProperty
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.File
@@ -45,7 +46,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -53,7 +54,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val install: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -70,7 +71,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val recreatePods: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -78,7 +79,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val resetValues: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -87,7 +88,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val reuseValues: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -95,7 +96,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val timeoutSeconds: Property<Int> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     /**
@@ -128,7 +129,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.property()
+            project.objects.emptyProperty()
 
 
     @TaskAction
@@ -141,6 +142,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
             flag("--recreate-pods", recreatePods)
             flag("--reset-values", resetValues)
             flag("--reuse-values", reuseValues)
+            option("--timeout", timeoutSeconds)
             flag("--wait", wait)
             flag("--dry-run", dryRun)
             args(releaseName)
