@@ -5,12 +5,11 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.ProjectLayout
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.versionProvider
 import javax.inject.Inject
 
 
@@ -41,8 +40,7 @@ interface HelmChart : Named, Buildable {
 private open class DefaultHelmChart
 @Inject constructor(
         private val name: String,
-        objectFactory: ObjectFactory,
-        projectLayout: ProjectLayout)
+        project: Project)
     : HelmChart {
 
     override fun getName(): String =
@@ -50,15 +48,15 @@ private open class DefaultHelmChart
 
 
     override val chartName: Property<String> =
-            objectFactory.property()
+            project.objects.property(name)
 
 
     override val chartVersion: Property<String> =
-            objectFactory.property()
+            project.objects.property(project.versionProvider)
 
 
     override val sourceDir: DirectoryProperty =
-            projectLayout.directoryProperty()
+            project.layout.directoryProperty()
 
 
     override fun getBuildDependencies(): TaskDependency =
@@ -81,5 +79,5 @@ private open class DefaultHelmChart
  */
 internal fun helmChartContainer(project: Project): NamedDomainObjectContainer<HelmChart> =
         project.container(HelmChart::class.java) { name ->
-            project.objects.newInstance(DefaultHelmChart::class.java, name)
+            project.objects.newInstance(DefaultHelmChart::class.java, name, project)
         }
