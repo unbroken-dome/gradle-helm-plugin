@@ -17,47 +17,47 @@ val Project.helm: HelmExtension
 /**
  * Gets the [Linting] sub-extension.
  */
-internal val HelmExtension.lint: Linting
+val HelmExtension.lint: Linting
     get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
 
 
 /**
  * Gets the `repositories` sub-extension.
  */
-internal val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
+val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
     get() = requiredExtension(HELM_REPOSITORIES_EXTENSION_NAME)
 
 
 /**
  * Gets the `charts` sub-extension.
  */
-internal val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
+val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
     get() = requiredExtension(HELM_CHARTS_EXTENSION_NAME)
 
 
 /**
  * Gets the [Filtering] sub-extension.
  */
-internal val HelmExtension.filtering: Filtering
+val HelmExtension.filtering: Filtering
     get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
 
 
 /**
  * Gets the chart's [Linting] extension.
  */
-internal val HelmChart.lint: Linting
+val HelmChart.lint: Linting
     get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
 
 
 /**
  * Gets the chart's [Filtering] extension.
  */
-internal val HelmChart.filtering: Filtering
+val HelmChart.filtering: Filtering
     get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
 
 
 /**
  * Gets the chart's `dependencies` extension.
  */
-internal val HelmChart.dependencies: ChartDependencyHandler
+val HelmChart.dependencies: ChartDependencyHandler
     get() = requiredExtension(HELM_DEPENDENCIES_EXTENSION_NAME)
