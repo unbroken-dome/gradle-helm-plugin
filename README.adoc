@@ -10,10 +10,8 @@ endif::[]
 
 This is a suite of Gradle plugins for building, publishing and managing https://www.helm.sh/[Helm] charts.
 
-[IMPORTANT]
-====
-This is still work in progress!
-====
+IMPORTANT: This is still work in progress!
+
 
 == Features
 
