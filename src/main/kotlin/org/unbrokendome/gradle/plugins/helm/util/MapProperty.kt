@@ -1,6 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
 import org.gradle.api.internal.provider.AbstractProvider
+import org.gradle.api.internal.provider.PropertyInternal
 import org.gradle.api.internal.provider.Providers
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -15,23 +16,37 @@ import java.util.LinkedList
  */
 interface MapProperty<K : Any, V : Any?> : Property<Map<K, V>> {
 
-    /**
-     *
-     */
     fun put(key: K, value: V)
 
     fun putFrom(key: K, providerOfValue: Provider<out V>)
 
     fun put(providerOfEntry: Provider<out Any>)
 
+    fun putAll(entries: Map<K, V>)
+
     fun putAll(providerOfEntries: Provider<out Map<K, V>>)
+
+
+    /**
+     * Kotlin operator support.
+     */
+    operator fun plusAssign(other: Map<K, V>) {
+        putAll(other)
+    }
+
+    /**
+     * Kotlin operator support.
+     */
+    operator fun plusAssign(entry: Pair<K, V>) {
+        put(entry.first, entry.second)
+    }
 }
 
 
 private class DefaultMapProperty<K : Any, V : Any?>(
         private val keyType: Class<out K>,
         private val valueType: Class<out V>)
-    : AbstractProvider<Map<K, V>>(), MapProperty<K, V> {
+    : AbstractProvider<Map<K, V>>(), MapProperty<K, V>, PropertyInternal<Map<K, V>> {
 
     private companion object {
 
@@ -83,10 +98,25 @@ private class DefaultMapProperty<K : Any, V : Any?>(
     }
 
 
-    override fun set(provider: Provider<out Map<K, V>>?) {
+    override fun set(provider: Provider<out Map<K, V>>) {
         requireNotNull(provider) { "Cannot set the value of a property using a null provider." }
         collectors.clear()
-        this.value = EntriesFromMapProvider(provider!!)
+        this.value = EntriesFromMapProvider(provider)
+    }
+
+
+    @Suppress("UNCHECKED_CAST")
+    override fun setFromAnyValue(`object`: Any?) {
+        when (`object`) {
+            null ->
+                set(null)
+            is Map<*, *> ->
+                set(`object` as Map<K, V>)
+            is Provider<*> ->
+                set(`object` as Provider<Map<K, V>>)
+            else ->
+                throw IllegalArgumentException("value must be either a Map or a Provider")
+        }
     }
 
 
@@ -126,6 +156,27 @@ private class DefaultMapProperty<K : Any, V : Any?>(
 
     override fun putAll(providerOfEntries: Provider<out Map<K, V>>) {
         collectors.add(EntriesFromMapProvider(providerOfEntries))
+    }
+
+
+    override fun putAll(entries: Map<K, V>) {
+        collectors.add(EntriesFromMap(entries))
+    }
+
+
+    /**
+     * Groovy operator support.
+     */
+    @Suppress("UNCHECKED_CAST", "unused")
+    fun putAt(key: K, value: Any?) {
+        when {
+            value is Provider<*> ->
+                putFrom(key, value as Provider<out V>)
+            valueType.isInstance(value) ->
+                put(key, value as V)
+            else ->
+                throw IllegalArgumentException("Value must be either of type ${valueType.name}, or a Provider of ${valueType.name}")
+        }
     }
 
 
