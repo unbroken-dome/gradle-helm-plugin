@@ -6,6 +6,7 @@ import assertk.assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildDependencies
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
 import org.unbrokendome.gradle.plugins.helm.dsl.*
@@ -85,13 +86,13 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
 
 
     @Test
-    fun `Plugin should create a HelmBuildDependencies task for each chart`() {
+    fun `Plugin should create a HelmBuildOrUpdateDependencies task for each chart`() {
         addChart()
 
-        val buildDependenciesTask = project.tasks.findByName("helmBuildMyChartChartDependencies")
+        val buildDependenciesTask = project.tasks.findByName("helmUpdateMyChartChartDependencies")
         assert(buildDependenciesTask)
-                .isInstanceOf(HelmBuildDependencies::class) {
-                    it.prop(HelmBuildDependencies::chartDir)
+                .isInstanceOf(HelmBuildOrUpdateDependencies::class) {
+                    it.prop(HelmBuildOrUpdateDependencies::chartDir)
                             .hasDirValueEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
                 }
     }

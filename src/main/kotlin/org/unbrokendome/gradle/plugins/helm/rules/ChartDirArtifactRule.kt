@@ -5,7 +5,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildDependencies
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 
 
@@ -42,7 +42,7 @@ internal class ChartDirArtifactRule(
                     ?.let { chart ->
                         configurations.create(configurationName)
 
-                        val buildDependenciesTask = tasks.getByName(chart.buildDependenciesTaskName) as HelmBuildDependencies
+                        val buildDependenciesTask = tasks.getByName(chart.updateDependenciesTaskName) as HelmBuildOrUpdateDependencies
                         artifacts.add(configurationName, buildDependenciesTask.chartDir) {
                             it.builtBy(buildDependenciesTask)
                             it.name = chart.chartName.get()

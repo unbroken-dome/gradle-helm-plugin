@@ -46,7 +46,7 @@ internal class LintTaskRule(
                                 task.valueFiles.from(chartLint.valueFiles)
                             }
 
-                            task.dependsOn(chart.buildDependenciesTaskName)
+                            task.dependsOn(chart.updateDependenciesTaskName)
                         }
                     }
         }
