@@ -38,7 +38,7 @@ internal class BuildDependenciesTaskRule(
                         tasks.create(taskName, HelmBuildOrUpdateDependencies::class.java) { task ->
                             task.description = "Builds or updates the dependencies for the ${chart.name} chart."
                             task.chartDir.set(filterSourcesTask.targetDir)
-                            task.dependsOn(HelmPlugin.initClientTaskName)
+                            task.dependsOn(HelmPlugin.addRepositoriesTaskName)
                             task.dependsOn(filterSourcesTask)
                         }
                     }
