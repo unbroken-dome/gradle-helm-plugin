@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.unbrokendome.gradle.plugins.helm.*
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
@@ -50,6 +51,13 @@ val HelmChart.lint: Linting
 
 
 /**
+ * Configures the chart linting.
+ */
+fun HelmChart.lint(configure: (Linting).() -> Unit) =
+        (this as ExtensionAware).extensions.configure(HELM_LINT_EXTENSION_NAME, configure)
+
+
+/**
  * Gets the chart's [Filtering] extension.
  */
 val HelmChart.filtering: Filtering
@@ -57,7 +65,21 @@ val HelmChart.filtering: Filtering
 
 
 /**
+ * Configures the chart filtering.
+ */
+fun HelmChart.filtering(configure: (Filtering).() -> Unit) =
+        (this as ExtensionAware).extensions.configure(HELM_FILTERING_EXTENSION_NAME, configure)
+
+
+/**
  * Gets the chart's `dependencies` extension.
  */
 val HelmChart.dependencies: ChartDependencyHandler
     get() = requiredExtension(HELM_DEPENDENCIES_EXTENSION_NAME)
+
+
+/**
+ * Configures the chart dependencies.
+ */
+fun HelmChart.dependencies(configure: (ChartDependencyHandler).() -> Unit) =
+        (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)
