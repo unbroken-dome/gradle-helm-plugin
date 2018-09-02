@@ -1,23 +1,18 @@
 package org.unbrokendome.gradle.plugins.helm.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Task
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.Dependency
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependenciesResolver
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
-import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.helmDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
 import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
@@ -26,7 +21,7 @@ import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.File
 import java.io.Reader
 import java.io.StringReader
-import java.util.*
+import java.util.Objects
 
 
 val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
@@ -209,10 +204,10 @@ open class HelmFilterSources : DefaultTask() {
                     configuredChartName.orNull?.let { configuredChartName ->
                         project.configurations.findByName(chartDependenciesConfigurationName(configuredChartName))
                                 ?.buildDependencies?.getDependencies(task)
-                                ?: emptySet()
-                    }
+                    } ?: emptySet()
+                } else {
+                    emptySet()
                 }
-                emptySet()
             }
 
 
