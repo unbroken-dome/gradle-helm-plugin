@@ -4,6 +4,8 @@ import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 
 
 /**
@@ -35,6 +37,23 @@ internal class AddRepositoryTaskRule(
                             task.description = "Registers the ${repository.name} repository."
                             task.repositoryName.set(repository.name)
                             task.url.set(repository.url)
+
+                            repository.configuredCredentials?.let {
+                                when (it) {
+                                    is PasswordCredentials -> {
+                                        task.username.set(it.username)
+                                        task.password.set(it.password)
+                                    }
+                                    is CertificateCredentials -> {
+                                        task.certificateFile.set(it.certificateFile)
+                                        task.keyFile.set(it.keyFile)
+                                    }
+                                    else ->
+                                        throw IllegalArgumentException("Only PasswordCredentials and " +
+                                                "CertificateCredentials are supported for Helm repositories")
+                                }
+                            }
+
                             task.dependsOn(HelmPlugin.initClientTaskName)
                         }
                     }

@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -32,7 +33,19 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
 
 
     /**
+     * A CA bundle used to verify certificates of HTTPS-enabled servers.
+     *
+     * Corresponds to the `--ca-file` CLI parameter.
+     */
+    @get:[Input Optional]
+    val caFile: Property<RegularFile> =
+            project.layout.fileProperty()
+
+
+    /**
      * Username to access the chart repository.
+     *
+     * Corresponds to the `--username` CLI parameter.
      */
     @get:[Input Optional]
     val username: Property<String> =
@@ -41,10 +54,32 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
 
     /**
      * Password to access the chart repository.
+     *
+     * Corresponds to the `--password` CLI parameter.
      */
     @get:[Input Optional]
     val password: Property<String> =
             project.objects.property()
+
+
+    /**
+     * Path to a certificate file for client SSL authentication.
+     *
+     * Corresponds to the `--cert-file` CLI parameter.
+     */
+    @get:[Input Optional]
+    val certificateFile: Property<RegularFile> =
+            project.layout.fileProperty()
+
+
+    /**
+     * Path to a certificate private key file for client SSL authentication.
+     *
+     * Corresponds to the `--key-file` CLI parameter.
+     */
+    @get:[Input Optional]
+    val keyFile: Property<RegularFile> =
+            project.layout.fileProperty()
 
 
     /**
@@ -66,6 +101,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
     @TaskAction
     fun addRepository() {
         execHelm("repo", "add") {
+            option("--ca-file", caFile)
             option("--username", username)
             option("--password", password)
             flag("--no-update", failIfExists)
