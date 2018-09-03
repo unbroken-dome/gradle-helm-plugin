@@ -42,9 +42,11 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
         val repository = project.helm.repositories.getByName("myRepo")
         assert(repository, name = "repository")
                 .prop(CredentialsContainer::configuredCredentials)
-                .isInstanceOf(PasswordCredentials::class) {
-                    it.prop(PasswordCredentials::username).hasValueEqualTo("username")
-                    it.prop(PasswordCredentials::password).hasValueEqualTo("password")
+                .isPresent {
+                    it.isInstanceOf(PasswordCredentials::class) {
+                        it.prop(PasswordCredentials::username).hasValueEqualTo("username")
+                        it.prop(PasswordCredentials::password).hasValueEqualTo("password")
+                    }
                 }
     }
 
@@ -64,17 +66,19 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
         val repository = project.helm.repositories.getByName("myRepo")
         assert(repository, name = "repository")
                 .prop(CredentialsContainer::configuredCredentials)
-                .isInstanceOf(CertificateCredentials::class) {
-                    it.prop(CertificateCredentials::certificateFile)
-                            .isPresent {
-                                it.prop("asFile", RegularFile::getAsFile)
-                                        .isEqualTo(File("/path/to/certificate"))
-                            }
-                    it.prop(CertificateCredentials::keyFile)
-                            .isPresent {
-                                it.prop("asFile", RegularFile::getAsFile)
-                                        .isEqualTo(File("/path/to/key"))
-                            }
+                .isPresent {
+                    it.isInstanceOf(CertificateCredentials::class) {
+                        it.prop(CertificateCredentials::certificateFile)
+                                .isPresent {
+                                    it.prop("asFile", RegularFile::getAsFile)
+                                            .isEqualTo(File("/path/to/certificate"))
+                                }
+                        it.prop(CertificateCredentials::keyFile)
+                                .isPresent {
+                                    it.prop("asFile", RegularFile::getAsFile)
+                                            .isEqualTo(File("/path/to/key"))
+                                }
+                    }
                 }
     }
 }

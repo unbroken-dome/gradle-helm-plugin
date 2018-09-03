@@ -6,6 +6,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
+import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 
 
 /**
@@ -38,15 +39,15 @@ internal class AddRepositoryTaskRule(
                             task.repositoryName.set(repository.name)
                             task.url.set(repository.url)
 
-                            repository.configuredCredentials?.let {
-                                when (it) {
+                            repository.configuredCredentials.ifPresent { credentials ->
+                                when (credentials) {
                                     is PasswordCredentials -> {
-                                        task.username.set(it.username)
-                                        task.password.set(it.password)
+                                        task.username.set(credentials.username)
+                                        task.password.set(credentials.password)
                                     }
                                     is CertificateCredentials -> {
-                                        task.certificateFile.set(it.certificateFile)
-                                        task.keyFile.set(it.keyFile)
+                                        task.certificateFile.set(credentials.certificateFile)
+                                        task.keyFile.set(credentials.keyFile)
                                     }
                                     else ->
                                         throw IllegalArgumentException("Only PasswordCredentials and " +

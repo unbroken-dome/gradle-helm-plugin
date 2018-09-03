@@ -5,6 +5,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainerSupport
@@ -60,7 +61,7 @@ private constructor(private val name: String,
 
 
     private constructor(name: String, objectFactory: ObjectFactory, credentialsFactory: CredentialsFactory)
-            : this(name, objectFactory, CredentialsContainerSupport(credentialsFactory))
+            : this(name, objectFactory, CredentialsContainerSupport(objectFactory, credentialsFactory))
 
 
     @Inject constructor(name: String, objectFactory: ObjectFactory)

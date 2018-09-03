@@ -10,9 +10,12 @@ import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClientBuilder
 import org.gradle.api.credentials.Credentials
+import org.gradle.api.internal.provider.Providers
+import org.gradle.api.provider.Provider
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
+import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import java.io.File
 import java.net.URI
 
@@ -24,7 +27,7 @@ internal class HttpHelmChartPublisher(
         url: URI,
         private val uploadMethod: String = "POST",
         uploadPath: String? = "/api/charts",
-        private val credentials: Credentials? = null)
+        private val credentials: Provider<Credentials> = Providers.notDefined())
     : HelmChartPublisher {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -71,7 +74,7 @@ internal class HttpHelmChartPublisher(
         return HttpClientBuilder.create()
                 .apply {
 
-                    credentials?.let { credentials ->
+                    credentials.ifPresent { credentials ->
                         when (credentials) {
                             is PasswordCredentials ->
                                 BasicCredentialsProvider()

@@ -34,7 +34,7 @@ private constructor(private val name: String,
 
 
     private constructor(name: String, objectFactory: ObjectFactory, credentialsFactory: CredentialsFactory)
-            : this(name, objectFactory, CredentialsContainerSupport(credentialsFactory))
+            : this(name, objectFactory, CredentialsContainerSupport(objectFactory, credentialsFactory))
 
 
     @Inject constructor(name: String, objectFactory: ObjectFactory)

@@ -5,6 +5,7 @@ import groovy.lang.Closure.DELEGATE_FIRST
 import groovy.lang.DelegatesTo
 import org.gradle.api.Action
 import org.gradle.api.credentials.Credentials
+import org.gradle.api.provider.Provider
 import org.gradle.util.ConfigureUtil
 import kotlin.reflect.KClass
 
@@ -161,11 +162,11 @@ interface CredentialsContainer {
 
 
     /**
-     * The currently configured credentials.
+     * A provider that returns the currently configured credentials.
      *
-     * Will be `null` if no credentials have been configured yet.
+     * Will have no value if no credentials have been configured.
      */
-    val configuredCredentials: Credentials?
+    val configuredCredentials: Provider<Credentials>
 }
 
 
