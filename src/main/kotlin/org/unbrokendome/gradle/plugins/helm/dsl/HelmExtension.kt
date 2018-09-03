@@ -9,9 +9,13 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.command.*
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.listProperty
+import org.unbrokendome.gradle.plugins.helm.util.orElse
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import javax.inject.Inject
 
 
@@ -48,31 +52,39 @@ private open class DefaultHelmExtension
     : HelmExtension {
 
     override val executable =
-            project.objects.property("helm")
+            project.objects.property(
+                    project.providerFromProjectProperty("helm.executable", evaluateGString = true)
+                            .orElse("helm"))
 
 
     override val debug: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property(
+                    project.booleanProviderFromProjectProperty("helm.debug"))
 
 
     override val home: DirectoryProperty =
-            project.layout.directoryProperty()
+            project.layout.directoryProperty(
+                    project.dirProviderFromProjectProperty("helm.home", evaluateGString = true))
 
 
     override val host: Property<String> =
-            project.objects.property()
+            project.objects.property(
+                    project.providerFromProjectProperty("helm.host"))
 
 
     override val kubeContext: Property<String> =
-            project.objects.property()
+            project.objects.property(
+                    project.providerFromProjectProperty("helm.kubeContext"))
 
 
     override val kubeConfig: RegularFileProperty =
-            project.layout.fileProperty()
+            project.layout.fileProperty(
+                    project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
 
 
     override val tillerNamespace: Property<String> =
-            project.objects.property()
+            project.objects.property(
+                    project.providerFromProjectProperty("helm.tillerNamespace"))
 
 
     override val extraArgs: ListProperty<String> =
@@ -81,7 +93,8 @@ private open class DefaultHelmExtension
 
     override val outputDir: DirectoryProperty =
             project.layout.directoryProperty(
-                    project.layout.buildDirectory.dir("helm/charts"))
+                    project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true)
+                            .orElse(project.layout.buildDirectory.dir("helm/charts")))
 
 
     override fun execHelm(command: String, subcommand: String?, spec: Action<HelmRunner>): ExecResult =

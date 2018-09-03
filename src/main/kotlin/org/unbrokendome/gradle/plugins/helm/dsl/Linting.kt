@@ -38,9 +38,15 @@ interface Linting {
 }
 
 
+/**
+ * Extension of [Linting] that supports setting values from a parent `Linting` instance.
+ */
 private interface LintingInternal : Linting, Hierarchical<Linting>
 
 
+/**
+ * Default implementation of [Linting].
+ */
 private open class DefaultLinting
 @Inject constructor(objectFactory: ObjectFactory, projectLayout: ProjectLayout) : LintingInternal {
 

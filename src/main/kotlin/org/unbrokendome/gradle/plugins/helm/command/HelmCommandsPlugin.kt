@@ -9,6 +9,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.dsl.createHelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 
 
 class HelmCommandsPlugin
@@ -19,7 +20,16 @@ class HelmCommandsPlugin
         val helmExtension = createHelmExtension(project)
         project.extensions.add(HelmExtension::class.java, HELM_EXTENSION_NAME, helmExtension)
 
-        (helmExtension as ExtensionAware).extensions
-                .add(Linting::class.java, HELM_LINT_EXTENSION_NAME, createLinting(project.objects))
+
+        createLinting(project.objects)
+                .apply {
+                    enabled.set(
+                            project.booleanProviderFromProjectProperty("helm.lint.enabled"))
+                    strict.set(
+                            project.booleanProviderFromProjectProperty("helm.lint.strict"))
+
+                    (helmExtension as ExtensionAware).extensions
+                            .add(Linting::class.java, HELM_LINT_EXTENSION_NAME, this)
+                }
     }
 }

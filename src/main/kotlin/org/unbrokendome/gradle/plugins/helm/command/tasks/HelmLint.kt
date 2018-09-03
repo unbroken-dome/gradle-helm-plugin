@@ -17,7 +17,6 @@ import org.unbrokendome.gradle.plugins.helm.util.MapProperty
 import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
