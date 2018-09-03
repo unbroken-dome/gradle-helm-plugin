@@ -10,15 +10,13 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.command.DefaultHelmRunner
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
-import org.unbrokendome.gradle.plugins.helm.command.HelmRunner
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.util.andThen
 import org.unbrokendome.gradle.plugins.helm.util.property
-
-
-typealias HelmRunnerModifier = HelmRunner.() -> Unit
 
 
 /**
@@ -26,7 +24,9 @@ typealias HelmRunnerModifier = HelmRunner.() -> Unit
  */
 abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmExecProvider {
 
-    private val runnerModifiers = mutableListOf<HelmRunnerModifier>()
+    @Suppress("LeakingThis")
+    private val execProviderSupport = HelmExecProviderSupport(project, this)
+
 
     init {
         group = HELM_GROUP
@@ -54,30 +54,21 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
 
 
     /**
-     * Adds a modifier that will be applied to every Helm CLI invocation.
+     * Modifies the [HelmExecSpec] before a Helm command is executed.
+     *
+     * The default implementation does nothing. Subclasses can override this if they need to modify each
+     * invocation of a Helm CLI command.
+     *
+     * @receiver the [HelmExecSpec] to be executed
      */
-    protected fun withHelmRunner(modifier: HelmRunnerModifier) {
-        runnerModifiers.add(modifier)
-    }
+    protected open fun HelmExecSpec.modifyHelmExecSpec() { }
 
 
-    private fun createHelmRunner(command: String, subcommand: String? = null) =
-            DefaultHelmRunner(project, this, command, subcommand)
-                    .apply {
-                        runnerModifiers.forEach { it(this) }
-                    }
+    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
+            execProviderSupport.execHelm(command, subcommand,
+                    action.andThen { modifyHelmExecSpec() })
 
 
-    /**
-     * Execute a Helm CLI command with the settings of this task.
-     */
-    fun execHelm(command: String, subcommand: String? = null,
-                           spec: HelmRunner.() -> Unit): ExecResult =
-            createHelmRunner(command, subcommand)
-                    .apply(spec)
-                    .run()
-
-
-    override fun execHelm(command: String, subcommand: String?, spec: Action<HelmRunner>): ExecResult =
-            execHelm(command, subcommand, spec::execute)
+    protected fun execHelm(command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit): ExecResult =
+            execHelm(command, subcommand, Action(action))
 }

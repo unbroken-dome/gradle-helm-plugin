@@ -3,17 +3,14 @@ package org.unbrokendome.gradle.plugins.helm.command
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 
 
 /**
  * Configures and executes a Helm CLI command.
  */
-interface HelmRunner {
+interface HelmExecSpec {
 
     /**
      * Adds some arguments to the CLI invocation.
@@ -105,147 +102,110 @@ interface HelmRunner {
     fun environment(name: String, provider: Provider<out Any>)
 
     /**
-     * If true (the default), the [run] method will fail with an exception if the process returns
+     * If true (the default), executing the command will fail with an exception if the process returns
      * a non-zero exit code.
      */
     fun assertSuccess(assertSuccess: Boolean = true)
 
     /**
-     * Invokes the Helm command with the current configuration.
+     * Adds an action that directly manipulates the underlying [ExecSpec].
      *
-     * @return an [ExecResult] indicating the result of the invocation
+     * @param action the action to execute on the [ExecSpec]
      */
-    fun run(): ExecResult
+    fun withExecSpec(action: Action<ExecSpec>)
+
+    /**
+     * Adds an action that directly manipulates the underlying [ExecSpec].
+     *
+     * @param action the action to execute on the [ExecSpec]
+     */
+    @JvmDefault
+    fun withExecSpec(action: ExecSpec.() -> Unit) =
+            withExecSpec(Action(action))
 }
 
 
 /**
- * Default implementation of [HelmRunner].
+ * Default implementation of [HelmExecSpec].
  *
  * Uses Gradle's [Project.exec] to invoke the Helm CLI.
  */
-internal class DefaultHelmRunner(
-        private val execFn: ((ExecSpec) -> Unit) -> ExecResult,
-        private val globalOptions: GlobalHelmOptions,
-        private val command: String,
-        private val subcommand: String?)
-    : HelmRunner {
+internal class DefaultHelmExecSpec(
+        private val execSpec: ExecSpec,
+        globalOptions: GlobalHelmOptions,
+        command: String,
+        subcommand: String?)
+    : HelmExecSpec {
 
-    constructor(project: Project,
-                globalOptions: GlobalHelmOptions,
-                command: String,
-                subcommand: String?)
-    : this({ project.exec(it) }, globalOptions, command, subcommand)
-
-
-    private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val actions = mutableListOf<Action<ExecSpec>>()
-    private var assertSuccess: Boolean = true
 
     init {
+        execSpec.executable = globalOptions.executable.getOrElse("helm")
+
+        execSpec.args(command)
+        subcommand?.let { execSpec.args(it) }
+
         environment("HELM_HOME", globalOptions.home)
         flag("--debug", globalOptions.debug)
     }
 
 
     override fun args(vararg args: Any) {
-        actions.add(Action { it.args(*args) })
+        execSpec.args(*args)
     }
 
 
     override fun args(provider: Provider<out Any>) {
-        actions.add(Action { spec ->
-            provider.ifPresent { value ->
-                if (value is Collection<*>) {
-                    spec.args(*value.toTypedArray())
-                } else {
-                    spec.args(value)
-                }
+        provider.ifPresent { value ->
+            if (value is Collection<*>) {
+                execSpec.args(*value.toTypedArray())
+            } else {
+                execSpec.args(value)
             }
-        })
+        }
     }
 
 
     override fun flag(name: String, value: Boolean, defaultValue: Boolean) {
         if (value != defaultValue) {
-            actions.add(Action { spec ->
-                spec.args(if (value) name else "$name=false")
-            })
+            execSpec.args(if (value) name else "$name=false")
         }
     }
 
 
     override fun flag(name: String, provider: Provider<Boolean>, defaultValue: Boolean) {
-        actions.add(Action { spec ->
-            provider.orNull
-                    ?.takeIf { it != defaultValue }
-                    ?.let { value ->
-                        spec.args(if (value) name else "$name=false")
-                    }
-        })
+        provider.orNull
+                ?.takeIf { it != defaultValue }
+                ?.let { value ->
+                    execSpec.args(if (value) name else "$name=false")
+                }
     }
 
 
     override fun option(name: String, value: Any) {
-        actions.add(Action { spec ->
-            spec.args(name, value)
-        })
+        execSpec.args(name, value)
     }
 
 
     override fun option(name: String, provider: Provider<out Any>) {
-        actions.add(Action { spec ->
-            provider.ifPresent { value ->
-                spec.args(name, value)
-            }
-        })
+        provider.ifPresent { value ->
+            option(name, value)
+        }
     }
 
 
     override fun environment(name: String, provider: Provider<out Any>) {
-        actions.add(Action { spec ->
-            provider.ifPresent { value ->
-                spec.environment(name, value)
-            }
-        })
+        provider.ifPresent { value ->
+            execSpec.environment(name, value)
+        }
     }
 
 
     override fun assertSuccess(assertSuccess: Boolean) {
-        this.assertSuccess = assertSuccess
+        execSpec.isIgnoreExitValue = !assertSuccess
     }
 
 
-    private fun apply(spec: ExecSpec) {
-        spec.executable = globalOptions.executable.getOrElse("helm")
-        spec.isIgnoreExitValue = !assertSuccess
-
-        spec.args(command)
-        subcommand?.let { spec.args(it) }
-
-        actions.forEach { it.execute(spec) }
-
-        globalOptions.extraArgs.ifPresent { extraArgs ->
-            spec.args(extraArgs)
-        }
+    override fun withExecSpec(action: Action<ExecSpec>) {
+        action.execute(execSpec)
     }
-
-
-    override fun run(): ExecResult =
-        execFn { spec ->
-            apply(spec)
-            if (logger.isInfoEnabled) {
-                logger.info("Executing: {}", maskCommandLine(spec.commandLine))
-            }
-        }
-
-
-    private fun maskCommandLine(commandLine: List<String>): List<String> =
-            commandLine.mapIndexed { index, arg ->
-                if (index > 0 && shouldMaskOptionValue(commandLine[index - 1])) "******" else arg
-            }
-
-
-    private fun shouldMaskOptionValue(arg: String) =
-            arg.startsWith("--") && arg.contains("password")
 }

@@ -8,7 +8,11 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.process.ExecResult
-import org.unbrokendome.gradle.plugins.helm.command.*
+import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
@@ -48,8 +52,12 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions, HelmServerOptions
 
 
 private open class DefaultHelmExtension
-@Inject constructor(private val project: Project)
+@Inject constructor(project: Project)
     : HelmExtension {
+
+    @Suppress("LeakingThis")
+    private val execProviderSupport = HelmExecProviderSupport(project, this)
+
 
     override val executable =
             project.objects.property(
@@ -97,10 +105,8 @@ private open class DefaultHelmExtension
                             .orElse(project.layout.buildDirectory.dir("helm/charts")))
 
 
-    override fun execHelm(command: String, subcommand: String?, spec: Action<HelmRunner>): ExecResult =
-            DefaultHelmRunner(project, this, command, subcommand)
-                    .also(spec::execute)
-                    .run()
+    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
+            execProviderSupport.execHelm(command, subcommand, action)
 }
 
 

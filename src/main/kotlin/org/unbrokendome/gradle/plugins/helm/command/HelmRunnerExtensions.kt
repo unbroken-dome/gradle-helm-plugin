@@ -13,7 +13,7 @@ import org.unbrokendome.gradle.plugins.helm.util.MapProperty
  *        using `--set-string`; other types of values will be added using `--set`.
  * @param valueFiles a [FileCollection] of YAML files containing additional values to pass to the command.
  */
-fun HelmRunner.valuesOptions(
+fun HelmExecSpec.valuesOptions(
         values: MapProperty<String, Any>,
         valueFiles: FileCollection) {
 
