@@ -2,8 +2,8 @@ package org.unbrokendome.gradle.plugins.helm.rules
 
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
@@ -38,6 +38,7 @@ internal class AddRepositoryTaskRule(
                             task.description = "Registers the ${repository.name} repository."
                             task.repositoryName.set(repository.name)
                             task.url.set(repository.url)
+                            task.caFile.set(repository.caFile)
 
                             repository.configuredCredentials.ifPresent { credentials ->
                                 when (credentials) {

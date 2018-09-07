@@ -3,6 +3,8 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
@@ -23,22 +25,29 @@ interface HelmRepository : Named, CredentialsContainer {
      * The URL of this repository.
      */
     val url: Property<URI>
+
+    /**
+     * An optional path to a CA bundle used to verify certificates of HTTPS-enabled servers.
+     */
+    val caFile: RegularFileProperty
 }
 
 
 private open class DefaultHelmRepository
 private constructor(private val name: String,
                     objectFactory: ObjectFactory,
+                    projectLayout: ProjectLayout,
                     credentialsContainer: CredentialsContainer)
     : HelmRepository, CredentialsContainer by credentialsContainer {
 
 
-    private constructor(name: String, objectFactory: ObjectFactory, credentialsFactory: CredentialsFactory)
-            : this(name, objectFactory, CredentialsContainerSupport(objectFactory, credentialsFactory))
+    private constructor(name: String, objectFactory: ObjectFactory,
+                        projectLayout: ProjectLayout, credentialsFactory: CredentialsFactory)
+            : this(name, objectFactory, projectLayout, CredentialsContainerSupport(objectFactory, credentialsFactory))
 
 
-    @Inject constructor(name: String, objectFactory: ObjectFactory)
-            : this(name, objectFactory, DefaultCredentialsFactory(objectFactory))
+    @Inject constructor(name: String, objectFactory: ObjectFactory, projectLayout: ProjectLayout)
+            : this(name, objectFactory, projectLayout, DefaultCredentialsFactory(objectFactory))
 
 
     override fun getName(): String =
@@ -47,6 +56,10 @@ private constructor(private val name: String,
 
     override val url: Property<URI> =
             objectFactory.property()
+
+
+    override val caFile: RegularFileProperty =
+            projectLayout.fileProperty()
 }
 
 
