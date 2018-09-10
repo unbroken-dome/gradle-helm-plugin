@@ -48,3 +48,9 @@ const val HELM_DEPENDENCIES_EXTENSION_NAME = "dependencies"
  * The name of the special "main" chart.
  */
 const val HELM_MAIN_CHART_NAME = "main"
+
+
+/**
+ * The name of the `releases` DSL sub.extension.
+ */
+const val HELM_RELEASES_EXTENSION_NAME = "releases"

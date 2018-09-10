@@ -66,6 +66,10 @@ gradlePlugin {
             id = "org.unbroken-dome.helm-publish"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.publishing.HelmPublishPlugin"
         }
+        "helmReleasesPlugin" {
+            id = "org.unbroken-dome.helm-releases"
+            implementationClass = "org.unbrokendome.gradle.plugins.helm.release.HelmReleasesPlugin"
+        }
     }
 }
 
@@ -85,6 +89,9 @@ pluginBundle {
         }
         "helmPublishPlugin" {
             displayName = "Helm Publish Plugin"
+        }
+        "helmReleasesPlugin" {
+            displayName = "Helm Releases Plugin"
         }
     }
 }
