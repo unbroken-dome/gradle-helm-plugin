@@ -69,14 +69,6 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
 
 
     /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
-     */
-    @get:Internal
-    val timeoutSeconds: Property<Int> =
-            project.objects.emptyProperty()
-
-
-    /**
      * Values to be used for the release.
      */
     @get:Input
@@ -122,7 +114,6 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
             flag("--replace", replace)
             flag("--dry-run", dryRun)
 
-            option("--timeout", timeoutSeconds)
             flag("--wait", wait)
 
             args(chart)

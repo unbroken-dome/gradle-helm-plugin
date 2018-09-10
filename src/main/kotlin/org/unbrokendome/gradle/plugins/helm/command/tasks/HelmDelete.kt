@@ -37,14 +37,6 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
             project.objects.emptyProperty()
 
 
-    /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
-     */
-    @get:Internal
-    val timeoutSeconds: Property<Int> =
-            project.objects.emptyProperty()
-
-
     init {
         @Suppress("LeakingThis")
         inputs.dir(home)
@@ -55,7 +47,6 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
     fun deleteRelease() {
         execHelm("delete") {
             flag("--purge", purge)
-            option("--timeout", timeoutSeconds)
             flag("--dry-run", dryRun)
             args(releaseName)
         }

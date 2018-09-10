@@ -4,7 +4,10 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
 import org.unbrokendome.gradle.plugins.helm.util.MapProperty
 import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
@@ -92,14 +95,6 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
 
 
     /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
-     */
-    @get:Internal
-    val timeoutSeconds: Property<Int> =
-            project.objects.emptyProperty()
-
-
-    /**
      * Values to be used for the release.
      */
     @get:Input
@@ -142,7 +137,6 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
             flag("--recreate-pods", recreatePods)
             flag("--reset-values", resetValues)
             flag("--reuse-values", reuseValues)
-            option("--timeout", timeoutSeconds)
             flag("--wait", wait)
             flag("--dry-run", dryRun)
             args(releaseName)

@@ -29,19 +29,10 @@ class HelmTest : AbstractHelmServerCommandTask() {
             project.objects.emptyProperty()
 
 
-    /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
-     */
-    @get:Internal
-    val timeoutSeconds: Property<Int> =
-            project.objects.emptyProperty()
-
-
     @TaskAction
     fun test() {
         execHelm("test") {
             flag("--cleanup", cleanup)
-            option("--timout", timeoutSeconds)
             args(releaseName)
         }
     }

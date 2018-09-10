@@ -3,6 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
@@ -35,8 +36,14 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), HelmSe
             project.objects.property(project.helm.tillerNamespace)
 
 
+    @get:Internal
+    override val timeoutSeconds: Property<Int> =
+            project.objects.property(project.helm.timeoutSeconds)
+
+
     override fun HelmExecSpec.modifyHelmExecSpec() {
         option("--kube-context", kubeContext)
+        option("--timeout", timeoutSeconds)
         environment("HELM_HOST", host)
         environment("TILLER_NAMESPACE", tillerNamespace)
         environment("KUBECONFIG", kubeConfig)

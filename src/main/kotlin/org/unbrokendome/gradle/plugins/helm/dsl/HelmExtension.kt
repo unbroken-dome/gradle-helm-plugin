@@ -15,6 +15,7 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.orElse
@@ -93,6 +94,10 @@ private open class DefaultHelmExtension
     override val tillerNamespace: Property<String> =
             project.objects.property(
                     project.providerFromProjectProperty("helm.tillerNamespace"))
+
+
+    override val timeoutSeconds: Property<Int> =
+            project.objects.emptyProperty()
 
 
     override val extraArgs: ListProperty<String> =
