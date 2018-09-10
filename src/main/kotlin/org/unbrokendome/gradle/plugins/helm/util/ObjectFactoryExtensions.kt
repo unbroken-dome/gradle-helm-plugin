@@ -4,6 +4,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 
 
 /**
@@ -60,3 +61,12 @@ inline fun <reified T : Any> ObjectFactory.property(initialProvider: Provider<ou
  */
 inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
         listProperty(T::class.java)
+
+
+/**
+ * Creates a new [SetProperty] to hold a list of values of the given type.
+ *
+ * @param T the type of element
+ */
+inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
+        setProperty(T::class.java)

@@ -54,10 +54,21 @@ class HelmInstallReleaseTaskRule(
                             task.wait.set(release.wait)
 
                             task.dependsOn(HelmPlugin.initServerTaskName)
+
                             task.dependsOn(TaskDependency {
                                 release.chart.orNull
                                         ?.buildDependencies?.getDependencies(it)
                                         ?: emptySet()
+                            })
+
+                            // Make sure all releases that this release depends on are installed first
+                            task.dependsOn(TaskDependency {
+                                release.dependsOn.get()
+                                        .mapNotNull { dependencyReleaseName ->
+                                            val dependencyTaskName = getTaskName(dependencyReleaseName)
+                                            tasks.findByName(dependencyTaskName)
+                                        }
+                                        .toSet()
                             })
                         }
                     }

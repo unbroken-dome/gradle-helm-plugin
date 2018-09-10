@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmDelete
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
@@ -45,6 +46,19 @@ internal class HelmDeleteReleaseTaskRule(
                             task.purge.set(release.purge)
 
                             task.dependsOn(HelmPlugin.initServerTaskName)
+
+                            // Make sure all dependent releases are deleted first
+                            task.dependsOn(TaskDependency {
+                                releases
+                                        .matching { otherRelease ->
+                                            otherRelease != release &&
+                                                    release.name in otherRelease.dependsOn.get()
+                                        }
+                                        .mapNotNull { dependentRelease ->
+                                            tasks.findByName(dependentRelease.deleteTaskName)
+                                        }
+                                        .toSet()
+                            })
                         }
                     }
         }

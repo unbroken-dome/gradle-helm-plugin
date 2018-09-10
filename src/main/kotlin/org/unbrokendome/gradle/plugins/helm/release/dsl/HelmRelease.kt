@@ -9,14 +9,17 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
+import org.unbrokendome.gradle.plugins.helm.util.FixedValueProvider
 import org.unbrokendome.gradle.plugins.helm.util.MapProperty
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
 import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.setProperty
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
@@ -172,6 +175,40 @@ interface HelmRelease : Named {
      * A collection of YAML files containing values for this release.
      */
     val valueFiles: ConfigurableFileCollection
+
+
+    /**
+     * Names of other releases that this release depends on.
+     *
+     * A dependency between two releases will create task dependencies such that the dependency will be installed
+     * before, and deleted after, the dependent release.
+     *
+     * Currently such dependencies can be expressed only within the same project.
+     */
+    val dependsOn: SetProperty<String>
+
+
+    /**
+     * Express a dependency on another release.
+     *
+     * A dependency between two releases will create task dependencies such that the dependency will be installed
+     * before, and deleted after, the dependent release.
+     *
+     * Currently such dependencies can be expressed only within the same project.
+     */
+    fun dependsOn(releaseName: String) {
+        this.dependsOn.add(releaseName)
+    }
+
+
+    /**
+     * Express a dependency on several other releases.
+     */
+    @JvmDefault
+    fun dependsOn(vararg releaseNames: String) {
+        this.dependsOn.addAll(
+                FixedValueProvider(releaseNames.asIterable()))
+    }
 }
 
 
@@ -249,6 +286,10 @@ private open class DefaultHelmRelease
 
     override val valueFiles: ConfigurableFileCollection =
             project.layout.configurableFiles()
+
+
+    override val dependsOn: SetProperty<String> =
+            project.objects.setProperty()
 
 
     override fun from(notation: Any) {
