@@ -6,8 +6,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.HELM_RELEASES_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
+import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.helmReleaseContainer
@@ -21,7 +20,6 @@ class HelmReleasesPlugin : Plugin<Project> {
 
 
     internal companion object {
-        const val initServerTaskName = "helmInitServer"
         const val installAllTaskName = "helmInstall"
         const val deleteAllTaskName = "helmDelete"
     }
@@ -29,7 +27,7 @@ class HelmReleasesPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
 
-        project.plugins.apply(HelmCommandsPlugin::class.java)
+        project.plugins.apply(HelmPlugin::class.java)
 
         val releases = createReleasesExtension(project)
 
@@ -38,7 +36,6 @@ class HelmReleasesPlugin : Plugin<Project> {
             addRule(HelmDeleteReleaseTaskRule(this, releases))
         }
 
-        createInitServerTask(project)
         createInstallAllReleasesTask(project, releases)
         createDeleteAllReleasesTask(project, releases)
     }
@@ -50,13 +47,6 @@ class HelmReleasesPlugin : Plugin<Project> {
                         (project.helm as ExtensionAware)
                                 .extensions.add(HELM_RELEASES_EXTENSION_NAME, this)
                     }
-
-
-    private fun createInitServerTask(project: Project) {
-        project.tasks.create(initServerTaskName, HelmInit::class.java) { task ->
-            task.skipRefresh.set(true)
-        }
-    }
 
 
     private fun createInstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {

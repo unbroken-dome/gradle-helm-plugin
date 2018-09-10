@@ -3,7 +3,12 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.unbrokendome.gradle.plugins.helm.*
+import org.unbrokendome.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_DEPENDENCIES_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_REPOSITORIES_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_TILLLER_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 
@@ -13,6 +18,13 @@ import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
  */
 val Project.helm: HelmExtension
     get() = extensions.getByType(HelmExtension::class.java)
+
+
+/**
+ * Gets the [Tiller] sub-extension.
+ */
+val HelmExtension.tiller: Tiller
+    get() = requiredExtension(HELM_TILLLER_EXTENSION_NAME)
 
 
 /**

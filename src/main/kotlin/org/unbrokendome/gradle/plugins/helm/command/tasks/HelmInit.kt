@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
@@ -67,6 +68,22 @@ open class HelmInit : AbstractHelmCommandTask() {
     @get:[Input Optional]
     val tillerImage: Property<String> =
             project.objects.property()
+
+
+    /**
+     * Upgrade if Tiller is already installed.
+     */
+    @get:[Input Optional]
+    val upgrade: Property<Boolean> =
+            project.objects.emptyProperty()
+
+
+    /**
+     * If `true`, block until Tiller is running and ready to receive requests.
+     */
+    @get:Internal
+    val wait: Property<Boolean> =
+            project.objects.emptyProperty()
 
 
     init {

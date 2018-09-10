@@ -2,8 +2,8 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.TaskContainer
+import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmDelete
-import org.unbrokendome.gradle.plugins.helm.release.HelmReleasesPlugin
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
@@ -44,7 +44,7 @@ internal class HelmDeleteReleaseTaskRule(
                             task.dryRun.set(release.dryRun)
                             task.purge.set(release.purge)
 
-                            task.dependsOn(HelmReleasesPlugin.initServerTaskName)
+                            task.dependsOn(HelmPlugin.initServerTaskName)
                         }
                     }
         }

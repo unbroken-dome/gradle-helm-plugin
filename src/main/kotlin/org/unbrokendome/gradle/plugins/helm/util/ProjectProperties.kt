@@ -59,6 +59,33 @@ fun Project.booleanProviderFromProjectProperty(propertyName: String): Provider<B
 
 
 /**
+ * Returns a [Provider] that provides the given project property if it is available, interpreting its value
+ * as an integer.
+ *
+ * The project property is resolved as per [Project.property].
+ *
+ * If the type of the property value is a [Number], the provider will return its integer value;
+ * if it is a [String], the provider will convert it to an integer. The provider will throw
+ * an exception if the property is not a `Number` or `String`.
+ *
+ * @receiver the Gradle [Project]
+ * @param propertyName the name of the property
+ * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
+ *         not exist
+ */
+fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> =
+        provider {
+            project.findProperty(propertyName)?.let { value ->
+                when (value) {
+                    is Number -> value.toInt()
+                    is String -> value.toInt()
+                    else -> throw IllegalArgumentException("Value cannot be converted to an Integer: $value")
+                }
+            }
+        }
+
+
+/**
  * Returns a [Provider] that provides the given project property if it is available, interpreting as the path of
  * a directory.
  *

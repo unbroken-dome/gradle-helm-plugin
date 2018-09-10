@@ -7,12 +7,37 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
-import org.unbrokendome.gradle.plugins.helm.dsl.*
+import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
+import org.unbrokendome.gradle.plugins.helm.dsl.Linting
+import org.unbrokendome.gradle.plugins.helm.dsl.Tiller
+import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
+import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
+import org.unbrokendome.gradle.plugins.helm.dsl.createTiller
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.createChartDependencyHandler
-import org.unbrokendome.gradle.plugins.helm.rules.*
+import org.unbrokendome.gradle.plugins.helm.dsl.filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.helmChartContainer
+import org.unbrokendome.gradle.plugins.helm.dsl.helmRepositoryContainer
+import org.unbrokendome.gradle.plugins.helm.dsl.lint
+import org.unbrokendome.gradle.plugins.helm.dsl.repositories
+import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.BuildDependenciesTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
+import org.unbrokendome.gradle.plugins.helm.rules.ChartPackagedArtifactRule
+import org.unbrokendome.gradle.plugins.helm.rules.FilterSourcesTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.MainChartRule
+import org.unbrokendome.gradle.plugins.helm.rules.PackageTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
+import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
+import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
+import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.orElse
@@ -25,6 +50,7 @@ class HelmPlugin
 
     internal companion object {
         const val initClientTaskName = "helmInitClient"
+        const val initServerTaskName = "helmInitServer"
         const val addRepositoriesTaskName = "helmAddRepositories"
     }
 
@@ -33,16 +59,25 @@ class HelmPlugin
 
         project.plugins.apply(HelmCommandsPlugin::class.java)
 
+        val tiller = createTillerExtension(project)
         configureRepositories(project)
-
         createFilteringExtension(project)
-
         configureCharts(project)
 
-        project.tasks.create(initClientTaskName, HelmInit::class.java) { task ->
-            task.clientOnly.set(true)
-        }
+        createInitClientTask(project)
+        createInitServerTask(project, tiller)
     }
+
+
+    /**
+     * Creates and installs the `helm.tiller` sub-extension.
+     */
+    private fun createTillerExtension(project: Project) =
+            createTiller(project)
+                    .apply {
+                        (project.helm as ExtensionAware)
+                                .extensions.add(HELM_TILLLER_EXTENSION_NAME, this)
+                    }
 
 
     /**
@@ -265,5 +300,33 @@ class HelmPlugin
                         }
                     }
                 }
+    }
+
+
+    /**
+     * Creates the `helmInitClient` task.
+     */
+    private fun createInitClientTask(project: Project) {
+        project.tasks.create(initClientTaskName, HelmInit::class.java) { task ->
+            task.clientOnly.set(true)
+        }
+    }
+
+
+    /**
+     * Creates the `helmInitServer` task.
+     */
+    private fun createInitServerTask(project: Project, tiller: Tiller) {
+        project.tasks.create(initServerTaskName, HelmInit::class.java) { task ->
+            task.onlyIf { tiller.install.getOrElse(true) }
+            task.forceUpgrade.set(tiller.forceUpgrade)
+            task.historyMax.set(tiller.historyMax)
+            task.replicas.set(tiller.replicas)
+            task.serviceAccount.set(tiller.serviceAccount)
+            task.tillerImage.set(tiller.image)
+            task.upgrade.set(tiller.upgrade)
+            task.wait.set(tiller.wait)
+            task.skipRefresh.set(true)
+        }
     }
 }
