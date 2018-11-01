@@ -71,7 +71,7 @@ open class HelmLint : AbstractHelmCommandTask() {
 
     init {
         @Suppress("LeakingThis")
-        inputs.dir(home)
+        inputs.dir(actualHelmHome)
     }
 
 

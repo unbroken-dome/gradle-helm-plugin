@@ -64,7 +64,7 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
 
     init {
         @Suppress("LeakingThis")
-        inputs.dir(home)
+        inputs.dir(actualHelmHome)
     }
 
 

@@ -39,7 +39,7 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
 
     init {
         @Suppress("LeakingThis")
-        inputs.dir(home)
+        inputs.dir(actualHelmHome)
     }
 
 
