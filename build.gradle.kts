@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm") version "1.2.41"
+    kotlin("jvm") version "1.3.10"
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish") version "0.10.0"
     id("org.jetbrains.dokka") version "0.9.17"
