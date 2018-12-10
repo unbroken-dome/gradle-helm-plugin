@@ -5,6 +5,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
@@ -39,6 +40,7 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
      *
      * Use this when the [chart] property contains only a simple chart reference, without a symbolic repository name.
      */
+    @get:[Input Optional]
     val repository: Property<URI> =
             project.objects.property()
 
