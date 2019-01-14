@@ -7,40 +7,14 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.dsl.Tiller
-import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
-import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
-import org.unbrokendome.gradle.plugins.helm.dsl.createTiller
+import org.unbrokendome.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.createChartDependencyHandler
-import org.unbrokendome.gradle.plugins.helm.dsl.filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.helmChartContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.helmRepositoryContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.lint
-import org.unbrokendome.gradle.plugins.helm.dsl.repositories
-import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.BuildDependenciesTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.rules.ChartPackagedArtifactRule
-import org.unbrokendome.gradle.plugins.helm.rules.FilterSourcesTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.MainChartRule
-import org.unbrokendome.gradle.plugins.helm.rules.PackageTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
-import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
-import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
-import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
+import org.unbrokendome.gradle.plugins.helm.rules.*
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.orElse
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.toUri
 
@@ -186,14 +160,11 @@ class HelmPlugin
             createFiltering(project.objects)
                     .apply {
                         enabled.set(
-                                project.booleanProviderFromProjectProperty("helm.filtering.enabled")
-                                        .orElse(true))
+                                project.booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true))
                         placeholderPrefix.set(
-                                project.providerFromProjectProperty("helm.filtering.placeholderPrefix")
-                                        .orElse("\${"))
+                                project.providerFromProjectProperty("helm.filtering.placeholderPrefix", defaultValue = "\${"))
                         placeholderSuffix.set(
-                                project.providerFromProjectProperty("helm.filtering.placeholderSuffix")
-                                        .orElse("}"))
+                                project.providerFromProjectProperty("helm.filtering.placeholderSuffix", defaultValue = "}"))
 
                         (project.helm as ExtensionAware)
                                 .extensions.add(Filtering::class.java, HELM_FILTERING_EXTENSION_NAME, this)

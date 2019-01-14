@@ -5,7 +5,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
@@ -19,7 +18,8 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:Input
     val clientOnly: Property<Boolean> =
-            project.objects.property(false)
+            project.objects.property<Boolean>()
+                    .convention(false)
 
 
     /**
@@ -27,7 +27,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val forceUpgrade: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -35,7 +35,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val historyMax: Property<Int> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -43,7 +43,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val replicas: Property<Int> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -59,7 +59,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val skipRefresh: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -75,7 +75,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val upgrade: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -83,7 +83,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     init {

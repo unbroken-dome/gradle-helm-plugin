@@ -9,8 +9,8 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
+import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
@@ -32,7 +32,7 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of other properties")
     val chartDir: DirectoryProperty =
-            project.layout.directoryProperty()
+            project.objects.directoryProperty()
 
 
     /**
@@ -77,7 +77,7 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
      */
     @Internal
     val skipRefresh: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     @TaskAction

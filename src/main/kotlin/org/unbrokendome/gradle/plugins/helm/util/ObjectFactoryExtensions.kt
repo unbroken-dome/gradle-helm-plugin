@@ -1,10 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
-import org.gradle.api.provider.SetProperty
+import org.gradle.api.provider.*
 
 
 /**
@@ -14,44 +11,7 @@ import org.gradle.api.provider.SetProperty
  * @return the property
  */
 inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
-        property(T::class.java)
-
-
-/**
- * Creates a [Property] to hold values of the given type, initialized to be empty (i.e. holding no value).
- *
- * Use this for properties of standard Java data types like [Int], [Boolean] etc. that will get a default value
- * assigned by Gradle.
- *
- * @param T the type of the property
- * @return the property
- */
-inline fun <reified T : Any> ObjectFactory.emptyProperty(): Property<T> =
-        property(T::class.java).apply { this.set(null as T?) }
-
-
-/**
- * Creates a [Property] to hold values of the given type, initializing with a value.
- *
- * @param T the type of the property
- * @param initialValue the initial value. If this is `null` then the property will not have a value intiially.
- * @return the property
- */
-inline fun <reified T : Any> ObjectFactory.property(initialValue: T?): Property<T> =
-        property<T>().apply { set(initialValue) }
-
-
-/**
- * Creates a [Property] to hold values of the given type, initializing it with a provider.
- *
- * Equivalent to calling `set(initialProvider)` on the new property.
- *
- * @param T the type of the property
- * @param initialProvider the initial provider.
- * @return the property
- */
-inline fun <reified T : Any> ObjectFactory.property(initialProvider: Provider<out T>): Property<T> =
-        property<T>().apply { set(initialProvider) }
+        property(T::class.javaObjectType)
 
 
 /**
@@ -70,3 +30,13 @@ inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
  */
 inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
         setProperty(T::class.java)
+
+
+/**
+ * Creates a new [MapProperty] to hold a map of the given key and value type.
+ *
+ * @param K the type of key
+ * @param V the type of value
+ */
+inline fun <reified K : Any, reified V : Any> ObjectFactory.mapProperty(): MapProperty<K, V> =
+        mapProperty(K::class.java, V::class.java)

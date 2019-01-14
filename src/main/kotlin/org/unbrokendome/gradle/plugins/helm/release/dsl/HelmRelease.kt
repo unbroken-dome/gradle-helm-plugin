@@ -7,19 +7,13 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.util.FixedValueProvider
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.setProperty
+import org.unbrokendome.gradle.plugins.helm.util.*
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
@@ -206,8 +200,7 @@ interface HelmRelease : Named {
      */
     @JvmDefault
     fun dependsOn(vararg releaseNames: String) {
-        this.dependsOn.addAll(
-                FixedValueProvider(releaseNames.asIterable()))
+        this.dependsOn.addAll(*releaseNames)
     }
 }
 
@@ -223,7 +216,8 @@ private open class DefaultHelmRelease
 
 
     override val releaseName: Property<String> =
-            project.objects.property(name)
+            project.objects.property<String>()
+                    .convention(name)
 
 
     override val chart: Property<ChartReference> =
@@ -264,24 +258,26 @@ private open class DefaultHelmRelease
 
 
     override val dryRun: Property<Boolean> =
-            project.objects.property(
-                    project.booleanProviderFromProjectProperty("helm.dryRun"))
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
 
 
     override val wait: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     override val replace: Property<Boolean> =
-            project.objects.property(false)
+            project.objects.property<Boolean>()
+                    .convention(false)
 
 
     override val purge: Property<Boolean> =
-            project.objects.property(false)
+            project.objects.property<Boolean>()
+                    .convention(false)
 
 
     override val values: MapProperty<String, Any> =
-            mapProperty()
+            project.objects.mapProperty()
 
 
     override val valueFiles: ConfigurableFileCollection =

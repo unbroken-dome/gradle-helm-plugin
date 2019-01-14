@@ -3,6 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -13,10 +14,7 @@ import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
-import org.unbrokendome.gradle.plugins.helm.util.ifPresent
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.unbrokendome.gradle.plugins.helm.util.*
 
 
 /**
@@ -31,7 +29,7 @@ open class HelmLint : AbstractHelmCommandTask() {
     @get:[InputDirectory SkipWhenEmpty]
     @Suppress("LeakingThis")
     val chartDir: DirectoryProperty =
-            newInputDirectory()
+            project.objects.directoryProperty()
 
 
     /**
@@ -39,7 +37,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val strict: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -47,7 +45,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:Input
     val values: MapProperty<String, Any> =
-            mapProperty()
+            project.objects.mapProperty()
 
 
     /**
@@ -66,7 +64,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:[OutputFile Optional]
     val outputMarkerFile: RegularFileProperty =
-            project.layout.fileProperty()
+            project.objects.fileProperty()
 
 
     init {

@@ -5,7 +5,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.intProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.orElse
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import javax.inject.Inject
@@ -77,50 +76,48 @@ private open class DefaultTiller
 
 
     override val install: Property<Boolean> =
-            project.objects.property(
-                    project.booleanProviderFromProjectProperty("helm.tiller.install")
-                            .orElse(true))
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.tiller.install", defaultValue = true))
 
 
     override val namespace: Property<String> =
-            project.objects.property(
-                    project.providerFromProjectProperty("helm.tiller.namespace"))
+            project.objects.property<String>()
+                    .convention(project.providerFromProjectProperty("helm.tiller.namespace"))
 
 
     override val forceUpgrade: Property<Boolean> =
-            project.objects.property(
-                    project.booleanProviderFromProjectProperty("helm.tiller.forceUpgrade"))
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.tiller.forceUpgrade"))
 
 
     override val historyMax: Property<Int> =
-            project.objects.property(
-                    project.intProviderFromProjectProperty("helm.tiller.historyMax"))
+            project.objects.property<Int>()
+                    .convention(project.intProviderFromProjectProperty("helm.tiller.historyMax"))
 
 
     override val replicas: Property<Int> =
-            project.objects.property(
-                    project.intProviderFromProjectProperty("helm.tiller.replicas"))
+            project.objects.property<Int>()
+                    .convention(project.intProviderFromProjectProperty("helm.tiller.replicas"))
 
 
     override val serviceAccount: Property<String> =
-            project.objects.property(
-                    project.providerFromProjectProperty("helm.tiller.serviceAccount"))
+            project.objects.property<String>()
+                    .convention(project.providerFromProjectProperty("helm.tiller.serviceAccount"))
 
 
     override val image: Property<String> =
-            project.objects.property(
-                    project.providerFromProjectProperty("helm.tiller.image"))
+            project.objects.property<String>()
+                    .convention(project.providerFromProjectProperty("helm.tiller.image"))
 
 
     override val upgrade: Property<Boolean> =
-            project.objects.property(
-                    project.booleanProviderFromProjectProperty("helm.tiller.upgrade"))
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.tiller.upgrade"))
 
 
     override val wait: Property<Boolean> =
-            project.objects.property(
-                    project.booleanProviderFromProjectProperty("helm.tiller.wait")
-                            .orElse(true))
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.tiller.wait", defaultValue = true))
 }
 
 

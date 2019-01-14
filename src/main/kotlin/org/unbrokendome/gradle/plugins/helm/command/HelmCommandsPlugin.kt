@@ -10,7 +10,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.dsl.createHelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.orElse
 
 
 class HelmCommandsPlugin
@@ -25,8 +24,7 @@ class HelmCommandsPlugin
         createLinting(project.objects)
                 .apply {
                     enabled.set(
-                            project.booleanProviderFromProjectProperty("helm.lint.enabled")
-                                    .orElse(true))
+                            project.booleanProviderFromProjectProperty("helm.lint.enabled", true))
                     strict.set(
                             project.booleanProviderFromProjectProperty("helm.lint.strict"))
 

@@ -3,14 +3,13 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.File
@@ -49,7 +48,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -57,7 +56,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val install: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -74,7 +73,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val recreatePods: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -82,7 +81,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val resetValues: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -91,7 +90,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val reuseValues: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -99,7 +98,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val values: MapProperty<String, Any> =
-            mapProperty()
+            project.objects.mapProperty()
 
 
     /**
@@ -124,7 +123,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     @TaskAction

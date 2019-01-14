@@ -45,28 +45,3 @@ internal fun Provider<String>.asGString(evalRoot: Any): Provider<String> =
  */
 internal fun Provider<String>.toUri(): Provider<URI> =
         map(URI::create)
-
-
-/**
- * Returns a new [Provider] that uses the given provider as a fallback if this provider does not have a value.
- *
- * The fallback provider may or may not have a value. If both this provider and the fallback provider have no value,
- * then the returned provider will not have a value either.
- *
- * @receiver the provider
- * @param fallbackProvider the fallback provider
- * @return the combined [Provider]
- */
-internal inline fun <reified T : Any> Provider<T>.orElse(fallbackProvider: Provider<out T>): Provider<T> =
-        FallbackProvider(T::class.java, this, fallbackProvider)
-
-
-/**
- * Returns a new [Provider] that uses the given default value as a fallback if this provider does not have a value.
- *
- * @receiver the provider
- * @param defaultValue the default value
- * @return the combined [Provider]
- */
-internal inline fun <reified T : Any> Provider<T>.orElse(defaultValue: T): Provider<T> =
-        orElse(FixedValueProvider(defaultValue))

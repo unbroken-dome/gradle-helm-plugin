@@ -24,9 +24,8 @@ open class HelmPublishChart : DefaultTask() {
      * The chart package file to be published.
      */
     @get:InputFile
-    @Suppress("LeakingThis")
     val chartFile: RegularFileProperty =
-            newInputFile()
+            project.objects.fileProperty()
 
 
     /**

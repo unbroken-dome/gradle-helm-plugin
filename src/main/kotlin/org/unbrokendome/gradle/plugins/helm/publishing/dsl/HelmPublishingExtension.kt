@@ -2,7 +2,6 @@ package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.publishing.HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME
 import javax.inject.Inject
 

@@ -27,7 +27,8 @@ private open class DefaultHelmChartPublishConvention
     : HelmChartPublishConvention {
 
     override val publish: Property<Boolean> =
-            objectFactory.property(true)
+            objectFactory.property<Boolean>()
+                    .convention(true)
 }
 
 

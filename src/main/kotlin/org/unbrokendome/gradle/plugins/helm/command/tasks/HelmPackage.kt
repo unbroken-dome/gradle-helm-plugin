@@ -14,7 +14,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
@@ -40,7 +39,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Input
     val updateDependencies: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -49,7 +48,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
     @get:InputDirectory
     @Suppress("LeakingThis")
     val sourceDir: DirectoryProperty =
-            newInputDirectory()
+            project.objects.directoryProperty()
 
 
     /**
@@ -67,9 +66,10 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Input
     val chartName: Property<String> =
-            project.objects.property(chartDescriptor.map {
-                requireNotNull(it.name) { "Chart name must either be present in Chart.yaml, or specified explicitly" }
-            })
+            project.objects.property<String>()
+                    .convention(chartDescriptor.map {
+                        requireNotNull(it.name) { "Chart name must either be present in Chart.yaml, or specified explicitly" }
+                    })
 
 
     /**
@@ -79,9 +79,10 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Input
     val chartVersion: Property<String> =
-            project.objects.property(chartDescriptor.map {
-                requireNotNull(it.version) { "Chart version must either be present in Chart.yaml, or specified explicitly" }
-            })
+            project.objects.property<String>()
+                    .convention(chartDescriptor.map {
+                        requireNotNull(it.version) { "Chart version must either be present in Chart.yaml, or specified explicitly" }
+                    })
 
 
     /**
@@ -93,7 +94,8 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of chartOutputPath")
     val destinationDir: DirectoryProperty =
-            project.layout.directoryProperty(project.helm.outputDir)
+            project.objects.directoryProperty()
+                    .convention(project.helm.outputDir)
 
 
     /**
@@ -121,7 +123,8 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Input
     val saveToLocalRepo: Property<Boolean> =
-            project.objects.property(false)
+            project.objects.property<Boolean>()
+                    .convention(false)
 
 
     init {

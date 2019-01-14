@@ -1,9 +1,9 @@
 package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import javax.inject.Inject
@@ -44,7 +44,7 @@ interface Filtering {
      * Values to be resolved for placeholders.
      */
     @get:Input
-    val values: MapProperty<String, Any?>
+    val values: MapProperty<String, Any>
 }
 
 
@@ -61,18 +61,23 @@ private open class DefaultFiltering
 @Inject constructor(objectFactory: ObjectFactory) : FilteringInternal {
 
     override val enabled: Property<Boolean> =
-            objectFactory.property(true)
+            objectFactory.property<Boolean>()
+                    .convention(true)
 
 
     override val placeholderPrefix: Property<String> =
-            objectFactory.property(FILTERING_DEFAULT_PLACEHOLDER_PREFIX)
+            objectFactory.property<String>()
+                    .convention(FILTERING_DEFAULT_PLACEHOLDER_PREFIX)
 
 
     override val placeholderSuffix: Property<String> =
-            objectFactory.property(FILTERING_DEFAULT_PLACEHOLDER_SUFFIX)
+            objectFactory.property<String>()
+                    .convention(FILTERING_DEFAULT_PLACEHOLDER_SUFFIX)
 
 
-    override val values = mapProperty<String, Any?>()
+    override val values: MapProperty<String, Any> =
+            objectFactory.mapProperty<String, Any>().empty()
+
 
     override fun setParent(parent: Filtering) {
         enabled.set(parent.enabled)
@@ -84,7 +89,7 @@ private open class DefaultFiltering
 
 
 /**
- * Creates a new [Linting] object using the given [ObjectFactory].
+ * Creates a new [Filtering] object using the given [ObjectFactory].
  *
  * @param objectFactory the Gradle [ObjectFactory] to create the object
  * @param parent the optional parent [Filtering] object

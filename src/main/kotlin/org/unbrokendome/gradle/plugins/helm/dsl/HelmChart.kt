@@ -48,15 +48,17 @@ private open class DefaultHelmChart
 
 
     override val chartName: Property<String> =
-            project.objects.property(name)
+            project.objects.property<String>()
+                    .convention(name)
 
 
     override val chartVersion: Property<String> =
-            project.objects.property(project.versionProvider)
+            project.objects.property<String>()
+                    .convention(project.versionProvider)
 
 
     override val sourceDir: DirectoryProperty =
-            project.layout.directoryProperty()
+            project.objects.directoryProperty()
 
 
     override fun getBuildDependencies(): TaskDependency =

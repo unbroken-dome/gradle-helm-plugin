@@ -13,14 +13,7 @@ import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.intProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
-import org.unbrokendome.gradle.plugins.helm.util.orElse
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.*
 import javax.inject.Inject
 
 
@@ -82,50 +75,51 @@ private open class DefaultHelmExtension
     private val execProviderSupport = HelmExecProviderSupport(project, this)
 
 
-    override val executable =
-            project.objects.property(
-                    project.providerFromProjectProperty("helm.executable", evaluateGString = true)
-                            .orElse("helm"))
+    override val executable: Property<String> =
+            project.objects.property<String>()
+                    .convention(project.providerFromProjectProperty("helm.executable",
+                            defaultValue = "helm", evaluateGString = true))
 
 
     override val debug: Property<Boolean> =
-            project.objects.property(
-                    project.booleanProviderFromProjectProperty("helm.debug"))
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.debug"))
 
 
     override val home: DirectoryProperty =
-            project.layout.directoryProperty(
-                    project.dirProviderFromProjectProperty("helm.home", evaluateGString = true))
+            project.objects.directoryProperty()
+                    .convention(project.dirProviderFromProjectProperty("helm.home", evaluateGString = true))
 
 
     override val host: Property<String> =
-            project.objects.property(
-                    project.providerFromProjectProperty("helm.host"))
+            project.objects.property<String>()
+                    .convention(project.providerFromProjectProperty("helm.host"))
 
 
     override val kubeContext: Property<String> =
-            project.objects.property(
-                    project.providerFromProjectProperty("helm.kubeContext"))
+            project.objects.property<String>()
+                    .convention(project.providerFromProjectProperty("helm.kubeContext"))
 
 
     override val kubeConfig: RegularFileProperty =
-            project.layout.fileProperty(
-                    project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
+            project.objects.fileProperty()
+                    .convention(project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
 
 
     override val timeoutSeconds: Property<Int> =
-            project.objects.property(
-                    project.intProviderFromProjectProperty("helm.timeoutSeconds"))
+            project.objects.property<Int>()
+                    .convention(project.intProviderFromProjectProperty("helm.timeoutSeconds"))
 
 
     override val extraArgs: ListProperty<String> =
-            project.objects.listProperty()
+            project.objects.listProperty<String>().empty()
 
 
     override val outputDir: DirectoryProperty =
-            project.layout.directoryProperty(
-                    project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true)
-                            .orElse(project.layout.buildDirectory.dir("helm/charts")))
+            project.objects.directoryProperty()
+                    .convention(project.coalesceProvider(
+                            project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true),
+                            project.layout.buildDirectory.dir("helm/charts")))
 
 
     override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
