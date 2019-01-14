@@ -30,7 +30,7 @@ internal inline fun <T : Any> Provider<T>.ifPresent(action: (T) -> Unit) {
 internal fun Provider<String>.asGString(evalRoot: Any): Provider<String> =
         map { value ->
             @Suppress("UNCHECKED_CAST")
-            val closure = Eval.me("{ -> \"${value.replace("\"", "\\\"")}\" }") as Closure<GString>
+            val closure = Eval.me("{ -> \"${value.replace("\"", "\\\"")}\" }") as Closure<CharSequence>
             closure.delegate = evalRoot
             closure.resolveStrategy = Closure.DELEGATE_ONLY
             closure.call().toString()
