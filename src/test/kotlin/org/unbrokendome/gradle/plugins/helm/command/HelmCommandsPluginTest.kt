@@ -45,7 +45,6 @@ class HelmCommandsPluginTest : AbstractGradleProjectTest() {
     fun `Plugin should not create any tasks`() {
         val taskCountBefore = project.tasks.size
         applyPlugin()
-        evaluateProject()
 
         assert(project.tasks, name = "tasks")
                 .hasSize(taskCountBefore)
