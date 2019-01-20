@@ -24,7 +24,7 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of other properties")
     val chartDir: DirectoryProperty =
-            project.layout.directoryProperty()
+            project.objects.directoryProperty()
 
 
     /**

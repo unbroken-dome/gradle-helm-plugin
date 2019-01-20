@@ -1,16 +1,11 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
@@ -50,7 +45,7 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -74,7 +69,7 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val replace: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     /**
@@ -82,7 +77,7 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val values: MapProperty<String, Any> =
-            mapProperty()
+            project.objects.mapProperty()
 
 
     /**
@@ -107,7 +102,7 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     @TaskAction

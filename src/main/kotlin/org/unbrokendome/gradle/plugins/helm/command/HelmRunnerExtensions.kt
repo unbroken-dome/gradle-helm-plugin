@@ -1,7 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.file.FileCollection
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
+import org.gradle.api.provider.Provider
 
 
 /**
@@ -9,12 +9,13 @@ import org.unbrokendome.gradle.plugins.helm.util.MapProperty
  *
  * This will add `--set`, `--set-string` and `--values` based on the supplied properties.
  *
- * @param values a [MapProperty] containing directly specified values. Entries with [String] values will be added
- *        using `--set-string`; other types of values will be added using `--set`.
+ * @param values a [Provider] of a [Map] containing directly specified values.
+ *        Entries with [String] values will be added using `--set-string`; other types of values will be added
+ *        using `--set`.
  * @param valueFiles a [FileCollection] of YAML files containing additional values to pass to the command.
  */
 fun HelmExecSpec.valuesOptions(
-        values: MapProperty<String, Any>,
+        values: Provider<Map<String, Any>>,
         valueFiles: FileCollection) {
 
     val (stringValues, otherValues) = values.get().toList()

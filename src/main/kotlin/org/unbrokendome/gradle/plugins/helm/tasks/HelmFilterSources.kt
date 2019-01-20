@@ -7,6 +7,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
@@ -18,10 +19,11 @@ import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
 import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
 import org.unbrokendome.gradle.plugins.helm.util.extension
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.putFrom
 import java.io.File
 import java.io.Reader
 import java.io.StringReader
-import java.util.Objects
+import java.util.*
 
 
 val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
@@ -75,7 +77,7 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:InputDirectory
     val sourceDir: DirectoryProperty =
-            newInputDirectory()
+            project.objects.directoryProperty()
 
 
     /**
@@ -84,7 +86,8 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:Internal("Represented as part of targetDir")
     val baseOutputDir: DirectoryProperty =
-            project.layout.directoryProperty(project.helm.outputDir)
+            project.objects.directoryProperty()
+                    .convention(project.helm.outputDir)
 
 
     /**
@@ -103,7 +106,8 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:Input
     val resolveDependencies: Property<Boolean> =
-            project.objects.property(true)
+            project.objects.property<Boolean>()
+                    .convention(true)
 
 
     init {

@@ -19,9 +19,10 @@ import org.gradle.api.provider.Provider
  * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
  *         not exist
  */
-internal fun Project.providerFromProjectProperty(propertyName: String, evaluateGString: Boolean = false): Provider<String> {
+internal fun Project.providerFromProjectProperty(propertyName: String, defaultValue: String? = null,
+                                                 evaluateGString: Boolean = false): Provider<String> {
     val provider = provider<String> {
-        project.findProperty(propertyName)?.toString()
+        project.findProperty(propertyName)?.toString() ?: defaultValue
     }
     return if (evaluateGString) {
         provider.asGString(this)
@@ -43,10 +44,11 @@ internal fun Project.providerFromProjectProperty(propertyName: String, evaluateG
  *
  * @receiver the Gradle [Project]
  * @param propertyName the name of the property
+ * @param defaultValue an optional default value for the provider, if the project property is not defined
  * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
  *         not exist
  */
-fun Project.booleanProviderFromProjectProperty(propertyName: String): Provider<Boolean> =
+fun Project.booleanProviderFromProjectProperty(propertyName: String, defaultValue: Boolean? = null): Provider<Boolean> =
         provider {
             project.findProperty(propertyName)?.let { value ->
                 when (value) {
@@ -54,7 +56,7 @@ fun Project.booleanProviderFromProjectProperty(propertyName: String): Provider<B
                     is String -> value.toBoolean()
                     else -> throw IllegalArgumentException("Value cannot be converted to a Boolean: $value")
                 }
-            }
+            } ?: defaultValue
         }
 
 
@@ -102,7 +104,7 @@ fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> 
  */
 fun Project.dirProviderFromProjectProperty(propertyName: String,
                                            evaluateGString: Boolean = false): Provider<Directory> =
-        providerFromProjectProperty(propertyName, evaluateGString)
+        providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
                 .let { pathProvider ->
                     project.layout.projectDirectory.dir(pathProvider)
                 }
@@ -125,7 +127,7 @@ fun Project.dirProviderFromProjectProperty(propertyName: String,
  */
 fun Project.fileProviderFromProjectProperty(propertyName: String,
                                             evaluateGString: Boolean = false): Provider<RegularFile> =
-        providerFromProjectProperty(propertyName, evaluateGString)
+        providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
                 .let { pathProvider ->
                     project.layout.projectDirectory.file(pathProvider)
                 }

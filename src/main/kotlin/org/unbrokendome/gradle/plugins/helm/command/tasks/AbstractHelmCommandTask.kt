@@ -17,9 +17,7 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.util.andThen
-import org.unbrokendome.gradle.plugins.helm.util.orElse
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.*
 import java.io.ByteArrayOutputStream
 
 
@@ -36,25 +34,29 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
         group = HELM_GROUP
     }
 
+
     @get:Input
     override val executable: Property<String> =
-            project.objects.property(project.helm.executable)
+            project.objects.property<String>()
+                    .convention(project.helm.executable)
 
 
     @get:Internal
     override val home: DirectoryProperty =
-            project.layout.directoryProperty(project.helm.home)
+            project.objects.directoryProperty()
+                    .convention(project.helm.home)
 
 
     @get:Console
     override val debug: Property<Boolean> =
-            project.objects.property(false)
+            project.objects.property<Boolean>()
+                    .convention(false)
 
 
     @get:Input
     override val extraArgs: ListProperty<String> =
-            project.objects.listProperty(String::class.java)
-                    .apply { set(project.helm.extraArgs) }
+            project.objects.listProperty<String>()
+                    .apply { addAll(project.helm.extraArgs) }
 
 
     /**
@@ -83,9 +85,8 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
      */
     @get:Internal
     protected val actualHelmHome: Provider<Directory>
-        get() =
-            home.orElse(
-                    project.layout.projectDirectory.dir(actualHelmHomePathProvider()))
+        get() = project.coalesceProvider(home,
+                project.layout.projectDirectory.dir(actualHelmHomePathProvider()))
 
 
     private fun actualHelmHomePathProvider() =

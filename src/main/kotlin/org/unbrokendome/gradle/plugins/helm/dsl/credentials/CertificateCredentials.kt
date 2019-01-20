@@ -1,8 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.dsl.credentials
 
 import org.gradle.api.credentials.Credentials
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
 
 
@@ -24,12 +24,12 @@ interface CertificateCredentials : Credentials {
 
 
 internal open class DefaultCertificateCredentials
-@Inject constructor(projectLayout: ProjectLayout)
+@Inject constructor(objectFactory: ObjectFactory)
     : CertificateCredentials {
 
     override val certificateFile: RegularFileProperty =
-            projectLayout.fileProperty()
+            objectFactory.fileProperty()
 
     override val keyFile: RegularFileProperty =
-            projectLayout.fileProperty()
+            objectFactory.fileProperty()
 }

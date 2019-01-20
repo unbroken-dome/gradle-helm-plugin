@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.yaml.snakeyaml.Yaml
 import java.net.URI
@@ -40,7 +39,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val caFile: Property<RegularFile> =
-            project.layout.fileProperty()
+            project.objects.fileProperty()
 
 
     /**
@@ -70,7 +69,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val certificateFile: Property<RegularFile> =
-            project.layout.fileProperty()
+            project.objects.fileProperty()
 
 
     /**
@@ -80,7 +79,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val keyFile: Property<RegularFile> =
-            project.layout.fileProperty()
+            project.objects.fileProperty()
 
 
     /**
@@ -90,7 +89,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:Internal
     val failIfExists: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     init {

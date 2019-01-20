@@ -4,7 +4,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
@@ -26,7 +25,7 @@ class HelmTest : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val cleanup: Property<Boolean> =
-            project.objects.emptyProperty()
+            project.objects.property()
 
 
     @TaskAction

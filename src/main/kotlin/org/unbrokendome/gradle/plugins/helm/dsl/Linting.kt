@@ -3,9 +3,8 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.unbrokendome.gradle.plugins.helm.util.MapProperty
-import org.unbrokendome.gradle.plugins.helm.util.emptyProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import javax.inject.Inject
@@ -51,13 +50,14 @@ private open class DefaultLinting
 @Inject constructor(objectFactory: ObjectFactory, projectLayout: ProjectLayout) : LintingInternal {
 
     override val enabled: Property<Boolean> =
-            objectFactory.property(true)
+            objectFactory.property<Boolean>()
+                    .convention(true)
 
     override val strict: Property<Boolean> =
-            objectFactory.emptyProperty()
+            objectFactory.property()
 
     override val values: MapProperty<String, Any> =
-            mapProperty()
+            objectFactory.mapProperty()
 
     override val valueFiles: ConfigurableFileCollection =
             projectLayout.configurableFiles()

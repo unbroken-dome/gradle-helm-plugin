@@ -5,14 +5,13 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainerSupport
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsFactory
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.DefaultCredentialsFactory
-import org.unbrokendome.gradle.plugins.helm.publishing.HttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.HelmChartPublisher
+import org.unbrokendome.gradle.plugins.helm.publishing.HttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
 import javax.inject.Inject
@@ -77,11 +76,13 @@ private constructor(private val name: String,
 
 
     override val uploadMethod: Property<String> =
-            objectFactory.property("POST")
+            objectFactory.property<String>()
+                    .convention("POST")
 
 
     override val uploadPath: Property<String> =
-            objectFactory.property("/api/charts")
+            objectFactory.property<String>()
+                    .convention("/api/charts")
 
 
     override val publisher: HelmChartPublisher
