@@ -1,5 +1,8 @@
 import org.asciidoctor.gradle.AsciidoctorTask
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URL
 
 
 plugins {
@@ -105,6 +108,15 @@ pluginBundle {
             displayName = "Helm Releases Plugin"
         }
     }
+}
+
+
+tasks.named("dokka", DokkaTask::class) {
+    outputFormat = "html"
+    externalDocumentationLink(delegateClosureOf<DokkaConfiguration.ExternalDocumentationLink.Builder> {
+        url = URL("https://docs.gradle.org/current/javadoc/")
+    })
+    reportUndocumented = false
 }
 
 
