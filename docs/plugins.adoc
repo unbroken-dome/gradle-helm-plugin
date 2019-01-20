@@ -1,50 +1,104 @@
 = Plugins
 
-The _gradle-helm-plugin_ library actually consists of four different plugins, with different use cases for each:
+The _gradle-helm-plugin_ library provides several Gradle plugins, with different use cases for each.
 
-== `org.unbroken-dome.helm-commands` plugin
+All plugins IDs are prefixed the namespace `org.unbroken-dome`.
 
-This plugin does little more than add the plugin library to your build's classpath so you can define tasks for various Helm CLI commands. Use this if you want to use Helm CLI commands directly as tasks, without any of the declarative DSL that the `helm` plugin offers.
 
-The plugin installs a `helm` DSL extension on the project which can be used to define default values for all Helm tasks (like `home` or `kubeContext`). Apart from this, the plugin does not create any tasks or other project model objects automatically.
+== `helm-commands`
 
-Note that the `helm-commands` plugin is implied when using any of the other plugins like `org.unbroken-dome.helm` or `org.unbroken-dome.helm-publish`, so you only need to list it when using it on its own.
+This plugin does little more than add the plugin library to your build's classpath so you can define tasks for
+ various Helm CLI commands. It creates the `helm` DSL block which you can use to configure common settings
+ for all tasks, like the Helm home path and the Kubecontext. Apart from this, it does not create any tasks
+ automatically.
 
-=== Example
+Use this if you want to use Helm CLI commands directly as tasks, without any of the declarative DSL that the `helm`
+ plugin offers.
 
-.build.gradle
-[source,groovy]
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
 ----
-import org.unbrokendome.gradle.plugins.helm.command.tasks.*
-
 plugins {
-    id 'org.unbroken-dome.helm-commands' version '<VERSION>'
-}
-
-helm {
-    home = file("${project.buildDir}/helm/home")
-}
-
-task helmInit(type: HelmInit)
-
-task installMariaDb(type: HelmInstall) {
-    dependsOn helmInit
-    chart = 'stable/mariadb'
-    version = '4.3.1'
-    releaseName = 'mariadb'
+    id 'org.unbroken-dome.helm-commands' version '{project-version}'
 }
 ----
 
-== `org.unbroken-dome.helm` plugin
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm-commands") version "{project-version}"
+}
+----
 
-This is the main plugin of the suite. It enables a variety of extra DSL blocks inside `helm`, for example `charts` and `repositories`.
+All the other plugins imply `helm-commands`, so you don't need to apply this plugin if you use any of the others.
 
 
-== `org.unbroken-dome.helm-publish` plugin
 
-Use this plugin _in addition to_ the `org.unbroken-dome.helm` plugin if you want to publish your charts to a remote repository like ChartMuseum. It enables the `helm.publishing` DSL block and adds publishing tasks for each chart.
+== `helm`
+
+This is the main plugin of the suite. It enables a variety of extra DSL blocks inside `helm`, for example `charts`
+ and `repositories`.
+
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
+----
+plugins {
+    id 'org.unbroken-dome.helm' version '{project-version}'
+}
+----
+
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm") version "{project-version}"
+}
+----
 
 
-== `org.unbroken-dome.helm-releases` plugin
+== `helm-publish`
 
-Use this plugin to manage releases (install/update/delete) on a remote Kubernetes cluster. You can declare your releases using Gradle DSL, referencing either Helm charts built using the other projects, or existing charts from a Helm repository.
+Use this plugin to publish charts to a remote chart repository like ChartMuseum.
+
+It enables the `helm.publishing` DSL block and adds publishing tasks for each chart.
+
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
+----
+plugins {
+    id 'org.unbroken-dome.helm-publish' version '{project-version}'
+}
+----
+
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm-publish") version "{project-version}"
+}
+----
+
+
+== `helm-releases`
+
+Use this plugin to manage Helm releases (install/update/delete) on a remote Kubernetes cluster.
+
+It enables the `helm.releases` DSL block, where you can declare your releases using Gradle DSL, referencing either
+ Helm charts built using the other projects, or existing charts from a Helm repository.
+
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
+----
+plugins {
+    id 'org.unbroken-dome.helm-releases' version '{project-version}'
+}
+----
+
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm-releases") version "{project-version}"
+}
+----

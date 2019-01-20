@@ -1,0 +1,111 @@
+= Defining Repositories
+
+Chart repositories are external storages of Helm charts. By default, a Helm client will know about the
+`local` and `stable` repositories. You can use the `helm.repositories` block to define additional
+repositories:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    repositories {
+        example {
+            url = uri('http://helm-repo.example.com/')
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    repositories {
+        create("example") {
+            url.set(uri("http://helm-repo.example.com/")
+        }
+    }
+}
+----
+
+Defining a repository will automatically add a task `helmAdd<X>Repository` (for example,
+`helmAddExampleRepository`) that does the equivalent of `helm repo add`.
+
+
+== Configuring Repository Credentials
+
+If a chart repository requires authentication, you can configure credentials using the `credentials`
+block. It works very similarly to other places in Gradle where credentials are used.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    repositories {
+        example {
+            url = uri('http://helm-repo.example.com/')
+            credentials {
+                username = 'user'
+                password = 'password'
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    repositories {
+        create("example") {
+            url.set(uri("http://helm-repo.example.com/")
+            credentials {
+                username.set("user")
+                password.set("password")
+            }
+        }
+    }
+}
+----
+
+In addition to username/password credentials, certificate credentials based on PEM files
+are also supported:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+
+helm {
+    repositories {
+        example {
+            url = uri('http://helm-repo.example.com/')
+
+            credentials(CertificateCredentials) {
+                certificateFile = file('path/to/cert.pem')
+                keyFile = file('path/to/key.pem')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+
+helm {
+    repositories {
+        create("example") {
+            url.set(uri("http://helm-repo.example.com/")
+
+            credentials(CertificateCredentials::class.java) {
+                certificateFile.set(file("path/to/cert.pem"))
+                keyFile.set(file("path/to/key.pem"))
+            }
+        }
+    }
+}
+----

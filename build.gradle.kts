@@ -117,12 +117,15 @@ dependencies {
 }
 
 
-val asciidoctor: AsciidoctorTask by tasks.getting(AsciidoctorTask::class) {
+tasks.named("asciidoctor", AsciidoctorTask::class) {
     sourceDir("docs")
+    sources(delegateClosureOf<PatternSet> { include("index.adoc") })
+
     options(mapOf(
             "doctype" to "book"
     ))
     attributes(mapOf(
-            "project-version" to project.version
+            "project-version" to project.version,
+            "source-highlighter" to "prettify"
     ))
 }

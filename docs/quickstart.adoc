@@ -1,0 +1,36 @@
+= Quick Start
+
+Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
+
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
+----
+plugins {
+    id 'org.unbroken-dome.helm' version '{project-version}'
+}
+----
+
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm") version "{project-version}"
+}
+----
+
+
+Put your Helm chart sources into `src/main/helm`:
+
+----
+📂 (project root)
+    📂 src
+        📂 main
+            📂 helm
+                📂 templates
+                    📄 ...
+                📄 Chart.yaml
+                📄 requirements.yaml
+                📄 values.yaml
+----
+
+Use the `helmPackage` task to build your chart.

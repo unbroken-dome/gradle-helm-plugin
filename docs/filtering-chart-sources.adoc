@@ -1,8 +1,10 @@
 = Filtering Chart Sources
 
-The plugin includes a _filtering_ step that will resolve placeholders in certain chart files before the chart is packaged.
+The plugin includes a _filtering_ step that will resolve placeholders in certain chart files before the chart
+is packaged.
 
-This is most useful to insert the name and version into the chart, because they will often correspond to the project version:
+This is most useful to insert the name and version into the chart, because they will often correspond to the
+Gradle project's name and version:
 
 .Chart.yaml
 [source,yaml]
@@ -11,28 +13,53 @@ name: ${chartName}
 version: ${chartVersion}
 ----
 
-The `chartName` and `chartVersion` placeholders are automatically available based on the corresponding properties of the chart in the DSL. You can also define additional placeholders and their values (see below).
+The `chartName` and `chartVersion` placeholders are automatically available based on the corresponding properties of
+the chart in the DSL. You can also define additional placeholders and their values (see below).
 
-NOTE: Only the files _Chart.yaml_, _requirements.yaml_ and _values.yaml_ are filtered this way. The actual templates in the chart are not filtered; you should use Helm's templating constructs instead.
+NOTE: Only the files _Chart.yaml_, _requirements.yaml_ and _values.yaml_ are filtered this way. The actual templates
+in the chart are not filtered; you should use Helm's templating constructs instead.
+
 
 == Configure the Filtering Step
 
-You can fine-tune the filtering process by modifying the `filtering` block, which is available both directly inside the `helm` block, as well as each chart. The chart-level filtering inherits from the global filtering but will override properties if they are defined in both places:
+You can fine-tune the filtering process by modifying the `filtering` block, which is available both directly inside
+the `helm` block, as well as each chart. The chart-level filtering inherits from the global filtering but will
+override properties if they are defined in both places:
 
-[source,groovy]
+[source,groovy,role="primary"]
+.Groovy
 ----
 helm {
     filtering {
-        // Set a custom pattern for placeholder delimiters. The default is '${' and '}'.
-        placeholderPrefix = '@['
-        placeholderSuffix = ']'
+        // This value will be resolvable in all charts' YAML files as ${authorName}
+        values.put 'authorName', 'A. U. Thor'
     }
 
     charts {
         main {
             filtering {
-                // add a custom value that can be resolved inside the YAML files.
+                // add a custom value that can be resolved only inside this chart's YAML files.
                 values.put 'dockerImage', 'busybox'
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    filtering {
+        // This value will be resolvable in all charts' YAML files as ${authorName}
+        values.put("authorName", "A. U. Thor")
+    }
+
+    charts {
+        main {
+            filtering {
+                // add a custom value that can be resolved only inside this chart's YAML files.
+                values.put("dockerImage", "busybox")
             }
         }
     }
@@ -50,4 +77,6 @@ The following properties are available in the `filtering` block:
 | values | `Map` | | The values to be resolved in placeholders.
 |===
 
-`values` is a special `MapProperty` which merges the values from different levels of `filtering` blocks. That means you can add some values in the global `helm.filtering` block, add some more inside the individual chart's `filtering` block, and they will all be available for the placeholder resolution.
+INFO: `values` is a `MapProperty` which merges the values from different levels of `filtering` blocks. That means
+you can add some values in the global `helm.filtering` block, add some more inside the individual chart's `filtering`
+block, and they will all be available for the placeholder resolution.

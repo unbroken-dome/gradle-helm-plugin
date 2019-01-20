@@ -5,8 +5,31 @@
 :icons: font
 :sectanchors:
 
+This is a suite of plugins for packaging and publishing Helm Charts from Gradle, and managing Helm releases
+on a Kubernetes cluster.
+
+include::prerequisites.adoc[leveloffset=1]
+
+include::quickstart.adoc[leveloffset=1]
+
+include::plugins.adoc[leveloffset=1]
+
+include::configure-helm.adoc[leveloffset=1]
 
 include::defining-charts.adoc[leveloffset=1]
 
+include::defining-repositories.adoc[leveloffset=1]
+
 include::filtering-chart-sources.adoc[leveloffset=1]
 
+include::linting-charts.adoc[leveloffset=1]
+
+include::managing-chart-dependencies.adoc[leveloffset=1]
+
+include::publishing-charts.adoc[leveloffset=1]
+
+include::managing-releases.adoc[leveloffset=1]
+
+include::using-helm-commands.adoc[leveloffset=1]
+
+include::config-from-project-properties.adoc[leveloffset=1]

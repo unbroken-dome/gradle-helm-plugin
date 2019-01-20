@@ -1,0 +1,155 @@
+= Publishing Charts
+
+The `helm-publish` plugin allows you to publish your charts to remote repositories over HTTP.
+
+NOTE: There is currently no "official" API to publish Helm charts; Helm defines only how charts should be
+served from a repository. Since https://chartmuseum.com/[ChartMuseum] is probably the most widespread
+type of repository, the plugin assumes its API pattern by default, with some limited possibilities
+for configuration.
+
+Apply the `helm-publish` plugin to your project:
+
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
+----
+plugins {
+    id 'org.unbroken-dome.helm-publish' version '{project-version}'
+}
+----
+
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm-publish") version "{project-version}"
+}
+----
+
+The plugin adds another sub-extension `helm.publishing` that lets you define the repository or
+repositories to publish to:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            example {
+                url = uri('http://helm-repo.example.com/')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            create("example") {
+                url.set(uri("http://helm-repo.example.com/")
+            }
+        }
+    }
+}
+----
+
+This will automatically define some Gradle tasks in the project:
+
+Task `helmPublish`::
+Publishes all charts to all repositories.
+
+Task `helmPublish<X>Chart`::
+Publishes chart X to all repositories.
+
+Task `helmPublish<X>ChartTo<Y>Repo`::
+Publishes chart X to repository Y, e.g. `helmPublishMainChartToExampleRepo`.
+
+[NOTE]
+====
+There is no connection between the repositories in `helm.repositories` and
+the publishing repositories in `helm.publishing.repositories`. The former are for retrieving
+charts, the latter are for publishing them.
+
+If you want to download from and publish to
+the same external repository, you would need to specify it both in `helm.repositories` and
+`helm.publishing.repositories` (similar to Gradle's built-in publishing).
+====
+
+
+== Specifying Credentials for Repositories
+
+Most likely, a chart repository will require some credentials for write access. You can configure
+credentials in the same way as for `repositories`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            example {
+                url = uri('http://helm-repo.example.com/')
+                credentials {
+                    username = 'user'
+                    password = 'password'
+                }
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            create("example") {
+                url.set(uri("http://helm-repo.example.com/")
+            }
+            credentials {
+                username.set("user")
+                password.set("password")
+            }
+        }
+    }
+}
+----
+
+
+
+
+== Preventing a Chart from Being Published
+
+By default, all charts defined in the project will be published. You can prevent this for a specific
+chart by setting its `publish` property to `false`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.charts {
+
+    // This chart will not be published
+    unpublishedChart {
+        // ...
+        publish = false
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.charts {
+
+    // This chart will not be published
+    create("unpublishedChart") {
+        // ...
+        publish = false
+    }
+}
+----
