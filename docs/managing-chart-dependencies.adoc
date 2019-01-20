@@ -1,0 +1,143 @@
+= Managing Chart Dependencies
+
+The `helm` plugin can manage your
+https://docs.helm.sh/developing_charts/#chart-dependencies[chart's dependencies], modifying the
+`requirements.yaml` file accordingly.
+
+This is especially useful if you have multiple charts in the same project (or in a multi-project build)
+that depend on one another, because it will also add Gradle task dependencies to make sure that the charts
+are packaged in the correct order.
+
+Note that you will still need a `requirements.yaml` file with `dependencies` entries; the plugin will not
+create it automatically. For each dependency declared in the Gradle script, it will find the matching
+dependency in `requirements.yaml` and modify its `repository` property.
+
+
+== Declaring a Dependency
+
+To declare a dependency from one chart onto another, use the `dependencies` block inside a `chart`.
+
+The following example defines two charts `foo` and `bar`, and declares a dependency from `bar` onto `foo`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.charts {
+
+    foo {
+        chartVersion = '1.2.3'
+        sourceDir = file('src/helm/foo')
+    }
+
+    bar {
+        chartVersion = '3.2.1'
+        sourceDir = file('src/helm/bar')
+
+        dependencies {
+            foo chart: 'foo'
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.charts {
+
+    create("foo") {
+        chartVersion.set("1.2.3")
+        sourceDir.set(file("src/helm/foo"))
+    }
+
+    create("bar") {
+        chartVersion = '3.2.1'
+        sourceDir.set(file("src/helm/bar"))
+
+        dependencies {
+            "foo"(chart = "foo")
+        }
+    }
+}
+----
+
+The "method" name inside `dependencies` is the name that the dependency will have in the `requirements.yaml`,
+whereas the `chart` parameter specifies the name of the chart in the Gradle DSL.
+
+TIP: The `dependencies` entry in the YAML file will be matched either by its `name` or an `alias`.
+
+You can also use an alternative syntax using `dependencies.add` if you prefer so:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+dependencies.add(name: 'foo', chart: 'foo')
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+dependencies.add(name = "foo", chart = "foo")
+----
+
+
+The resulting `requirements.yaml` file for the `bar` chart will look as follows:
+
+[source,yaml]
+.requirements.yaml
+----
+dependencies:
+  - name: foo
+    repository: file://../foo
+----
+
+The URL in `repository` points to the local output directory of the `foo` chart,
+relative to the output directory of the `bar` chart.
+
+
+== Chart Dependencies in Multi-Project Builds
+
+If you have a Gradle multi-project builds, chart dependencies can also refer to charts built by
+other projects.
+
+Use the `project` parameter when adding a dependency, in addition to the `chart` parameter:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+dependencies {
+    // Assuming that the foo chart is defined in the foo project
+    foo project: ':foo', chart: 'foo'
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+dependencies {
+    // Assuming that the foo chart is defined in the foo project
+    "foo"(project = ":foo", chart = "foo")
+}
+----
+
+
+The `chart` parameter defaults to `"main"`, so if a dependency references another project's `main`
+chart, the `chart` parameter can be omitted:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+dependencies {
+    // Referencing the main chart in the foo project
+    foo project: ':foo'
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+dependencies {
+    // Referencing the main chart in the foo project
+    "foo"(project = ":foo")
+}
+----

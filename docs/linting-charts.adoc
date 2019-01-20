@@ -1,0 +1,157 @@
+= Linting Charts
+
+The default workflow for building and packaging a Helm chart includes a lint step, which is
+performs by the `HelmLint` task and maps to a `helm lint` CLI call.
+
+Both the global `helm` DSL block and each `chart` block provide a nested `lint` block, where you
+can fine-tune linting on a global or chart level. Each chart will inherit the global configuration
+and can selectively override certain aspects of it.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+
+    // The global lint configuration applies to all charts
+    lint {
+        // treat linter warnings as errors (failing the build)
+        strict = true
+    }
+
+    charts {
+        main {
+            // This configures linting only for the main chart
+            lint {
+                // disable strict linting only for this chart
+                strict = false
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+
+    // The global lint configuration applies to all charts
+    lint {
+        // treat linter warnings as errors (failing the build)
+        strict.set(true)
+    }
+
+    (charts) {
+        "main" {
+            // This configures linting only for the main chart
+            lint {
+                // disable strict linting only for this chart
+                strict.set(false)
+            }
+        }
+    }
+}
+----
+
+
+== Passing Values to the Linter
+
+You can pass values to the linter using the `values` and `valueFiles`.
+
+This may be necessary if you use the `required` function in your Helm templates (see
+https://github.com/helm/helm/issues/2347[Helm issue #2347]). Also, it can be useful if
+you have conditional templates which would not be rendered when using the default values
+from values.yaml.
+
+[TIP]
+`helm lint` does not actually perform a syntactic analysis of your charts; instead it renders
+the template internally (just as `helm install` would do) and checks the resulting YAML for
+correctness.
+
+Values and value files defined in the global `lint` block are automatically inherited by
+each chart; however a chart can add additional values or value files.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+
+    lint {
+        valueFiles.from 'src/test/helm/helm-lint-global.yaml'
+    }
+
+    charts {
+        main {
+            lint {
+                valueFiles.from 'src/test/helm/helm-lint-main.yaml'
+                values.put 'foo', 'bar'
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+
+    lint {
+        valueFiles.from("src/test/helm/helm-lint-global.yaml")
+    }
+
+    (charts) {
+        "main" {
+            lint {
+                valueFiles.from("src/test/helm/helm-lint-main.yaml")
+                values.put("foo", "bar")
+            }
+        }
+    }
+}
+----
+
+
+== Disable the Lint Step
+
+You can disable the lint step altogether by setting the `lint.enabled` property to `false`. This
+works on a global as well as on a chart level. (Again, the chart setting is inherited from the
+global setting).
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+
+    lint {
+        // disable linting by default
+        enabled = false
+    }
+
+    charts {
+        main {
+            // enable linting for the main chart
+            lint.enabled = true
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+
+    lint {
+        // disable linting by default
+        enabled.set(false)
+    }
+
+    (charts) {
+        "main" {
+            // enable linting for the main chart
+            lint.enabled.set(true)
+        }
+    }
+}
+----

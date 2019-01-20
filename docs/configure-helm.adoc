@@ -1,0 +1,92 @@
+= Configuring the Helm Client
+
+The global flags for Helm can be configured directly in the `helm` DSL block.
+
+Most of these correspond to options that are passed to every Helm CLI command as a parameter
+or an environment variable, or parameters that are passed to the initial `helm init` call that
+sets up the local Helm environment.
+
+[TIP]
+====
+As these settings can be dependent on the build environment, it is often useful to specify them in
+`gradle.properties` or on the command line instead.
+See <<Configuration from Project Properties>>.
+====
+
+
+The following `helm.home` sets the Helm home directory to a path inside the Gradle build directory.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    home = file("$buildDir/helm/home")
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    home.set(file("$buildDir/helm/home"))
+}
+----
+
+
+[TIP]
+====
+Setting the Helm home directory to a path like this is actually a good practice, as it makes your
+build less dependent on the local machine, and does not pollute the local Helm configuration.
+====
+
+The plugin splits what is usually done by `helm init` into two steps:
+
+Task `helmInitClient`::
+This will call `helm init --client-only`, skipping a remote Tiller installation. Since this sets up the
+Helm client, most other Helm tasks will have a dependency on this.
+
+Task `helmInitServer`::
+This will call `helm init` which also installs Tiller in the remote cluster. Only tasks that actually
+communicate with Tiller (like
+link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-install/[`HelmInstall`]
+or
+link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-delete/[`HelmDelete`]
+depend on this.
+
+
+== Configuring Tiller
+
+Inside the `helm.tiller` block you can configure certain settings for the remote Tiller installation.
+Most of these correspond to parameters of the `helm init` CLI command.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    tiller {
+        // Install/expect Tiller in a different namespace than kube-system
+        namespace = "custom-namespace"
+
+        // Set a service account for Tiller
+        serviceAccount = "tiller-service-account"
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    tiller {
+        // Install/expect Tiller in a different namespace than kube-system
+        namespace.set("custom-namespace")
+
+        // Set a service account for Tiller
+        serviceAccount.set("tiller-service-account")
+    }
+}
+----
+
+Please refer to the
+link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.dsl/-tiller/[API Reference] for a
+full list of configuration options.

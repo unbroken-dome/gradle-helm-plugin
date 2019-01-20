@@ -1,0 +1,39 @@
+= Using Helm Commands
+
+The plugin `org.unbroken-dome.helm-commands` allows you to use Helm commands directly, similar to what you would do
+with the Helm CLI. `helm-commands` is also implied by all the other plugins in the suite.
+
+For most Helm CLI commands, there is a corresponding Gradle task type (except for commands that do not really make
+sense for a build script, like `helm search` or `helm inspect`).
+
+NOTE: In most cases it is more convenient to use the high-level DSL provided by the other plugins to manage your
+charts in a declarative way.
+
+Check the link:/dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/[API Reference]
+for a full list of available tasks.
+
+
+== Example
+
+.build.gradle
+[source,groovy]
+----
+import org.unbrokendome.gradle.plugins.helm.command.tasks.*
+
+plugins {
+    id 'org.unbroken-dome.helm-commands' version '<VERSION>'
+}
+
+helm {
+    home = file("${project.buildDir}/helm/home")
+}
+
+task helmInit(type: HelmInit)
+
+task installMariaDb(type: HelmInstall) {
+    dependsOn helmInit
+    chart = 'stable/mariadb'
+    version = '4.3.1'
+    releaseName = 'mariadb'
+}
+----

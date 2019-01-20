@@ -1,0 +1,157 @@
+= Configuration from Project Properties
+
+Many settings can be configured by Gradle
+https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties[project properties]
+instead of specifying them in the DSL. This has the advantage that you can pass them on the command line
+(using `-P` switches) or a local `~/gradle.properties` file to account for different build environments.
+In addition, such properties are automatically inherited by subprojects.
+
+Some of these properties allow evaluation as a Groovy `GString`, so that you can do things like
+`-Phelm.home=$buildDir/helm/home` (but the dollar signs may need to be escaped so the shell does not
+treat them as environment variables).
+
+In general, the name of the project property corresponds to the path of the property in the DSL,
+e.g. `helm.home`.
+
+NOTE: Properties set explicitly in your Gradle script have precedence over properties from the command line
+or `gradle.properties` file, so it may be better to put them in `gradle.properties` in the first place, to
+allow for easier overriding.
+
+== Basic Helm Properties
+
+[cols="3,4,1"]
+|===
+| Property | Description | GString
+
+| `helm.executable`
+| Path to the Helm CLI executable. Defaults to `helm`.
+| icon:check[]
+
+| `helm.debug`
+| Enable verbose output from the Helm CLI.
+|
+
+| `helm.home`
+| Location of the Helm home directory.
+| icon:check[]
+
+| `helm.host`
+| Address of Tiller, in the format `host:port`.
+|
+
+| `helm.kubeContext`
+| Name of the kubeconfig context to use.
+|
+
+| `helm.kubeConfig`
+| Path to the Kubernetes configuration file.
+| icon:check[]
+
+| `helm.timeoutSeconds`
+| Timeout used for various Helm CLI commands.
+|
+
+| `helm.outputDir`
+| The base output directory for charts; defaults to `$buildDir/helm/charts`.
+| icon:check[]
+|===
+
+== Tiller
+
+[cols="2*"]
+|===
+| Property | Description
+
+| `helm.tiller.install`
+| If `true`, install Tiller on the cluster.
+
+| `helm.tiller.namespace`
+| Namespace of Tiller.
+
+| `helm.tiller.forceUpgrade`
+| Force upgrade of Tiller to the current Helm version.
+
+| `helm.tiller.historyMax`
+| Limit the maximum number of revisions saved per release.
+
+| `helm.tiller.replicas`
+| Amount of Tiller instances to run on the cluster.
+
+| `helm.tiller.serviceAccount`
+| Name of the service account to use for Tiller.
+
+| `helm.tiller.image`
+| Override the Tiller image.
+
+| `helm.tiller.upgrade`
+| Upgrade if Tiller is already installed.
+
+| `helm.tiller.wait`
+| Block until Tiller is running and ready to receive requests (defaults to `true`)
+
+|===
+
+== Repositories
+
+You can configure repositories entirely from Gradle properties -- just the presence of a set of
+`helm.repositories.<name>.<xyz>` properties will automatically create a corresponding repository.
+
+[cols="2*"]
+|===
+| Property | Description
+
+| `helm.repository.<name>.url`
+| The URL of the repository.
+
+| `helm.repository.<name>.credentials.username`
+| Username for password-based authentication.
+
+| `helm.repository.<name>.credentials.password`
+| Password for password-based authentication.
+
+| `helm.repository.<name>.credentials.certificateFile`
+| Client certificate file for certificate authentication.
+
+| `helm.repository.<name>.credentials.keyFile`
+| Private key file for certificate authentication.
+|===
+
+== Filtering
+
+[cols="2*"]
+|===
+| Property | Description
+
+| `helm.filtering.enabled`
+| Globally enable or disable filtering. Defaults to `true`.
+
+| `helm.filtering.placeholderPrefix`
+| Prefix that demarcates a placeholder in filtered YAML files. Defaults to `${`.
+
+| `helm.filtering.placeholderSuffix`
+| Suffix that demarcates a placeholder in filtered YAML files. Defaults to `}`.
+|===
+
+== Linting
+
+[cols="2*"]
+|===
+| Property | Description
+
+| `helm.lint.enabled`
+| Globally enable or disable linting. Defaults to `true`.
+
+| `helm.lint.strict`
+| Globally enable strict mode for linting. Defaults to `false`.
+
+|===
+
+== Releases
+
+[cols="2*"]
+|===
+| Property | Description
+
+| `helm.dryRun`
+| Only perform a dry run when installing or deleting releases.
+|===

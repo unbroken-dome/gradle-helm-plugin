@@ -1,0 +1,199 @@
+= Managing Releases
+
+With the `helm-release` plugin, you can manage Helm releases on a remote Kubernetes cluster.
+
+It allows you to define your releases in the Gradle DSL, in a declarative fashion. In this way, it can
+be used as an alternative to tools like https://github.com/roboll/helmfile[Helmfile] or
+https://github.com/Praqma/Helmsman[Helmsman], with the advantage of leveraging the full power of Gradle
+instead of defining a custom file format.
+
+Define your releases using the `helm.repositories` block in your Gradle script:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releases {
+        mariadb {
+            from 'stable/mariadb'
+            version = '5.1.1'
+
+            // pass values (like --set on the command line)
+            values = [ 'rootUser.password': 'secret' ]
+
+            // pass value files (like -f on the command line)
+            valueFiles.from 'mariadb.yaml'
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releases {
+        create("mariadb") {
+            from("stable/mariadb")
+            version.set("5.1.1")
+
+            // pass values (like --set on the command line)
+            values.set(mapOf("rootUser.password" to "secret"))
+
+            // pass value files (like -f on the command line)
+            valueFiles.from("mariadb.yaml")
+        }
+    }
+}
+----
+
+There are quite a few properties you can set for a release; most of them correspond to a command line
+option in `helm install`, `helm upgrade` or `helm delete`.
+
+The `from` method is quite powerful, as it accepts various sources for the chart from which the release
+will be created. Besides a `String` (for specifying the chart directly), it can also be a `File`,
+`RegularFile`, `Directory`, `URI` or also a Gradle `Provider` of any of these types.
+
+It is also possible to use a `FileCollection` (e.g. a Gradle `Configuration`), which should consist of
+only one file. In that case, any
+https://docs.gradle.org/current/javadoc/org/gradle/api/Buildable.html#getBuildDependencies--[build dependencies]
+expressed by the `FileCollection` will be honored by the release.
+
+Of course you can also reference charts built by the `helm` plugin, by just passing the chart's DSL object
+to `from`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    charts {
+        foo {
+            // configure the foo chart ...
+        }
+    }
+
+    releases {
+        foo {
+            from charts.foo
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    charts {
+        create("foo") {
+            // configure the foo chart ...
+        }
+    }
+
+    releases {
+        foo {
+            from charts["foo"]
+        }
+    }
+}
+----
+
+You can also refer to a chart by name (and optionally project) by using the `chart` helper function:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+// Chart in the same project, equivalent to charts.foo
+from chart('foo')
+
+// foo chart in the foo project
+from chart(project: ':foo', chart: 'foo')
+
+// main chart in the foo project
+from chart(project: ':foo')
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+// Chart in the same project, equivalent to charts["foo"]
+from(chart("foo"))
+
+// foo chart in the foo project
+from(chart(project = ":foo", chart = "foo")
+
+// main chart in the foo project
+from(chart(project = ":foo"))
+----
+
+
+== Release Tasks
+
+For each release defined in the `releases` block, the following Gradle tasks will be generated:
+
+Task `helmInstall<X>`::
+Installs the release named X. This task will also do upgrades; depending on the `replace` property
+it will either call `helm upgrade --install` (by default) or `helm install --replace`.
+
+Task `helmDelete<X>`::
+Deletes the release named X (by calling `helm delete`).
+
+
+In addition, there will be the following tasks to manage _all_ releases in the project at once:
+
+Task `helmInstall`::
+Install or upgrade all releases.
+
+Task `helmDelete`::
+Delete all releases.
+
+TIP: If you use a chart built by the helm plugin for a release, the corresponding `helmInstall`
+task will have a task dependency on the `helmPackage` task so that the chart is guaranteed to be
+up to date before it is installed.
+
+
+== Release Dependencies
+
+You can express dependencies between releases, to influence the order of installations/deletions
+when using the `helmInstall` or `helmDelete` task. A release will always be installed after all
+its dependencies, and deleted before its dependencies are deleted.
+
+Currently it is not possible to define dependencies on releases in another Gradle project.
+
+TIP: While a release dependency influences the order of `install` invocations, it does not guarantee
+that the release will be up and running on the cluster when the installation of the dependent release
+begins.. By default, `helm install` does not wait until the deployment is complete -- if this is what
+you need, you can set `wait` to `true` in the release, so that the install/upgrade command is invoked
+with the `--wait` flag.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releases {
+
+    postgres {
+        from 'stable/postgresql'
+    }
+
+    myApp {
+        // ...
+        dependsOn 'postgres'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releases {
+
+    create("postgres") {
+        from("stable/postgresql")
+    }
+
+    create("myApp") {
+        // ...
+        dependsOn("postgres")
+    }
+}
+----
