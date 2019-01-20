@@ -10,8 +10,6 @@ endif::[]
 
 This is a suite of Gradle plugins for building, publishing and managing https://www.helm.sh/[Helm] charts.
 
-IMPORTANT: This is still work in progress!
-
 
 == Features
 
@@ -23,7 +21,7 @@ IMPORTANT: This is still work in progress!
 
 == Requirements
 
-* Gradle 4.3 or higher
+* Gradle 5.1 or higher
 * JDK 1.8 or higher (for running Gradle)
 * Helm command-line client
 
@@ -36,7 +34,7 @@ Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
 [source,groovy]
 ----
 plugins {
-  id 'org.unbroken-dome.helm' version '0.2.3'
+  id 'org.unbroken-dome.helm' version '0.3.0'
 }
 ----
 
@@ -60,4 +58,5 @@ Use the `helmPackage` task to build your chart.
 
 == Further Documentation
 
-Please refer to the https://github.com/unbroken-dome/gradle-helm-plugin/wiki[Wiki] for full documentation.
+* https://unbroken-dome.github.io/projects/gradle-helm-plugin/[User Manual]
+* https://unbroken-dome.github.io/projects/gradle-helm-plugin/dokka/gradle-helm-plugin/[API/DSL Documentation]
