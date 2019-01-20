@@ -1,0 +1,12 @@
+= Gradle Helm Plugin
+:revnumber: {project-version}
+:doctype: book
+:toc: left
+:icons: font
+:sectanchors:
+
+
+include::defining-charts.adoc[leveloffset=1]
+
+include::filtering-chart-sources.adoc[leveloffset=1]
+

@@ -1,0 +1,75 @@
+= Defining Charts
+
+With the `org.unbroken-dome.helm` plugin you can configure your Helm chart using a declarative DSL, and the corresponding Gradle tasks will be added automatically.
+
+.build.gradle
+[source,groovy,subs="attributes"]
+----
+plugins {
+    id 'org.unbroken-dome.helm' version '{project-version}'
+}
+
+helm {
+    charts {
+        foo {
+            chartName = 'foo'
+            chartVersion = '1.2.3'
+            sourceDir = file('src/helm')
+        }
+    }
+}
+----
+
+Note that the chart moniker used in the DSL and the actual chart name are not necessarily the same, unless you set them to the same value.
+
+From this chart definition, a number of tasks will be created automatically:
+
+* Task `helmFilterFooChartSources`: Resolve placeholders in the chart sources, and copy everything to a directory build/helm/foo (`helm package` requires the chart directory to have the same name as the chart).
+* Task `helmBuildFooChartDependencies`: equivalent to the `helm dep build` CLI command.
+* Task `helmLintFooChart`: equivalent to the `helm lint` CLI command.
+* Task `helmPackageFooChart`: equivalent to the `helm package` CLI command.
+
+Also, the following configurations and artifacts will be created:
+
+* Configuration `helmFoo`: Contains a single artifact that has the chart directory as its output, and is built by the `helmBuildFooChartDependencies` task.
+* Configuration `helmFooPackaged`: Contains a single artifact that has the packaged (tar.gz) chart file as its output, and is built by the `helmPackageFooChart` task.
+
+In addition, the plugin creates a task named `helmPackage` that will depend on all charts' package task, so it can be used to build all the project's charts.
+
+== Using the `main` chart
+
+If you don't define any charts in the `helm.charts` DSL block, then by convention a chart named `"main"` will be defined automatically, equivalent to the following:
+
+[source,groovy]
+----
+helm.charts {
+    main {
+        chartName = project.name
+        chartVersion = project.version
+        sourceDir = file('src/main/helm')
+    }
+}
+----
+
+NOTE: since Helm chart versions must be SemVer-compliant, you should either make sure that the project version is a valid SemVer, or set the main chart version to a different value.
+
+The `main` chart will not be instantiated if you define any other charts; however you can reference the `main` chart to modify some of its properties:
+
+[source,groovy]
+----
+helm.charts.main.chartVersion = '1.0.0'
+----
+
+== Using Charts in a Multi-Project Build
+
+Of course, instead of defining multiple charts in one Gradle project, you can also have a multi-project build where each subproject defines a single `main` chart. That way, you can take advantage of the `main` chart convention in every project.
+
+However, note that the default values defined in the `helm` block are not automatically inherited by subprojects. If you want to define your Helm CLI options in one central place, you can add a `subprojects` clause in the root project:
+
+[source,groovy]
+----
+subprojects {
+    helm.home = "${rootProject.buildDir}/helm/home
+}
+----
+

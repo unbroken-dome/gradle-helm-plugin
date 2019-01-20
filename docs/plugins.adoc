@@ -1,0 +1,50 @@
+= Plugins
+
+The _gradle-helm-plugin_ library actually consists of four different plugins, with different use cases for each:
+
+== `org.unbroken-dome.helm-commands` plugin
+
+This plugin does little more than add the plugin library to your build's classpath so you can define tasks for various Helm CLI commands. Use this if you want to use Helm CLI commands directly as tasks, without any of the declarative DSL that the `helm` plugin offers.
+
+The plugin installs a `helm` DSL extension on the project which can be used to define default values for all Helm tasks (like `home` or `kubeContext`). Apart from this, the plugin does not create any tasks or other project model objects automatically.
+
+Note that the `helm-commands` plugin is implied when using any of the other plugins like `org.unbroken-dome.helm` or `org.unbroken-dome.helm-publish`, so you only need to list it when using it on its own.
+
+=== Example
+
+.build.gradle
+[source,groovy]
+----
+import org.unbrokendome.gradle.plugins.helm.command.tasks.*
+
+plugins {
+    id 'org.unbroken-dome.helm-commands' version '<VERSION>'
+}
+
+helm {
+    home = file("${project.buildDir}/helm/home")
+}
+
+task helmInit(type: HelmInit)
+
+task installMariaDb(type: HelmInstall) {
+    dependsOn helmInit
+    chart = 'stable/mariadb'
+    version = '4.3.1'
+    releaseName = 'mariadb'
+}
+----
+
+== `org.unbroken-dome.helm` plugin
+
+This is the main plugin of the suite. It enables a variety of extra DSL blocks inside `helm`, for example `charts` and `repositories`.
+
+
+== `org.unbroken-dome.helm-publish` plugin
+
+Use this plugin _in addition to_ the `org.unbroken-dome.helm` plugin if you want to publish your charts to a remote repository like ChartMuseum. It enables the `helm.publishing` DSL block and adds publishing tasks for each chart.
+
+
+== `org.unbroken-dome.helm-releases` plugin
+
+Use this plugin to manage releases (install/update/delete) on a remote Kubernetes cluster. You can declare your releases using Gradle DSL, referencing either Helm charts built using the other projects, or existing charts from a Helm repository.

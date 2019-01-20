@@ -1,3 +1,4 @@
+import org.asciidoctor.gradle.AsciidoctorTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
@@ -7,6 +8,7 @@ plugins {
     id("com.gradle.plugin-publish") version "0.10.0"
     id("org.jetbrains.dokka") version "0.9.17"
     id("maven-publish")
+    id("org.asciidoctor.convert") version "1.5.9.2"
 }
 
 
@@ -103,4 +105,24 @@ pluginBundle {
             displayName = "Helm Releases Plugin"
         }
     }
+}
+
+
+asciidoctorj {
+    version = "1.6.0"
+}
+
+dependencies {
+    "asciidoctor"("com.bmuschko:asciidoctorj-tabbed-code-extension:0.2")
+}
+
+
+val asciidoctor: AsciidoctorTask by tasks.getting(AsciidoctorTask::class) {
+    sourceDir("docs")
+    options(mapOf(
+            "doctype" to "book"
+    ))
+    attributes(mapOf(
+            "project-version" to project.version
+    ))
 }
