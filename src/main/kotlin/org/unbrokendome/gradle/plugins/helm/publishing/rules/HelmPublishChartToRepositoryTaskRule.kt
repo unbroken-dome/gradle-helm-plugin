@@ -7,28 +7,28 @@ import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingReposit
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.tasks.HelmPublishChart
 import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
-import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
+import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
 
 
 /**
  * Rule that creates a task for publishing a given chart to a given repository.
  */
 internal class HelmPublishChartToRepositoryTaskRule(
-        private val project: Project,
-        private val charts: NamedDomainObjectCollection<HelmChart>,
-        private val repositories: NamedDomainObjectCollection<HelmPublishingRepository>
+    private val project: Project,
+    private val charts: NamedDomainObjectCollection<HelmChart>,
+    private val repositories: NamedDomainObjectCollection<HelmPublishingRepository>
 ) : AbstractRule() {
 
     internal companion object {
         fun getTaskName(chartName: String, repositoryName: String) =
-                "helmPublish${chartName.capitalize()}ChartTo${repositoryName.capitalize()}Repo"
+            "helmPublish${chartName.capitalize()}ChartTo${repositoryName.capitalize()}Repo"
     }
 
     private val regex = Regex(getTaskName("(\\p{Upper}.*)", "(\\p{Upper}.*)"))
 
 
     override fun getDescription(): String =
-            "Pattern: ${getTaskName("<Chart>", "<Repo>")}"
+        "Pattern: ${getTaskName("<Chart>", "<Repo>")}"
 
 
     override fun apply(taskName: String) {
@@ -38,7 +38,8 @@ internal class HelmPublishChartToRepositoryTaskRule(
             val chart = charts.findByName(chartName) ?: charts.findByName(chartName.capitalize())
 
             val repositoryName = matchResult.groupValues[2].decapitalize()
-            val repository = repositories.findByName(repositoryName) ?: repositories.findByName(repositoryName.capitalize())
+            val repository =
+                repositories.findByName(repositoryName) ?: repositories.findByName(repositoryName.capitalize())
 
             if (chart != null && repository != null) {
 
@@ -47,11 +48,13 @@ internal class HelmPublishChartToRepositoryTaskRule(
 
                     task.onlyIf { chart.publishConvention.publish.get() }
 
-                    task.chartFile.set(project.layout.file(
+                    task.chartFile.set(
+                        project.layout.file(
                             project.provider {
-                                project.configurations.getByName(chart.dirArtifactConfigurationName)
-                                        .singleFile
-                            }))
+                                project.configurations.getByName(chart.packagedArtifactConfigurationName)
+                                    .artifacts.single().file
+                            })
+                    )
                     task.targetRepository = repository
                     task.dependsOn(chart)
                 }
@@ -68,4 +71,4 @@ internal class HelmPublishChartToRepositoryTaskRule(
  * @param repositoryName the name of the repository
  */
 internal fun HelmChart.publishToRepositoryTaskName(repositoryName: String) =
-        HelmPublishChartToRepositoryTaskRule.getTaskName(name, repositoryName)
+    HelmPublishChartToRepositoryTaskRule.getTaskName(name, repositoryName)
