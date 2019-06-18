@@ -17,5 +17,5 @@ internal val HelmExtension.publishing: HelmPublishingExtension
 /**
  * Gets the `publishing.repositories` sub-extension.
  */
-internal val HelmPublishingExtension.repositories: NamedDomainObjectContainer<HelmPublishingRepository>
+internal val HelmPublishingExtension.repositories: HelmPublishingRepositoryContainer
     get() = requiredExtension(HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME)

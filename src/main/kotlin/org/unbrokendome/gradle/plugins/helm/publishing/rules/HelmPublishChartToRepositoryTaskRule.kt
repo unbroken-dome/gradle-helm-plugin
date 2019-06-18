@@ -48,6 +48,8 @@ internal class HelmPublishChartToRepositoryTaskRule(
 
                     task.onlyIf { chart.publishConvention.publish.get() }
 
+                    task.chartName.set(chart.chartName)
+                    task.chartVersion.set(chart.chartVersion)
                     task.chartFile.set(
                         project.layout.file(
                             project.provider {

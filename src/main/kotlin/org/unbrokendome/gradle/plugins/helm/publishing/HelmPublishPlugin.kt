@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
+import org.gradle.internal.reflect.Instantiator
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
@@ -16,13 +17,16 @@ import org.unbrokendome.gradle.plugins.helm.publishing.dsl.*
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartToRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.publishTaskName
+import javax.inject.Inject
 
 
 /**
  * A Gradle plugin that adds publishing capabilities for Helm charts.
  */
 class HelmPublishPlugin
-    : Plugin<Project> {
+@Inject constructor(
+    private val instantiator: Instantiator
+) : Plugin<Project> {
 
     override fun apply(project: Project) {
 
@@ -52,13 +56,14 @@ class HelmPublishPlugin
      * Creates and registers a `helm.publishing` sub-extension with the DSL.
      */
     private fun createPublishingExtension(project: Project) =
-            createHelmPublishingExtension(project)
-                    .apply {
-                        (project.helm as ExtensionAware).extensions.add(
-                                HelmPublishingExtension::class.java,
-                                HELM_PUBLISHING_EXTENSION_NAME,
-                                this)
-                    }
+        project.objects.createHelmPublishingExtension(instantiator)
+            .apply {
+                (project.helm as ExtensionAware).extensions.add(
+                    HelmPublishingExtension::class.java,
+                    HELM_PUBLISHING_EXTENSION_NAME,
+                    this
+                )
+            }
 
 
     /**
@@ -67,9 +72,11 @@ class HelmPublishPlugin
      * @see HelmChartPublishConvention
      */
     private fun addChartPublishConvention(chart: HelmChart, project: Project) {
-        (chart as HasConvention).convention.add(HelmChartPublishConvention::class.java,
-                HELM_CHART_PUBLISHING_CONVENTION_NAME,
-                createHelmChartPublishConvention(project.objects))
+        (chart as HasConvention).convention.add(
+            HelmChartPublishConvention::class.java,
+            HELM_CHART_PUBLISHING_CONVENTION_NAME,
+            createHelmChartPublishConvention(project.objects)
+        )
     }
 
 
@@ -83,7 +90,7 @@ class HelmPublishPlugin
 
             task.dependsOn(TaskDependency {
                 charts.map { chart -> project.tasks.getByName(chart.publishTaskName) }
-                        .toSet()
+                    .toSet()
             })
         }
     }

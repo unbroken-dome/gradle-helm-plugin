@@ -2,10 +2,15 @@
 
 The `helm-publish` plugin allows you to publish your charts to remote repositories over HTTP.
 
-NOTE: There is currently no "official" API to publish Helm charts; Helm defines only how charts should be
-served from a repository. Since https://chartmuseum.com/[ChartMuseum] is probably the most widespread
-type of repository, the plugin assumes its API pattern by default, with some limited possibilities
-for configuration.
+[NOTE]
+====
+There is currently no "official" API to publish Helm charts; Helm defines only how charts should be
+served from a repository. https://chartmuseum.com/[ChartMuseum] and https://jfrog.com/artifactory/[Artifactory]
+are two widespread Helm repository servers, and both are supported by this plugin.
+
+For other repository types that are not directly supported, you could try using the `custom` repository type,
+or consider creating a PR to add support for it.
+====
 
 Apply the `helm-publish` plugin to your project:
 
@@ -34,8 +39,11 @@ repositories to publish to:
 helm {
     publishing {
         repositories {
-            example {
+            chartMuseum('example') {
                 url = uri('http://helm-repo.example.com/')
+            }
+            artifactory('myRepo') {
+                url = uri('http://artifactory.example.com/helm-local')
             }
         }
     }
@@ -48,8 +56,11 @@ helm {
 helm {
     publishing {
         repositories {
-            create("example") {
-                url.set(uri("http://helm-repo.example.com/")
+            chartMuseum("example") {
+                url.set(uri("http://helm-repo.example.com/"))
+            }
+            artifactory("myRepo") {
+                url.set(uri("http://artifactory.example.com/helm-local"))
             }
         }
     }
@@ -77,6 +88,89 @@ If you want to download from and publish to
 the same external repository, you would need to specify it both in `helm.repositories` and
 `helm.publishing.repositories` (similar to Gradle's built-in publishing).
 ====
+
+If you only define a single publishing repository, the name can be omitted, in which case the name `"default"` is
+used:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            artifactory {
+                url = uri('http://artifactory.example.com/helm-local')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            artifactory {
+                url.set(uri("http://artifactory.example.com/helm-local"))
+            }
+        }
+    }
+}
+----
+
+The following repository types are supported:
+
+- `artifactory`
+- `chartMuseum`
+- `custom` (see next section)
+
+
+== Custom repositories
+
+If your target repository is not directly supported but involves some sort of HTTP upload, you can try the `custom`
+type which offers some (limited) possibilities to configure a freestyle upload.
+Use the `uploadMethod` and/or `uploadPath` properties to customize the upload request:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            custom {
+                url = uri('http://artifactory.example.com/helm-local')
+                uploadMethod = 'PUT'
+                uploadPath = '/charts/{name}/{version}/{filename}'
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            custom {
+                url.set(uri("http://helm-repo.example.com"))
+                uploadMethod.set("PUT")
+                uploadPath.set("/charts/{name}/{version}/{filename}")
+            }
+        }
+    }
+}
+----
+
+The following placeholders can be used in the `uploadPath` property:
+
+- `{name}` will be replaced with the chart name
+- `{version}` will be replaced with the chart version
+- `{filename}` will be replaced with the file name of the packaged chart, i.e. `{name}-{version}.tgz`
+
 
 
 == Specifying Credentials for Repositories
@@ -109,7 +203,7 @@ helm {
     publishing {
         repositories {
             create("example") {
-                url.set(uri("http://helm-repo.example.com/")
+                url.set(uri("http://helm-repo.example.com/"))
             }
             credentials {
                 username.set("user")

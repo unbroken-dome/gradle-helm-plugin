@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.publishing
+package org.unbrokendome.gradle.plugins.helm.publishing.publishers
 
 import java.io.File
 
@@ -11,7 +11,9 @@ internal interface HelmChartPublisher {
     /**
      * Publishes the given chart file to the repository.
      *
+     * @param chartName the name of the chart
+     * @param chartVersion the version of the chart
      * @param chartFile the path to the chart package file (`.tgz`) on disk
      */
-    fun publish(chartFile: File)
+    fun publish(chartName: String, chartVersion: String, chartFile: File)
 }
