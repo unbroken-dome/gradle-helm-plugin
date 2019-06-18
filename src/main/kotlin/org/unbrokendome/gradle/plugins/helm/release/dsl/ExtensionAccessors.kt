@@ -9,5 +9,5 @@ import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 /**
  * Gets the `releases` sub-extension.
  */
-val HelmExtension.releases: NamedDomainObjectContainer<HelmRelease>
+internal val HelmExtension.releases: NamedDomainObjectContainer<HelmRelease>
     get() = requiredExtension(HELM_RELEASES_EXTENSION_NAME)

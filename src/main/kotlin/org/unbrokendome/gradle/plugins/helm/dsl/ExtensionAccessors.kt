@@ -16,82 +16,82 @@ import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 /**
  * Gets the [HelmExtension] that is installed on the project.
  */
-val Project.helm: HelmExtension
+internal val Project.helm: HelmExtension
     get() = extensions.getByType(HelmExtension::class.java)
 
 
 /**
  * Gets the [Tiller] sub-extension.
  */
-val HelmExtension.tiller: Tiller
+internal val HelmExtension.tiller: Tiller
     get() = requiredExtension(HELM_TILLLER_EXTENSION_NAME)
 
 
 /**
  * Gets the [Linting] sub-extension.
  */
-val HelmExtension.lint: Linting
+internal val HelmExtension.lint: Linting
     get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
 
 
 /**
  * Gets the `repositories` sub-extension.
  */
-val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
+internal val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
     get() = requiredExtension(HELM_REPOSITORIES_EXTENSION_NAME)
 
 
 /**
  * Gets the `charts` sub-extension.
  */
-val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
+internal val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
     get() = requiredExtension(HELM_CHARTS_EXTENSION_NAME)
 
 
 /**
  * Gets the [Filtering] sub-extension.
  */
-val HelmExtension.filtering: Filtering
+internal val HelmExtension.filtering: Filtering
     get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
 
 
 /**
  * Gets the chart's [Linting] extension.
  */
-val HelmChart.lint: Linting
+internal val HelmChart.lint: Linting
     get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
 
 
 /**
  * Configures the chart linting.
  */
-fun HelmChart.lint(configure: (Linting).() -> Unit) =
+internal fun HelmChart.lint(configure: (Linting).() -> Unit) =
         (this as ExtensionAware).extensions.configure(HELM_LINT_EXTENSION_NAME, configure)
 
 
 /**
  * Gets the chart's [Filtering] extension.
  */
-val HelmChart.filtering: Filtering
+internal val HelmChart.filtering: Filtering
     get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
 
 
 /**
  * Configures the chart filtering.
  */
-fun HelmChart.filtering(configure: (Filtering).() -> Unit) =
+internal fun HelmChart.filtering(configure: (Filtering).() -> Unit) =
         (this as ExtensionAware).extensions.configure(HELM_FILTERING_EXTENSION_NAME, configure)
 
 
 /**
  * Gets the chart's `dependencies` extension.
  */
-val HelmChart.dependencies: ChartDependencyHandler
+internal val HelmChart.dependencies: ChartDependencyHandler
     get() = requiredExtension(HELM_DEPENDENCIES_EXTENSION_NAME)
 
 
 /**
  * Configures the chart dependencies.
  */
-fun HelmChart.dependencies(configure: (ChartDependencyHandler).() -> Unit) =
+internal fun HelmChart.dependencies(configure: (ChartDependencyHandler).() -> Unit) =
         (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)

@@ -10,12 +10,12 @@ import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 /**
  * Gets the `publishing` sub-extension.
  */
-val HelmExtension.publishing: HelmPublishingExtension
+internal val HelmExtension.publishing: HelmPublishingExtension
     get() = requiredExtension(HELM_PUBLISHING_EXTENSION_NAME)
 
 
 /**
  * Gets the `publishing.repositories` sub-extension.
  */
-val HelmPublishingExtension.repositories: NamedDomainObjectContainer<HelmPublishingRepository>
+internal val HelmPublishingExtension.repositories: NamedDomainObjectContainer<HelmPublishingRepository>
     get() = requiredExtension(HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME)
