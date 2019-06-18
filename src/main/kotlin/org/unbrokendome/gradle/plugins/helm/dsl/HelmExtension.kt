@@ -133,5 +133,5 @@ private open class DefaultHelmExtension
  * @param project the Gradle [Project]
  * @return the created [HelmExtension] object
  */
-fun createHelmExtension(project: Project): HelmExtension =
+internal fun createHelmExtension(project: Project): HelmExtension =
         project.objects.newInstance(DefaultHelmExtension::class.java, project)
