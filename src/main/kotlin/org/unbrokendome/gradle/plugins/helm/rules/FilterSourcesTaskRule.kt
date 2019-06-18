@@ -11,13 +11,13 @@ import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
  * A rule that creates a [HelmFilterSources] task for each chart.
  */
 internal class FilterSourcesTaskRule(
-        private val tasks: TaskContainer,
-        private val charts: Iterable<HelmChart>)
-    : AbstractRule() {
+    private val tasks: TaskContainer,
+    private val charts: Iterable<HelmChart>
+) : AbstractRule() {
 
     internal companion object {
         fun getTaskName(chartName: String) =
-                "helmFilter${chartName.capitalize()}ChartSources"
+            "helmFilter${chartName.capitalize()}ChartSources"
     }
 
 
@@ -25,23 +25,23 @@ internal class FilterSourcesTaskRule(
 
 
     override fun getDescription(): String =
-            "Pattern: ${getTaskName("<Chart>")}"
+        "Pattern: ${getTaskName("<Chart>")}"
 
 
     override fun apply(taskName: String) {
         if (regex.matches(taskName)) {
             charts.find { it.filterSourcesTaskName == taskName }
-                    ?.let { chart ->
-                        tasks.create(taskName, HelmFilterSources::class.java) { task ->
-                            task.description = "Filters the sources for the ${chart.name} chart."
-                            task.configuredChartName.set(chart.name)
-                            task.chartName.set(chart.chartName)
-                            task.chartVersion.set(chart.chartVersion)
-                            task.sourceDir.set(chart.sourceDir)
+                ?.let { chart ->
+                    tasks.create(taskName, HelmFilterSources::class.java) { task ->
+                        task.description = "Filters the sources for the ${chart.name} chart."
+                        task.configuredChartName.set(chart.name)
+                        task.chartName.set(chart.chartName)
+                        task.chartVersion.set(chart.chartVersion)
+                        task.sourceDir.set(chart.sourceDir)
 
-                            (task.filtering as FilteringInternal).setParent(chart.filtering)
-                        }
+                        (task.filtering as FilteringInternal).setParent(chart.filtering)
                     }
+                }
         }
     }
 }
