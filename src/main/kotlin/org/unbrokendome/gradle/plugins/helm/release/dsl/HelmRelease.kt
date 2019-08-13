@@ -133,6 +133,10 @@ interface HelmRelease : Named {
      */
     val dryRun: Property<Boolean>
 
+    /**
+     * If `true`, will execute the release atomically.
+     */
+    val atomic: Property<Boolean>
 
     /**
      * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
@@ -261,6 +265,9 @@ private open class DefaultHelmRelease
             project.objects.property<Boolean>()
                     .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
 
+    override val atomic: Property<Boolean> =
+            project.objects.property<Boolean>()
+                    .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
 
     override val wait: Property<Boolean> =
             project.objects.property()
