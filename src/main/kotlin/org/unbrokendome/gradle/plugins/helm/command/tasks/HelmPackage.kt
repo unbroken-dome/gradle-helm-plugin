@@ -4,12 +4,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
@@ -140,6 +135,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
         this.destinationDir.get().asFile.mkdirs()
 
         execHelm("package") {
+            option("--version", chartVersion)
             option("--app-version", appVersion)
             flag("--dependency-update", updateDependencies)
             option("--destination", destinationDir)
