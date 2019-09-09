@@ -102,6 +102,8 @@ open class HelmInit : AbstractHelmCommandTask() {
             option("--service-account", serviceAccount)
             flag("--skip-refresh", skipRefresh)
             option("--tiller-image", tillerImage)
+            flag("--upgrade", upgrade)
+            flag("--wait", wait)
         }
     }
 }
