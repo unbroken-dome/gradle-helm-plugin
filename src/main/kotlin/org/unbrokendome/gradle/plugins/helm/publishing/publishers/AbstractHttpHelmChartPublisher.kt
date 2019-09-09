@@ -2,6 +2,8 @@ package org.unbrokendome.gradle.plugins.helm.publishing.publishers
 
 import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.client.config.CookieSpecs
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.FileEntity
@@ -87,6 +89,12 @@ internal abstract class AbstractHttpHelmChartPublisher(
     private fun createHttpClient(): CloseableHttpClient {
         return HttpClientBuilder.create()
             .apply {
+
+                // The "default" CookieSpec does not always understand RFC-6265 compliant cookies, which
+                // may be used by Artifactory
+                setDefaultRequestConfig(
+                    RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()
+                )
 
                 credentials.ifPresent { credentials ->
                     when (credentials) {
