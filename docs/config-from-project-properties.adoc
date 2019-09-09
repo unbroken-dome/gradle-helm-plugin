@@ -155,3 +155,7 @@ You can configure repositories entirely from Gradle properties -- just the prese
 | `helm.dryRun`
 | Only perform a dry run when installing or deleting releases.
 |===
+
+| `helm.atomic`
+| Perform releases atomically
+|===

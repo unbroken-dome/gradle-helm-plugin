@@ -48,6 +48,7 @@ class HelmInstallReleaseTaskRule(
                             task.repository.set(release.repository)
                             task.namespace.set(release.namespace)
                             task.dryRun.set(release.dryRun)
+                            task.atomic.set(release.atomic)
                             task.replace.set(release.replace)
                             task.values.set(release.values)
                             task.valueFiles.from(release.valueFiles)
