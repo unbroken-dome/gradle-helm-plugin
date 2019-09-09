@@ -72,11 +72,8 @@ class HelmPublishPlugin
      * @see HelmChartPublishConvention
      */
     private fun addChartPublishConvention(chart: HelmChart, project: Project) {
-        (chart as HasConvention).convention.add(
-            HelmChartPublishConvention::class.java,
-            HELM_CHART_PUBLISHING_CONVENTION_NAME,
-            createHelmChartPublishConvention(project.objects)
-        )
+        (chart as HasConvention).convention.plugins[HELM_CHART_PUBLISHING_CONVENTION_NAME] =
+            project.objects.createHelmChartPublishConvention()
     }
 
 
@@ -95,5 +92,3 @@ class HelmPublishPlugin
         }
     }
 }
-
-

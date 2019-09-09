@@ -35,11 +35,11 @@ private open class DefaultHelmChartPublishConvention
 /**
  * Creates a new [HelmChartPublishConvention] using the given [ObjectFactory].
  *
- * @param objectFactory the [ObjectFactory] used to instantiate the convention object
+ * @receiver the [ObjectFactory] used to instantiate the convention object
  * @return the [HelmChartPublishConvention]
  */
-internal fun createHelmChartPublishConvention(objectFactory: ObjectFactory): HelmChartPublishConvention =
-        objectFactory.newInstance(DefaultHelmChartPublishConvention::class.java)
+internal fun ObjectFactory.createHelmChartPublishConvention(): HelmChartPublishConvention =
+        newInstance(DefaultHelmChartPublishConvention::class.java)
 
 
 /**

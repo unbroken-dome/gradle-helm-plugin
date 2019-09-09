@@ -2,7 +2,6 @@ package org.unbrokendome.gradle.plugins.helm.util
 
 import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.ExtensionAware
-import java.security.cert.Extension
 
 
 /**
@@ -14,7 +13,7 @@ import java.security.cert.Extension
  */
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> Any.extension(name: String): T? =
-        (this as ExtensionAware).extensions.findByName(name) as T?
+    (this as ExtensionAware).extensions.findByName(name) as T?
 
 
 /**
@@ -26,7 +25,7 @@ internal fun <T : Any> Any.extension(name: String): T? =
  */
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> Any.requiredExtension(name: String): T =
-        (this as ExtensionAware).extensions.getByName(name) as T
+    (this as ExtensionAware).extensions.getByName(name) as T
 
 
 /**
@@ -37,7 +36,7 @@ internal fun <T : Any> Any.requiredExtension(name: String): T =
  * @throws org.gradle.api.UnknownDomainObjectException if the extension does not exist
  */
 internal inline fun <reified T : Any> Any.requiredExtension(): T =
-        (this as ExtensionAware).extensions.getByType(T::class.java)
+    (this as ExtensionAware).extensions.getByType(T::class.java)
 
 
 /**
@@ -48,4 +47,4 @@ internal inline fun <reified T : Any> Any.requiredExtension(): T =
  * @throws org.gradle.api.UnknownDomainObjectException if the convention does not exist
  */
 internal inline fun <reified T : Any> Any.requiredConvention(): T =
-        (this as HasConvention).convention.getByType(T::class.java)
+    (this as HasConvention).convention.getPlugin(T::class.java)
