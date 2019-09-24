@@ -74,47 +74,47 @@ private open class DefaultTiller
 @Inject constructor(project: Project) : Tiller {
 
 
-    override val install: Property<Boolean> =
+    final override val install: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.tiller.install", defaultValue = true))
 
 
-    override val namespace: Property<String> =
+    final override val namespace: Property<String> =
         project.objects.property<String>()
             .convention(project.providerFromProjectProperty("helm.tiller.namespace"))
 
 
-    override val forceUpgrade: Property<Boolean> =
+    final override val forceUpgrade: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.tiller.forceUpgrade"))
 
 
-    override val historyMax: Property<Int> =
+    final override val historyMax: Property<Int> =
         project.objects.property<Int>()
             .convention(project.intProviderFromProjectProperty("helm.tiller.historyMax"))
 
 
-    override val replicas: Property<Int> =
+    final override val replicas: Property<Int> =
         project.objects.property<Int>()
             .convention(project.intProviderFromProjectProperty("helm.tiller.replicas"))
 
 
-    override val serviceAccount: Property<String> =
+    final override val serviceAccount: Property<String> =
         project.objects.property<String>()
             .convention(project.providerFromProjectProperty("helm.tiller.serviceAccount"))
 
 
-    override val image: Property<String> =
+    final override val image: Property<String> =
         project.objects.property<String>()
             .convention(project.providerFromProjectProperty("helm.tiller.image"))
 
 
-    override val upgrade: Property<Boolean> =
+    final override val upgrade: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.tiller.upgrade"))
 
 
-    override val wait: Property<Boolean> =
+    final override val wait: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.tiller.wait", defaultValue = true))
 }
@@ -123,8 +123,8 @@ private open class DefaultTiller
 /**
  * Creates a new [Tiller] object using the given project's [ObjectFactory].
  *
- * @param project the Gradle [Project]
+ * @receiver the Gradle [Project]
  * @return the created [Tiller] object
  */
-internal fun createTiller(project: Project): Tiller =
-    project.objects.newInstance(DefaultTiller::class.java, project)
+internal fun Project.createTiller(): Tiller =
+    objects.newInstance(DefaultTiller::class.java, this)

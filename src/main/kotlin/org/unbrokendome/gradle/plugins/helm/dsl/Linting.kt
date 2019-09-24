@@ -49,20 +49,20 @@ private interface LintingInternal : Linting, Hierarchical<Linting>
 private open class DefaultLinting
 @Inject constructor(objectFactory: ObjectFactory, projectLayout: ProjectLayout) : LintingInternal {
 
-    override val enabled: Property<Boolean> =
+    final override val enabled: Property<Boolean> =
         objectFactory.property<Boolean>()
             .convention(true)
 
-    override val strict: Property<Boolean> =
+    final override val strict: Property<Boolean> =
         objectFactory.property()
 
-    override val values: MapProperty<String, Any> =
+    final override val values: MapProperty<String, Any> =
         objectFactory.mapProperty()
 
-    override val valueFiles: ConfigurableFileCollection =
+    final override val valueFiles: ConfigurableFileCollection =
         projectLayout.configurableFiles()
 
-    override fun setParent(parent: Linting) {
+    final override fun setParent(parent: Linting) {
         enabled.set(parent.enabled)
         strict.set(parent.strict)
         values.putAll(parent.values)
@@ -74,12 +74,12 @@ private open class DefaultLinting
 /**
  * Creates a new [Linting] object using the given [ObjectFactory].
  *
- * @param objectFactory the Gradle [ObjectFactory] to create the object
+ * @receiver the Gradle [ObjectFactory] to create the object
  * @param parent the optional parent [Linting] object
  * @return the created [Linting] object
  */
-internal fun createLinting(objectFactory: ObjectFactory, parent: Linting? = null): Linting =
-    objectFactory.newInstance(DefaultLinting::class.java)
+internal fun ObjectFactory.createLinting(parent: Linting? = null): Linting =
+    newInstance(DefaultLinting::class.java)
         .apply {
             parent?.let(this::setParent)
         }

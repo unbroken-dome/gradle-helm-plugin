@@ -30,7 +30,7 @@ private constructor(
             : this(project.objects, name)
 
 
-    override fun getName(): String =
+    final override fun getName(): String =
         name
 
 

@@ -217,20 +217,20 @@ private open class DefaultHelmRelease
     private val project: Project
 ) : HelmRelease {
 
-    override fun getName(): String =
+    final override fun getName(): String =
         name
 
 
-    override val releaseName: Property<String> =
+    final override val releaseName: Property<String> =
         project.objects.property<String>()
             .convention(name)
 
 
-    override val chart: Property<ChartReference> =
+    final override val chart: Property<ChartReference> =
         project.objects.property()
 
 
-    override fun chart(project: String?, chart: String): ChartReference =
+    final override fun chart(project: String?, chart: String): ChartReference =
         if (project == null) {
             // Referring to a chart in the same project -> use a HelmChartReference
             HelmChartReference(this.project, chart)
@@ -254,53 +254,53 @@ private open class DefaultHelmRelease
         }
 
 
-    override val repository: Property<URI> =
+    final override val repository: Property<URI> =
         project.objects.property()
 
 
-    override val namespace: Property<String> =
+    final override val namespace: Property<String> =
         project.objects.property()
 
 
-    override val version: Property<String> =
+    final override val version: Property<String> =
         project.objects.property()
 
 
-    override val dryRun: Property<Boolean> =
+    final override val dryRun: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
 
-    override val atomic: Property<Boolean> =
+    final override val atomic: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
 
-    override val wait: Property<Boolean> =
+    final override val wait: Property<Boolean> =
         project.objects.property()
 
 
-    override val replace: Property<Boolean> =
+    final override val replace: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(false)
 
 
-    override val purge: Property<Boolean> =
+    final override val purge: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(false)
 
 
-    override val values: MapProperty<String, Any> =
+    final override val values: MapProperty<String, Any> =
         project.objects.mapProperty()
 
 
-    override val valueFiles: ConfigurableFileCollection =
+    final override val valueFiles: ConfigurableFileCollection =
         project.layout.configurableFiles()
 
 
-    override val dependsOn: SetProperty<String> =
+    final override val dependsOn: SetProperty<String> =
         project.objects.setProperty()
 
 
-    override fun from(notation: Any) {
+    final override fun from(notation: Any) {
         if (notation is Provider<*>) {
             chart.set(notation.map(this::notationToChartReference))
         } else {
@@ -322,10 +322,10 @@ private open class DefaultHelmRelease
 /**
  * Creates a [NamedDomainObjectContainer] that holds [HelmRelease]s.
  *
- * @param project the Gradle [Project]
+ * @receiver the Gradle [Project]
  * @return the container for `HelmRelease`s
  */
-internal fun helmReleaseContainer(project: Project): NamedDomainObjectContainer<HelmRelease> =
-    project.container(HelmRelease::class.java) { name ->
-        project.objects.newInstance(DefaultHelmRelease::class.java, name, project)
+internal fun Project.helmReleaseContainer(): NamedDomainObjectContainer<HelmRelease> =
+    container(HelmRelease::class.java) { name ->
+        objects.newInstance(DefaultHelmRelease::class.java, name, this)
     }

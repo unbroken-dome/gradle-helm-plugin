@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.tasks
 
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
@@ -8,15 +9,18 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
-import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependenciesResolver
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
+import org.unbrokendome.gradle.plugins.helm.dsl.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
+import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.putFrom
+import org.unbrokendome.gradle.plugins.helm.util.versionProvider
 import java.io.File
 import java.io.Reader
 import java.io.StringReader
@@ -108,18 +112,6 @@ open class HelmFilterSources : DefaultTask() {
 
 
     init {
-        val globalFiltering: Filtering? = project.helm.extension(HELM_FILTERING_EXTENSION_NAME)
-
-        // we install the "filtering" block as an extension on the task so we get the convenience
-        // accessors by Gradle (property, method with closure, Kotlin DSL accessor)
-        createFiltering(project.objects, parent = globalFiltering)
-            .apply {
-                values.putFrom("chartName", chartName)
-                values.putFrom("chartVersion", chartVersion)
-                values.putFrom("projectVersion", project.versionProvider)
-                extensions.add(Filtering::class.java, "filtering", this)
-            }
-
         dependsOn(chartRequirementsTaskDependency())
     }
 
@@ -128,8 +120,20 @@ open class HelmFilterSources : DefaultTask() {
      * Settings that control filtering of the chart sources.
      */
     @get:Nested
-    val filtering: Filtering
-        get() = extensions.getByName("filtering") as Filtering
+    val filtering: Filtering = project.objects.createFiltering(parent = project.helm.filtering)
+        .apply {
+            values.putFrom("chartName", chartName)
+            values.putFrom("chartVersion", chartVersion)
+            values.putFrom("projectVersion", project.versionProvider)
+        }
+
+
+    /**
+     * Configures filtering for this task.
+     */
+    fun filtering(configureAction: Action<Filtering>) {
+        configureAction.execute(filtering)
+    }
 
 
     @TaskAction

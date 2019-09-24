@@ -47,7 +47,7 @@ class HelmPlugin
      * Creates and installs the `helm.tiller` sub-extension.
      */
     private fun createTillerExtension(project: Project) =
-        createTiller(project)
+        project.createTiller()
             .apply {
                 (project.helm as ExtensionAware)
                     .extensions.add(HELM_TILLLER_EXTENSION_NAME, this)
@@ -135,7 +135,7 @@ class HelmPlugin
      * Creates and installs the `helm.repositories` sub-extension.
      */
     private fun createRepositoriesExtension(project: Project) =
-        helmRepositoryContainer(project)
+        project.helmRepositoryContainer()
             .apply {
                 (project.helm as ExtensionAware)
                     .extensions.add(HELM_REPOSITORIES_EXTENSION_NAME, this)
@@ -146,7 +146,7 @@ class HelmPlugin
      * Creates and installs the `helm.charts` sub-extension.
      */
     private fun createChartsExtension(project: Project) =
-        helmChartContainer(project)
+        project.helmChartContainer()
             .apply {
                 (project.helm as ExtensionAware)
                     .extensions.add(HELM_CHARTS_EXTENSION_NAME, this)
@@ -157,7 +157,7 @@ class HelmPlugin
      * Creates and installs the `helm.filtering` sub-extension.
      */
     private fun createFilteringExtension(project: Project) =
-        createFiltering(project.objects)
+        project.objects.createFiltering()
             .apply {
                 enabled.set(
                     project.booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true)
@@ -199,7 +199,7 @@ class HelmPlugin
             .add(
                 Filtering::class.java,
                 "filtering",
-                createFiltering(objectFactory, parent = helmExtension.filtering)
+                objectFactory.createFiltering(parent = helmExtension.filtering)
             )
     }
 
@@ -216,7 +216,7 @@ class HelmPlugin
             .add(
                 Linting::class.java,
                 "lint",
-                createLinting(objectFactory, parent = helmExtension.lint)
+                objectFactory.createLinting(parent = helmExtension.lint)
             )
     }
 

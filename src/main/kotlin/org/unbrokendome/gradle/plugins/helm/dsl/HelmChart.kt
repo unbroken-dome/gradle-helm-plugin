@@ -5,6 +5,7 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
@@ -40,28 +41,29 @@ interface HelmChart : Named, Buildable {
 private open class DefaultHelmChart
 @Inject constructor(
     private val name: String,
-    project: Project
+    project: Project,
+    objects: ObjectFactory
 ) : HelmChart {
 
-    override fun getName(): String =
+    final override fun getName(): String =
         name
 
 
-    override val chartName: Property<String> =
-        project.objects.property<String>()
+    final override val chartName: Property<String> =
+        objects.property<String>()
             .convention(name)
 
 
-    override val chartVersion: Property<String> =
-        project.objects.property<String>()
+    final override val chartVersion: Property<String> =
+        objects.property<String>()
             .convention(project.versionProvider)
 
 
-    override val sourceDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    final override val sourceDir: DirectoryProperty =
+        objects.directoryProperty()
 
 
-    override fun getBuildDependencies(): TaskDependency =
+    final override fun getBuildDependencies(): TaskDependency =
         TaskDependency { task ->
             if (task != null) {
                 setOf(
@@ -77,10 +79,10 @@ private open class DefaultHelmChart
 /**
  * Creates a [NamedDomainObjectContainer] that holds [HelmChart]s.
  *
- * @param project the Gradle [Project]
+ * @receiver the Gradle [Project]
  * @return the container for `HelmChart`s
  */
-internal fun helmChartContainer(project: Project): NamedDomainObjectContainer<HelmChart> =
-    project.container(HelmChart::class.java) { name ->
-        project.objects.newInstance(DefaultHelmChart::class.java, name, project)
+internal fun Project.helmChartContainer(): NamedDomainObjectContainer<HelmChart> =
+    container(HelmChart::class.java) { name ->
+        objects.newInstance(DefaultHelmChart::class.java, name, this)
     }

@@ -35,40 +35,40 @@ interface HelmRepository : Named, CredentialsContainer {
 private open class DefaultHelmRepository
 private constructor(
     private val name: String,
-    objectFactory: ObjectFactory,
+    objects: ObjectFactory,
     credentialsContainer: CredentialsContainer
 ) : HelmRepository, CredentialsContainer by credentialsContainer {
 
 
-    private constructor(name: String, objectFactory: ObjectFactory, credentialsFactory: CredentialsFactory)
-            : this(name, objectFactory, CredentialsContainerSupport(objectFactory, credentialsFactory))
+    private constructor(name: String, objects: ObjectFactory, credentialsFactory: CredentialsFactory)
+            : this(name, objects, CredentialsContainerSupport(objects, credentialsFactory))
 
 
     @Inject
-    constructor(name: String, objectFactory: ObjectFactory)
-            : this(name, objectFactory, DefaultCredentialsFactory(objectFactory))
+    constructor(name: String, objects: ObjectFactory)
+            : this(name, objects, DefaultCredentialsFactory(objects))
 
 
-    override fun getName(): String =
+    final override fun getName(): String =
         name
 
 
-    override val url: Property<URI> =
-        objectFactory.property()
+    final override val url: Property<URI> =
+        objects.property()
 
 
-    override val caFile: RegularFileProperty =
-        objectFactory.fileProperty()
+    final override val caFile: RegularFileProperty =
+        objects.fileProperty()
 }
 
 
 /**
  * Creates a [NamedDomainObjectContainer] that holds [HelmRepository] objects.
  *
- * @param project the Gradle [Project]
+ * @receiver the Gradle [Project]
  * @return the container for `HelmRepository` objects
  */
-internal fun helmRepositoryContainer(project: Project): NamedDomainObjectContainer<HelmRepository> =
-    project.container(HelmRepository::class.java) { name ->
-        project.objects.newInstance(DefaultHelmRepository::class.java, name)
+internal fun Project.helmRepositoryContainer(): NamedDomainObjectContainer<HelmRepository> =
+    container(HelmRepository::class.java) { name ->
+        objects.newInstance(DefaultHelmRepository::class.java, name)
     }

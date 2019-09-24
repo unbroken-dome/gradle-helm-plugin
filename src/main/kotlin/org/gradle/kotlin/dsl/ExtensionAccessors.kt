@@ -1,5 +1,8 @@
+@file:Suppress("unused")
+
 package org.gradle.kotlin.dsl
 
+import org.gradle.api.Action
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.HELM_DEPENDENCIES_EXTENSION_NAME
@@ -23,7 +26,7 @@ val HelmChart.lint: Linting
 /**
  * Configures the chart linting.
  */
-fun HelmChart.lint(configure: (Linting).() -> Unit) =
+fun HelmChart.lint(configure: Action<Linting>) =
     (this as ExtensionAware).extensions.configure(HELM_LINT_EXTENSION_NAME, configure)
 
 
@@ -37,7 +40,7 @@ val HelmChart.filtering: Filtering
 /**
  * Configures the chart filtering.
  */
-fun HelmChart.filtering(configure: (Filtering).() -> Unit) =
+fun HelmChart.filtering(configure: Action<Filtering>) =
     (this as ExtensionAware).extensions.configure(HELM_FILTERING_EXTENSION_NAME, configure)
 
 
@@ -51,7 +54,7 @@ val HelmChart.dependencies: ChartDependencyHandler
 /**
  * Configures the chart dependencies.
  */
-fun HelmChart.dependencies(configure: (ChartDependencyHandler).() -> Unit) =
+fun HelmChart.dependencies(configure: Action<ChartDependencyHandler>) =
     (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)
 
 

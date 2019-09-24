@@ -17,11 +17,11 @@ class HelmCommandsPlugin
 
     override fun apply(project: Project) {
 
-        val helmExtension = createHelmExtension(project)
+        val helmExtension = project.createHelmExtension()
         project.extensions.add(HelmExtension::class.java, HELM_EXTENSION_NAME, helmExtension)
 
 
-        createLinting(project.objects)
+        project.objects.createLinting()
             .apply {
                 enabled.set(
                     project.booleanProviderFromProjectProperty("helm.lint.enabled", true)

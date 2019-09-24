@@ -58,28 +58,30 @@ internal interface FilteringInternal : Filtering, Hierarchical<Filtering>
  * Default implementation of [Filtering].
  */
 private open class DefaultFiltering
-@Inject constructor(objectFactory: ObjectFactory) : FilteringInternal {
+@Inject constructor(
+    objectFactory: ObjectFactory
+) : FilteringInternal {
 
-    override val enabled: Property<Boolean> =
+    final override val enabled: Property<Boolean> =
         objectFactory.property<Boolean>()
             .convention(true)
 
 
-    override val placeholderPrefix: Property<String> =
+    final override val placeholderPrefix: Property<String> =
         objectFactory.property<String>()
             .convention(FILTERING_DEFAULT_PLACEHOLDER_PREFIX)
 
 
-    override val placeholderSuffix: Property<String> =
+    final override val placeholderSuffix: Property<String> =
         objectFactory.property<String>()
             .convention(FILTERING_DEFAULT_PLACEHOLDER_SUFFIX)
 
 
-    override val values: MapProperty<String, Any> =
+    final override val values: MapProperty<String, Any> =
         objectFactory.mapProperty<String, Any>().empty()
 
 
-    override fun setParent(parent: Filtering) {
+    final override fun setParent(parent: Filtering) {
         enabled.set(parent.enabled)
         placeholderPrefix.set(parent.placeholderPrefix)
         placeholderSuffix.set(parent.placeholderSuffix)
@@ -91,12 +93,12 @@ private open class DefaultFiltering
 /**
  * Creates a new [Filtering] object using the given [ObjectFactory].
  *
- * @param objectFactory the Gradle [ObjectFactory] to create the object
+ * @receiver the Gradle [ObjectFactory] to create the object
  * @param parent the optional parent [Filtering] object
  * @return the created [Filtering] object
  */
-internal fun createFiltering(objectFactory: ObjectFactory, parent: Filtering? = null): Filtering =
-    objectFactory.newInstance(DefaultFiltering::class.java)
+internal fun ObjectFactory.createFiltering(parent: Filtering? = null): Filtering =
+    newInstance(DefaultFiltering::class.java)
         .apply {
             parent?.let(this::setParent)
         }

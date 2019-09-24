@@ -42,7 +42,7 @@ class HelmReleasesPlugin : Plugin<Project> {
 
 
     private fun createReleasesExtension(project: Project) =
-        helmReleaseContainer(project)
+        project.helmReleaseContainer()
             .apply {
                 (project.helm as ExtensionAware)
                     .extensions.add(HELM_RELEASES_EXTENSION_NAME, this)
