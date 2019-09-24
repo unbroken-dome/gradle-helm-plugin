@@ -21,13 +21,15 @@ import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.putFrom
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.Reader
 import java.io.StringReader
 import java.util.*
 
 
-val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
+private val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
 
 
 /**
@@ -111,6 +113,16 @@ open class HelmFilterSources : DefaultTask() {
             .convention(true)
 
 
+    /**
+     * If `true` (the default), the `name` and `version` entries in the Chart.yaml file will be overridden
+     * with the actual values of [chartName] and [chartVersion], respectively.
+     */
+    @get:Input
+    val overrideChartInfo: Property<Boolean> =
+        project.objects.property<Boolean>()
+            .convention(true)
+
+
     init {
         dependsOn(chartRequirementsTaskDependency())
     }
@@ -131,6 +143,7 @@ open class HelmFilterSources : DefaultTask() {
     /**
      * Configures filtering for this task.
      */
+    @Suppress("unused")
     fun filtering(configureAction: Action<Filtering>) {
         configureAction.execute(filtering)
     }
@@ -141,8 +154,24 @@ open class HelmFilterSources : DefaultTask() {
         project.copy { spec ->
             spec.from(sourceDir)
             spec.into(targetDir)
+            applyChartInfoOverrides(spec)
             applyFiltering(spec)
             applyDependencyResolution(spec)
+        }
+    }
+
+
+    private fun applyChartInfoOverrides(copySpec: CopySpec) {
+        if (overrideChartInfo.get()) {
+            copySpec.filesMatching("Chart.yaml") { details ->
+                details.filter(
+                    mapOf("overrides" to mapOf(
+                        "name" to chartName.get(),
+                        "version" to chartVersion.get()
+                    )),
+                    YamlOverrideFilterReader::class.java
+                )
+            }
         }
     }
 
@@ -151,26 +180,22 @@ open class HelmFilterSources : DefaultTask() {
      * Apply the [Filtering] options to a [CopySpec].
      */
     private fun applyFiltering(copySpec: CopySpec) {
+        if (filtering.enabled.get()) {
 
-        this.filtering.let { filtering ->
+            // the regex to match placeholders inside the files
+            val regex = Regex(
+                Regex.escape(filtering.placeholderPrefix.get()) +
+                        "(.*?)" +
+                        Regex.escape(filtering.placeholderSuffix.get())
+            )
 
-            if (filtering.enabled.get()) {
+            val values = filtering.values.get()
 
-                // the regex to match placeholders inside the files
-                val regex = Regex(
-                    Regex.escape(filtering.placeholderPrefix.get()) +
-                            "(.*?)" +
-                            Regex.escape(filtering.placeholderSuffix.get())
-                )
-
-                val values = filtering.values.get()
-
-                copySpec.filesMatching(FilteredFilePatterns) { details ->
-                    details.filter { line ->
-                        line.replace(regex) { matchResult ->
-                            val key = matchResult.groupValues[1]
-                            Objects.toString(values[key])
-                        }
+            copySpec.filesMatching(FilteredFilePatterns) { details ->
+                details.filter { line ->
+                    line.replace(regex) { matchResult ->
+                        val key = matchResult.groupValues[1]
+                        Objects.toString(values[key])
                     }
                 }
             }
@@ -220,6 +245,39 @@ open class HelmFilterSources : DefaultTask() {
                 emptySet()
             }
         }
+
+
+    /**
+     * A [java.io.FilterReader] that modifies a given YAML file by overriding specific values.
+     *
+     * The YAML file is assumed to have a mapping structure at the root.
+     * Overridden values must be provided by setting the `overrides` property. Only values on the root level
+     * may be overridden.
+     *
+     * Any values that are already present in the source and have corresponding entries in [overrides] will be
+     * overridden in-place with the new values. Entries in [overrides] that do not appear in the original source
+     * will be appended at the end.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    internal class YamlOverrideFilterReader(input: Reader) : DelegateReader(input) {
+
+        private companion object {
+            val yaml = Yaml(DumperOptions().apply {
+                defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
+                isPrettyFlow = true
+            })
+        }
+
+
+        var overrides: Map<String, Any> = emptyMap()
+
+
+        override val delegate: Reader by lazy {
+            val map = yaml.loadAs(`in`, Map::class.java)
+            val yamlOutput = yaml.dump(map + overrides)
+            StringReader(yamlOutput)
+        }
+    }
 
 
     /**
