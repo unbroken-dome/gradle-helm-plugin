@@ -17,7 +17,7 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val releaseName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -25,7 +25,7 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -33,7 +33,7 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val purge: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     init {

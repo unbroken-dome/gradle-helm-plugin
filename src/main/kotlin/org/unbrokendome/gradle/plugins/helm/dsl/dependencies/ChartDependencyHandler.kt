@@ -46,11 +46,12 @@ interface ChartDependencyHandler {
      */
     @JvmDefault
     fun add(notation: Map<*, *>) = add(
-            name = requireNotNull(notation["name"]?.toString()) {
-                "The \"name\" parameter is required when declaring a chart dependency."
-            },
-            chart = notation["name"]?.toString() ?: "main",
-            project = notation["project"]?.toString())
+        name = requireNotNull(notation["name"]?.toString()) {
+            "The \"name\" parameter is required when declaring a chart dependency."
+        },
+        chart = notation["name"]?.toString() ?: "main",
+        project = notation["project"]?.toString()
+    )
 
 
     /**
@@ -78,9 +79,9 @@ interface ChartDependencyHandler {
 
 private open class DefaultChartDependencyHandler
 @Inject constructor(
-        private val chart: HelmChart,
-        private val project: Project)
-    : ChartDependencyHandler {
+    private val chart: HelmChart,
+    private val project: Project
+) : ChartDependencyHandler {
 
 
     private val chartDependenciesConfiguration: Configuration
@@ -90,9 +91,10 @@ private open class DefaultChartDependencyHandler
                 findByName(configurationName) ?: create(configurationName) { configuration ->
                     configuration.isVisible = false
                     (configuration as ExtensionAware).extensions.add(
-                            MutableMap::class.java,
-                            HELM_DEPENDENCIES_CONF_EXTENSION_NAME,
-                            mutableMapOf<String, Any>())
+                        MutableMap::class.java,
+                        HELM_DEPENDENCIES_CONF_EXTENSION_NAME,
+                        mutableMapOf<String, Any>()
+                    )
                 }
             }
         }
@@ -105,16 +107,18 @@ private open class DefaultChartDependencyHandler
         }
 
         val dependencyNotation: Any =
-                if (project != null) {
-                    // dependency on a chart in another project
-                    this.project.dependencies.project(mapOf(
-                            "path" to project,
-                            "configuration" to chartDirArtifactConfigurationName(chart)
-                    ))
-                } else {
-                    // dependency on a chart in the same project
-                    this.project.configurations.getByName(chartDirArtifactConfigurationName(chart))
-                }
+            if (project != null) {
+                // dependency on a chart in another project
+                this.project.dependencies.project(
+                    mapOf(
+                        "path" to project,
+                        "configuration" to chartDirArtifactConfigurationName(chart)
+                    )
+                )
+            } else {
+                // dependency on a chart in the same project
+                this.project.configurations.getByName(chartDirArtifactConfigurationName(chart))
+            }
 
         chartDependenciesConfiguration.let { configuration ->
             configuration.helmDependencies[name] = dependencyNotation
@@ -133,12 +137,12 @@ private open class DefaultChartDependencyHandler
 
 
     private fun chartDirArtifactConfigurationName(dependencyName: String) =
-            ChartDirArtifactRule.getConfigurationName(dependencyName)
+        ChartDirArtifactRule.getConfigurationName(dependencyName)
 }
 
 
 internal fun createChartDependencyHandler(chart: HelmChart, project: Project): ChartDependencyHandler =
-        project.objects.newInstance(DefaultChartDependencyHandler::class.java, chart, project)
+    project.objects.newInstance(DefaultChartDependencyHandler::class.java, chart, project)
 
 
 /**

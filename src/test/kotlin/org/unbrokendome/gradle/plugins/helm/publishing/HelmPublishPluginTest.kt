@@ -30,9 +30,9 @@ class HelmPublishPluginTest : AbstractGradleProjectTest() {
     @Test
     fun `Plugin should create a helm publishing DSL extension`() {
         assert(project, name = "project")
-                .hasExtension<HelmExtension>("helm") {
-                    it.hasExtension<HelmPublishingExtension>("publishing")
-                }
+            .hasExtension<HelmExtension>("helm") {
+                it.hasExtension<HelmPublishingExtension>("publishing")
+            }
     }
 
 
@@ -52,7 +52,7 @@ class HelmPublishPluginTest : AbstractGradleProjectTest() {
 
             val publishAllTask = project.tasks.findByName("helmPublish")
             assert(publishAllTask)
-                    .isNotNull()
+                .isNotNull()
         }
     }
 }

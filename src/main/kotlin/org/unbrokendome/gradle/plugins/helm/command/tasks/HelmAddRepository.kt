@@ -21,7 +21,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:Input
     val repositoryName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -29,7 +29,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:Input
     val url: Property<URI> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -39,7 +39,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val caFile: Property<RegularFile> =
-            project.objects.fileProperty()
+        project.objects.fileProperty()
 
 
     /**
@@ -49,7 +49,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val username: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -59,7 +59,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val password: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -69,7 +69,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val certificateFile: Property<RegularFile> =
-            project.objects.fileProperty()
+        project.objects.fileProperty()
 
 
     /**
@@ -79,7 +79,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val keyFile: Property<RegularFile> =
-            project.objects.fileProperty()
+        project.objects.fileProperty()
 
 
     /**
@@ -89,7 +89,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:Internal
     val failIfExists: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     init {
@@ -113,15 +113,15 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
     @Suppress("UNCHECKED_CAST")
     private fun checkUpToDate(): Boolean {
         val repositoriesYaml = actualHelmHome.get()
-                .file("repository/repositories.yaml")
-                .asFile
-                .reader().use {
-                    Yaml().load(it) as Map<String, Any>
-                }
+            .file("repository/repositories.yaml")
+            .asFile
+            .reader().use {
+                Yaml().load(it) as Map<String, Any>
+            }
         val name = repositoryName.get()
         val repositoryData = (repositoriesYaml["repositories"] as List<Map<String, String>>)
-                .find { it["name"] == name }
-                ?: return false
+            .find { it["name"] == name }
+            ?: return false
 
         return repositoryData["url"] == url.get().toString() &&
                 repositoryData["caFile"] == caFile.orNull?.toString().orEmpty() &&

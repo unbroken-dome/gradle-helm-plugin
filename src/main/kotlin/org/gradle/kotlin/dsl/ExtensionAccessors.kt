@@ -24,7 +24,7 @@ val HelmChart.lint: Linting
  * Configures the chart linting.
  */
 fun HelmChart.lint(configure: (Linting).() -> Unit) =
-        (this as ExtensionAware).extensions.configure(HELM_LINT_EXTENSION_NAME, configure)
+    (this as ExtensionAware).extensions.configure(HELM_LINT_EXTENSION_NAME, configure)
 
 
 /**
@@ -38,7 +38,7 @@ val HelmChart.filtering: Filtering
  * Configures the chart filtering.
  */
 fun HelmChart.filtering(configure: (Filtering).() -> Unit) =
-        (this as ExtensionAware).extensions.configure(HELM_FILTERING_EXTENSION_NAME, configure)
+    (this as ExtensionAware).extensions.configure(HELM_FILTERING_EXTENSION_NAME, configure)
 
 
 /**
@@ -52,7 +52,7 @@ val HelmChart.dependencies: ChartDependencyHandler
  * Configures the chart dependencies.
  */
 fun HelmChart.dependencies(configure: (ChartDependencyHandler).() -> Unit) =
-        (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)
+    (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)
 
 
 /**

@@ -15,9 +15,9 @@ import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
  * A rule that creates a [HelmInstallOrUpgrade] task for a release.
  */
 class HelmInstallReleaseTaskRule(
-        private val tasks: TaskContainer,
-        private val releases: NamedDomainObjectContainer<HelmRelease>)
-    : AbstractRule() {
+    private val tasks: TaskContainer,
+    private val releases: NamedDomainObjectContainer<HelmRelease>
+) : AbstractRule() {
 
 
     internal companion object {
@@ -25,54 +25,54 @@ class HelmInstallReleaseTaskRule(
         const val TaskNamePrefix = "helmInstall"
 
         fun getTaskName(releaseName: String) =
-                TaskNamePrefix + releaseName.capitalizeWords()
+            TaskNamePrefix + releaseName.capitalizeWords()
     }
 
 
     override fun getDescription(): String =
-            "Pattern: $TaskNamePrefix<Release>"
+        "Pattern: $TaskNamePrefix<Release>"
 
 
     override fun apply(taskName: String) {
         if (taskName.startsWith(TaskNamePrefix)) {
 
             releases.find { getTaskName(it.name) == taskName }
-                    ?.let { release ->
+                ?.let { release ->
 
-                        tasks.create(taskName, HelmInstallOrUpgrade::class.java) { task ->
-                            task.description = "Installs or upgrades the ${release.name} release."
+                    tasks.create(taskName, HelmInstallOrUpgrade::class.java) { task ->
+                        task.description = "Installs or upgrades the ${release.name} release."
 
-                            task.chart.set(release.chart.map(ChartReference::chartLocation))
-                            task.releaseName.set(release.releaseName)
-                            task.version.set(release.version)
-                            task.repository.set(release.repository)
-                            task.namespace.set(release.namespace)
-                            task.dryRun.set(release.dryRun)
-                            task.atomic.set(release.atomic)
-                            task.replace.set(release.replace)
-                            task.values.set(release.values)
-                            task.valueFiles.from(release.valueFiles)
-                            task.wait.set(release.wait)
+                        task.chart.set(release.chart.map(ChartReference::chartLocation))
+                        task.releaseName.set(release.releaseName)
+                        task.version.set(release.version)
+                        task.repository.set(release.repository)
+                        task.namespace.set(release.namespace)
+                        task.dryRun.set(release.dryRun)
+                        task.atomic.set(release.atomic)
+                        task.replace.set(release.replace)
+                        task.values.set(release.values)
+                        task.valueFiles.from(release.valueFiles)
+                        task.wait.set(release.wait)
 
-                            task.dependsOn(HelmPlugin.initServerTaskName)
+                        task.dependsOn(HelmPlugin.initServerTaskName)
 
-                            task.dependsOn(TaskDependency {
-                                release.chart.orNull
-                                        ?.buildDependencies?.getDependencies(it)
-                                        ?: emptySet()
-                            })
+                        task.dependsOn(TaskDependency {
+                            release.chart.orNull
+                                ?.buildDependencies?.getDependencies(it)
+                                ?: emptySet()
+                        })
 
-                            // Make sure all releases that this release depends on are installed first
-                            task.dependsOn(TaskDependency {
-                                release.dependsOn.get()
-                                        .mapNotNull { dependencyReleaseName ->
-                                            val dependencyTaskName = getTaskName(dependencyReleaseName)
-                                            tasks.findByName(dependencyTaskName)
-                                        }
-                                        .toSet()
-                            })
-                        }
+                        // Make sure all releases that this release depends on are installed first
+                        task.dependsOn(TaskDependency {
+                            release.dependsOn.get()
+                                .mapNotNull { dependencyReleaseName ->
+                                    val dependencyTaskName = getTaskName(dependencyReleaseName)
+                                    tasks.findByName(dependencyTaskName)
+                                }
+                                .toSet()
+                        })
                     }
+                }
         }
 
     }

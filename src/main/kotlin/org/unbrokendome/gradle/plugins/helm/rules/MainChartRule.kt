@@ -15,13 +15,13 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
  * - chart source directory: `src/main/helm`
  */
 internal class MainChartRule(
-        private val project: Project,
-        private val charts: NamedDomainObjectContainer<HelmChart>)
-    : AbstractRule() {
+    private val project: Project,
+    private val charts: NamedDomainObjectContainer<HelmChart>
+) : AbstractRule() {
 
 
     override fun getDescription(): String =
-            "main chart"
+        "main chart"
 
 
     override fun apply(chartName: String) {
@@ -30,7 +30,8 @@ internal class MainChartRule(
                 mainChart.chartName.set(project.name)
                 mainChart.chartVersion.set(project.provider { project.version.toString() })
                 mainChart.sourceDir.set(
-                        project.layout.projectDirectory.dir("src/main/helm"))
+                    project.layout.projectDirectory.dir("src/main/helm")
+                )
             }
         }
     }

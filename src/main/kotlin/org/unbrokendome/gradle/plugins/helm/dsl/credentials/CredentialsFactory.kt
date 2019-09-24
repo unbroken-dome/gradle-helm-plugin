@@ -33,21 +33,23 @@ internal interface CredentialsFactory {
 internal class DefaultCredentialsFactory(private val objectFactory: ObjectFactory) : CredentialsFactory {
 
     private val knownTypes: Map<Class<out Credentials>, Class<out Credentials>> = mapOf(
-            PasswordCredentials::class.java to DefaultPasswordCredentials::class.java,
-            CertificateCredentials::class.java to DefaultCertificateCredentials::class.java)
+        PasswordCredentials::class.java to DefaultPasswordCredentials::class.java,
+        CertificateCredentials::class.java to DefaultCertificateCredentials::class.java
+    )
 
 
     override fun <T : Credentials> create(type: Class<T>): T {
         val implementationType = knownTypes[type]
-                ?: throw IllegalArgumentException("Unsupported credentials type: ${type.name}. " +
-                        "The following types are supported: ${knownTypes.keys.joinToString(", ") { it.name }}")
+            ?: throw IllegalArgumentException("Unsupported credentials type: ${type.name}. " +
+                    "The following types are supported: ${knownTypes.keys.joinToString(", ") { it.name }}"
+            )
         return objectFactory.newInstance(implementationType)
-                .let { type.cast(it) }
+            .let { type.cast(it) }
     }
 
 
     override fun getPublicType(credentials: Credentials): Class<out Credentials> {
         return knownTypes.keys
-                .first { it.isInstance(credentials) }
+            .first { it.isInstance(credentials) }
     }
 }

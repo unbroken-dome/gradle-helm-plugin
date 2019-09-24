@@ -17,41 +17,41 @@ internal abstract class DelegateReader(input: Reader) : FilterReader(input) {
 
 
     override fun read(): Int =
-            delegate.read()
+        delegate.read()
 
 
     override fun read(cbuf: CharArray, off: Int, len: Int): Int =
-            delegate.read(cbuf, off, len)
+        delegate.read(cbuf, off, len)
 
 
     override fun read(target: CharBuffer): Int =
-            delegate.read(target)
+        delegate.read(target)
 
 
     override fun read(cbuf: CharArray): Int =
-            delegate.read(cbuf)
+        delegate.read(cbuf)
 
 
     override fun skip(n: Long): Long =
-            delegate.skip(n)
+        delegate.skip(n)
 
 
     override fun ready(): Boolean =
-            delegate.ready()
+        delegate.ready()
 
 
     override fun markSupported(): Boolean =
-            delegate.markSupported()
+        delegate.markSupported()
 
 
     override fun mark(readAheadLimit: Int) =
-            delegate.mark(readAheadLimit)
+        delegate.mark(readAheadLimit)
 
 
     override fun reset() =
-            delegate.reset()
+        delegate.reset()
 
 
     override fun close() =
-            delegate.close()
+        delegate.close()
 }

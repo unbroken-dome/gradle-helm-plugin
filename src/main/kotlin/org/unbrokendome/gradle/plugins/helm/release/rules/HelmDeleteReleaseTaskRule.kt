@@ -14,9 +14,9 @@ import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
  * A rule that creates a [HelmDelete] task for a release.
  */
 internal class HelmDeleteReleaseTaskRule(
-        private val tasks: TaskContainer,
-        private val releases: NamedDomainObjectContainer<HelmRelease>)
-    : AbstractRule() {
+    private val tasks: TaskContainer,
+    private val releases: NamedDomainObjectContainer<HelmRelease>
+) : AbstractRule() {
 
 
     internal companion object {
@@ -24,43 +24,43 @@ internal class HelmDeleteReleaseTaskRule(
         const val TaskNamePrefix = "helmDelete"
 
         fun getTaskName(releaseName: String) =
-                TaskNamePrefix + releaseName.capitalizeWords()
+            TaskNamePrefix + releaseName.capitalizeWords()
     }
 
 
     override fun getDescription(): String =
-            "Pattern: $TaskNamePrefix<Release>"
+        "Pattern: $TaskNamePrefix<Release>"
 
 
     override fun apply(taskName: String) {
         if (taskName.startsWith(TaskNamePrefix)) {
 
             releases.find { getTaskName(it.name) == taskName }
-                    ?.let { release ->
+                ?.let { release ->
 
-                        tasks.create(taskName, HelmDelete::class.java) { task ->
-                            task.description = "Deletes the ${release.name} release."
+                    tasks.create(taskName, HelmDelete::class.java) { task ->
+                        task.description = "Deletes the ${release.name} release."
 
-                            task.releaseName.set(release.releaseName)
-                            task.dryRun.set(release.dryRun)
-                            task.purge.set(release.purge)
+                        task.releaseName.set(release.releaseName)
+                        task.dryRun.set(release.dryRun)
+                        task.purge.set(release.purge)
 
-                            task.dependsOn(HelmPlugin.initServerTaskName)
+                        task.dependsOn(HelmPlugin.initServerTaskName)
 
-                            // Make sure all dependent releases are deleted first
-                            task.dependsOn(TaskDependency {
-                                releases
-                                        .matching { otherRelease ->
-                                            otherRelease != release &&
-                                                    release.name in otherRelease.dependsOn.get()
-                                        }
-                                        .mapNotNull { dependentRelease ->
-                                            tasks.findByName(dependentRelease.deleteTaskName)
-                                        }
-                                        .toSet()
-                            })
-                        }
+                        // Make sure all dependent releases are deleted first
+                        task.dependsOn(TaskDependency {
+                            releases
+                                .matching { otherRelease ->
+                                    otherRelease != release &&
+                                            release.name in otherRelease.dependsOn.get()
+                                }
+                                .mapNotNull { dependentRelease ->
+                                    tasks.findByName(dependentRelease.deleteTaskName)
+                                }
+                                .toSet()
+                        })
                     }
+                }
         }
     }
 }

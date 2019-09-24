@@ -12,35 +12,39 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * Support for implementing [CredentialsContainer].
  */
 internal class CredentialsContainerSupport(
-        objectFactory: ObjectFactory,
-        private val credentialsFactory: CredentialsFactory)
-    : CredentialsContainer {
+    objectFactory: ObjectFactory,
+    private val credentialsFactory: CredentialsFactory
+) : CredentialsContainer {
 
     private val credentials: Property<Credentials> =
-            objectFactory.property()
+        objectFactory.property()
 
 
     override fun getCredentials(): PasswordCredentials {
         return (credentials.orNull ?: setCredentials(PasswordCredentials::class.java))
                 as? PasswordCredentials
-                ?: throw IllegalStateException("Can not use getCredentials() method when not using " +
-                        "PasswordCredentials; please use getCredentials(Class)")
+            ?: throw IllegalStateException(
+                "Can not use getCredentials() method when not using " +
+                        "PasswordCredentials; please use getCredentials(Class)"
+            )
     }
 
 
     override fun <T : Credentials> getCredentials(type: Class<T>): T {
         return (credentials.orNull ?: setCredentials(type))
-                .let {
-                    require(type.isInstance(it)) { "Given credentials type '${type.name}' does not match actual type " +
-                            "'${credentialsFactory.getPublicType(it).name}'" }
-                    type.cast(it)
+            .let {
+                require(type.isInstance(it)) {
+                    "Given credentials type '${type.name}' does not match actual type " +
+                            "'${credentialsFactory.getPublicType(it).name}'"
                 }
+                type.cast(it)
+            }
     }
 
 
     private fun <T : Credentials> setCredentials(type: Class<T>): T {
         return credentialsFactory.create(type)
-                .also { credentials.set(it) }
+            .also { credentials.set(it) }
     }
 
 

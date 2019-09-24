@@ -34,7 +34,7 @@ class HelmPublishPlugin
 
         val publishingExtension = createPublishingExtension(project)
 
-        project.plugins.withType(HelmPlugin::class.java) { _ ->
+        project.plugins.withType(HelmPlugin::class.java) {
 
             val charts = project.helm.charts
             charts.all { chart ->

@@ -23,12 +23,11 @@ interface HelmChartPublishConvention {
 
 
 private open class DefaultHelmChartPublishConvention
-@Inject constructor(objectFactory: ObjectFactory)
-    : HelmChartPublishConvention {
+@Inject constructor(objectFactory: ObjectFactory) : HelmChartPublishConvention {
 
     override val publish: Property<Boolean> =
-            objectFactory.property<Boolean>()
-                    .convention(true)
+        objectFactory.property<Boolean>()
+            .convention(true)
 }
 
 
@@ -39,7 +38,7 @@ private open class DefaultHelmChartPublishConvention
  * @return the [HelmChartPublishConvention]
  */
 internal fun ObjectFactory.createHelmChartPublishConvention(): HelmChartPublishConvention =
-        newInstance(DefaultHelmChartPublishConvention::class.java)
+    newInstance(DefaultHelmChartPublishConvention::class.java)
 
 
 /**

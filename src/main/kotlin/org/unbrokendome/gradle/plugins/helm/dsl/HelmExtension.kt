@@ -68,62 +68,68 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
 
 
 private open class DefaultHelmExtension
-@Inject constructor(project: Project)
-    : HelmExtension {
+@Inject constructor(project: Project) : HelmExtension {
 
     @Suppress("LeakingThis")
     private val execProviderSupport = HelmExecProviderSupport(project, this)
 
 
     override val executable: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.providerFromProjectProperty("helm.executable",
-                            defaultValue = "helm", evaluateGString = true))
+        project.objects.property<String>()
+            .convention(
+                project.providerFromProjectProperty(
+                    "helm.executable",
+                    defaultValue = "helm", evaluateGString = true
+                )
+            )
 
 
     override val debug: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(project.booleanProviderFromProjectProperty("helm.debug"))
+        project.objects.property<Boolean>()
+            .convention(project.booleanProviderFromProjectProperty("helm.debug"))
 
 
     override val home: DirectoryProperty =
-            project.objects.directoryProperty()
-                    .convention(project.dirProviderFromProjectProperty("helm.home", evaluateGString = true))
+        project.objects.directoryProperty()
+            .convention(project.dirProviderFromProjectProperty("helm.home", evaluateGString = true))
 
 
     override val host: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.providerFromProjectProperty("helm.host"))
+        project.objects.property<String>()
+            .convention(project.providerFromProjectProperty("helm.host"))
 
 
     override val kubeContext: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.providerFromProjectProperty("helm.kubeContext"))
+        project.objects.property<String>()
+            .convention(project.providerFromProjectProperty("helm.kubeContext"))
 
 
     override val kubeConfig: RegularFileProperty =
-            project.objects.fileProperty()
-                    .convention(project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
+        project.objects.fileProperty()
+            .convention(project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
 
 
     override val timeoutSeconds: Property<Int> =
-            project.objects.property<Int>()
-                    .convention(project.intProviderFromProjectProperty("helm.timeoutSeconds"))
+        project.objects.property<Int>()
+            .convention(project.intProviderFromProjectProperty("helm.timeoutSeconds"))
 
 
     override val extraArgs: ListProperty<String> =
-            project.objects.listProperty<String>().empty()
+        project.objects.listProperty<String>().empty()
 
 
     override val outputDir: DirectoryProperty =
-            project.objects.directoryProperty()
-                    .convention(project.coalesceProvider(
-                            project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true),
-                            project.layout.buildDirectory.dir("helm/charts")))
+        project.objects.directoryProperty()
+            .convention(
+                project.coalesceProvider(
+                    project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true),
+                    project.layout.buildDirectory.dir("helm/charts")
+                )
+            )
 
 
     override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
-            execProviderSupport.execHelm(command, subcommand, action)
+        execProviderSupport.execHelm(command, subcommand, action)
 }
 
 
@@ -134,4 +140,4 @@ private open class DefaultHelmExtension
  * @return the created [HelmExtension] object
  */
 internal fun createHelmExtension(project: Project): HelmExtension =
-        project.objects.newInstance(DefaultHelmExtension::class.java, project)
+    project.objects.newInstance(DefaultHelmExtension::class.java, project)

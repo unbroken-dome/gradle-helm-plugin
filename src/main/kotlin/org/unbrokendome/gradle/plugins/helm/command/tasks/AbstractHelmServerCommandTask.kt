@@ -24,8 +24,8 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val host: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.helm.host)
+        project.objects.property<String>()
+            .convention(project.helm.host)
 
 
     /**
@@ -36,8 +36,8 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val kubeConfig: RegularFileProperty =
-            project.objects.fileProperty()
-                    .convention(project.helm.kubeConfig)
+        project.objects.fileProperty()
+            .convention(project.helm.kubeConfig)
 
 
     /**
@@ -47,8 +47,8 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val kubeContext: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.helm.kubeContext)
+        project.objects.property<String>()
+            .convention(project.helm.kubeContext)
 
 
     /**
@@ -59,8 +59,8 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val tillerNamespace: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.helm.tiller.namespace)
+        project.objects.property<String>()
+            .convention(project.helm.tiller.namespace)
 
 
     /**
@@ -70,8 +70,8 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:Internal
     val timeoutSeconds: Property<Int> =
-            project.objects.property<Int>()
-                    .convention(project.helm.timeoutSeconds)
+        project.objects.property<Int>()
+            .convention(project.helm.timeoutSeconds)
 
 
     override fun HelmExecSpec.modifyHelmExecSpec() {

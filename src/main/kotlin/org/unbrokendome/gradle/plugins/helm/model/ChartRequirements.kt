@@ -54,31 +54,33 @@ internal interface ChartRequirements {
 
 
 private class DefaultChartRequirements(
-        private val map: Map<String, Any?>)
-    : ChartRequirements {
+    private val map: Map<String, Any?>
+) : ChartRequirements {
 
 
     @Suppress("UNCHECKED_CAST")
     override val dependencies: List<ChartRequirements.Dependency>
         get() =
             (map["dependencies"] as? List<Map<String, Any?>>)
-                    ?.map { DefaultDependency(it) }
-                    ?: emptyList()
+                ?.map { DefaultDependency(it) }
+                ?: emptyList()
 
 
     override fun withMappedDependencies(
-            transform: (ChartRequirements.Dependency) -> ChartRequirements.Dependency): ChartRequirements =
-            DefaultChartRequirements(
-                    map + ("dependencies" to dependencies.map { transform(it).toMap() }))
+        transform: (ChartRequirements.Dependency) -> ChartRequirements.Dependency
+    ): ChartRequirements =
+        DefaultChartRequirements(
+            map + ("dependencies" to dependencies.map { transform(it).toMap() })
+        )
 
 
     override fun toMap(): Map<String, Any?> =
-            this.map
+        this.map
 
 
     private class DefaultDependency(
-            private val map: Map<String, Any?>)
-        : ChartRequirements.Dependency {
+        private val map: Map<String, Any?>
+    ) : ChartRequirements.Dependency {
 
         override val name: String
             get() = map["name"] as String
@@ -97,11 +99,11 @@ private class DefaultChartRequirements(
 
 
         override fun withRepository(repository: String): ChartRequirements.Dependency =
-                DefaultDependency(map + ("repository" to repository))
+            DefaultDependency(map + ("repository" to repository))
 
 
         override fun toMap(): Map<String, Any?> =
-                this.map.toMap()
+            this.map.toMap()
     }
 }
 
@@ -142,8 +144,8 @@ internal object ChartRequirementsYaml {
      * @return the YAML representation as a string
      */
     fun saveToString(chartRequirements: ChartRequirements) =
-            StringWriter().use { writer ->
-                save(chartRequirements, writer)
-                writer.toString()
-            }
+        StringWriter().use { writer ->
+            save(chartRequirements, writer)
+            writer.toString()
+        }
 }

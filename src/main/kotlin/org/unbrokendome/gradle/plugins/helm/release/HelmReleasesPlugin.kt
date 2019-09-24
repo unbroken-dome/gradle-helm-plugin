@@ -42,11 +42,11 @@ class HelmReleasesPlugin : Plugin<Project> {
 
 
     private fun createReleasesExtension(project: Project) =
-            helmReleaseContainer(project)
-                    .apply {
-                        (project.helm as ExtensionAware)
-                                .extensions.add(HELM_RELEASES_EXTENSION_NAME, this)
-                    }
+        helmReleaseContainer(project)
+            .apply {
+                (project.helm as ExtensionAware)
+                    .extensions.add(HELM_RELEASES_EXTENSION_NAME, this)
+            }
 
 
     private fun createInstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
@@ -67,14 +67,16 @@ class HelmReleasesPlugin : Plugin<Project> {
     }
 
 
-    private fun allReleasesTaskDependency(project: Project, releases: Iterable<HelmRelease>,
-                                          taskNameFn: (HelmRelease) -> String) =
-            TaskDependency {
-                releases
-                        .map { release ->
-                            val taskName = taskNameFn(release)
-                            project.tasks.getByName(taskName)
-                        }
-                        .toSet()
-            }
+    private fun allReleasesTaskDependency(
+        project: Project, releases: Iterable<HelmRelease>,
+        taskNameFn: (HelmRelease) -> String
+    ) =
+        TaskDependency {
+            releases
+                .map { release ->
+                    val taskName = taskNameFn(release)
+                    project.tasks.getByName(taskName)
+                }
+                .toSet()
+        }
 }

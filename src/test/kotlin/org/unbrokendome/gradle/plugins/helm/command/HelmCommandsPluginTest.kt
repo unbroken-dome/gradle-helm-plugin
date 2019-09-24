@@ -35,9 +35,9 @@ class HelmCommandsPluginTest : AbstractGradleProjectTest() {
         applyPlugin()
 
         assert(project, name = "project")
-                .hasExtension<HelmExtension>("helm") {
-                    it.hasExtension<Linting>("lint")
-                }
+            .hasExtension<HelmExtension>("helm") {
+                it.hasExtension<Linting>("lint")
+            }
     }
 
 
@@ -47,7 +47,7 @@ class HelmCommandsPluginTest : AbstractGradleProjectTest() {
         applyPlugin()
 
         assert(project.tasks, name = "tasks")
-                .hasSize(taskCountBefore)
+            .hasSize(taskCountBefore)
     }
 
 

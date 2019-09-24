@@ -1,6 +1,5 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
-import org.gradle.api.NamedDomainObjectContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.publishing.HELM_PUBLISHING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.publishing.HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME

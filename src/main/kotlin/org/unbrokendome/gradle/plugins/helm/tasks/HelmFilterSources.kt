@@ -50,7 +50,7 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:[Input Optional]
     val configuredChartName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -58,7 +58,7 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:Input
     val chartName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -66,7 +66,7 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:Input
     val chartVersion: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -74,7 +74,7 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:InputDirectory
     val sourceDir: DirectoryProperty =
-            project.objects.directoryProperty()
+        project.objects.directoryProperty()
 
 
     /**
@@ -83,8 +83,8 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:Internal("Represented as part of targetDir")
     val baseOutputDir: DirectoryProperty =
-            project.objects.directoryProperty()
-                    .convention(project.helm.outputDir)
+        project.objects.directoryProperty()
+            .convention(project.helm.outputDir)
 
 
     /**
@@ -94,7 +94,7 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:OutputDirectory
     val targetDir: Provider<Directory> =
-            baseOutputDir.dir(chartName)
+        baseOutputDir.dir(chartName)
 
 
     /**
@@ -103,8 +103,8 @@ open class HelmFilterSources : DefaultTask() {
      */
     @get:Input
     val resolveDependencies: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(true)
+        project.objects.property<Boolean>()
+            .convention(true)
 
 
     init {
@@ -113,12 +113,12 @@ open class HelmFilterSources : DefaultTask() {
         // we install the "filtering" block as an extension on the task so we get the convenience
         // accessors by Gradle (property, method with closure, Kotlin DSL accessor)
         createFiltering(project.objects, parent = globalFiltering)
-                .apply {
-                    values.putFrom("chartName", chartName)
-                    values.putFrom("chartVersion", chartVersion)
-                    values.putFrom("projectVersion", project.versionProvider)
-                    extensions.add(Filtering::class.java, "filtering", this)
-                }
+            .apply {
+                values.putFrom("chartName", chartName)
+                values.putFrom("chartVersion", chartVersion)
+                values.putFrom("projectVersion", project.versionProvider)
+                extensions.add(Filtering::class.java, "filtering", this)
+            }
 
         dependsOn(chartRequirementsTaskDependency())
     }
@@ -154,9 +154,10 @@ open class HelmFilterSources : DefaultTask() {
 
                 // the regex to match placeholders inside the files
                 val regex = Regex(
-                        Regex.escape(filtering.placeholderPrefix.get()) +
-                                "(.*?)" +
-                                Regex.escape(filtering.placeholderSuffix.get()))
+                    Regex.escape(filtering.placeholderPrefix.get()) +
+                            "(.*?)" +
+                            Regex.escape(filtering.placeholderSuffix.get())
+                )
 
                 val values = filtering.values.get()
 
@@ -183,14 +184,18 @@ open class HelmFilterSources : DefaultTask() {
         if (resolveDependencies.get()) {
 
             val chartDependenciesMap = ChartDependenciesResolver.chartDependenciesMap(
-                    project, configuredChartName.orNull)
+                project, configuredChartName.orNull
+            )
 
 
             spec.filesMatching("requirements.yaml") {
                 it.filter(
-                        mapOf("basePath" to targetDir.get().file(it.path).asFile,
-                                "chartDependenciesMap" to chartDependenciesMap),
-                        RequirementsResolvingFilterReader::class.java)
+                    mapOf(
+                        "basePath" to targetDir.get().file(it.path).asFile,
+                        "chartDependenciesMap" to chartDependenciesMap
+                    ),
+                    RequirementsResolvingFilterReader::class.java
+                )
             }
         }
     }
@@ -201,16 +206,16 @@ open class HelmFilterSources : DefaultTask() {
      * chart dependencies.
      */
     private fun chartRequirementsTaskDependency() =
-            TaskDependency { task ->
-                if (resolveDependencies.getOrElse(false)) {
-                    configuredChartName.orNull?.let { configuredChartName ->
-                        project.configurations.findByName(chartDependenciesConfigurationName(configuredChartName))
-                                ?.buildDependencies?.getDependencies(task)
-                    } ?: emptySet()
-                } else {
-                    emptySet()
-                }
+        TaskDependency { task ->
+            if (resolveDependencies.getOrElse(false)) {
+                configuredChartName.orNull?.let { configuredChartName ->
+                    project.configurations.findByName(chartDependenciesConfigurationName(configuredChartName))
+                        ?.buildDependencies?.getDependencies(task)
+                } ?: emptySet()
+            } else {
+                emptySet()
             }
+        }
 
 
     /**
@@ -220,8 +225,7 @@ open class HelmFilterSources : DefaultTask() {
      * [org.gradle.api.file.ContentFilterable.filter] method.
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    internal class RequirementsResolvingFilterReader(input: Reader)
-        : DelegateReader(input) {
+    internal class RequirementsResolvingFilterReader(input: Reader) : DelegateReader(input) {
 
         /**
          * The base path (= the path of the requirements.yaml file to be filtered). Paths to resolved chart
@@ -239,19 +243,20 @@ open class HelmFilterSources : DefaultTask() {
         override val delegate: Reader by lazy(LazyThreadSafetyMode.NONE) {
 
             val resolvedRequirementsYaml = ChartRequirementsYaml.load(`in`)
-                    .withMappedDependencies { dependency ->
+                .withMappedDependencies { dependency ->
 
-                        val resolvedRepository: File? = chartDependenciesMap[dependency.name]
-                                ?: dependency.alias?.let { alias -> chartDependenciesMap[alias] }
+                    val resolvedRepository: File? = chartDependenciesMap[dependency.name]
+                        ?: dependency.alias?.let { alias -> chartDependenciesMap[alias] }
 
-                        if (resolvedRepository != null) {
-                            dependency.withRepository(
-                                    "file://" + resolvedRepository.relativeTo(basePath.parentFile).path)
-                        } else {
-                            dependency
-                        }
+                    if (resolvedRepository != null) {
+                        dependency.withRepository(
+                            "file://" + resolvedRepository.relativeTo(basePath.parentFile).path
+                        )
+                    } else {
+                        dependency
                     }
-                    .let { ChartRequirementsYaml.saveToString(it) }
+                }
+                .let { ChartRequirementsYaml.saveToString(it) }
 
             StringReader(resolvedRequirementsYaml)
         }

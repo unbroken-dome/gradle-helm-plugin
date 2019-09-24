@@ -30,7 +30,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val chart: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -65,7 +65,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:[Input Optional]
     val repository: Property<URI> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -73,7 +73,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -81,7 +81,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val releaseName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -89,7 +89,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val namespace: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -97,7 +97,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val replace: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -105,7 +105,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val values: MapProperty<String, Any> =
-            project.objects.mapProperty()
+        project.objects.mapProperty()
 
 
     /**
@@ -113,7 +113,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:InputFiles
     val valueFiles: ConfigurableFileCollection =
-            project.layout.configurableFiles()
+        project.layout.configurableFiles()
 
 
     /**
@@ -121,7 +121,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val version: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -130,7 +130,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     @TaskAction

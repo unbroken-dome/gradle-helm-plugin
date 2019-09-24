@@ -22,14 +22,16 @@ class HelmCommandsPlugin
 
 
         createLinting(project.objects)
-                .apply {
-                    enabled.set(
-                            project.booleanProviderFromProjectProperty("helm.lint.enabled", true))
-                    strict.set(
-                            project.booleanProviderFromProjectProperty("helm.lint.strict"))
+            .apply {
+                enabled.set(
+                    project.booleanProviderFromProjectProperty("helm.lint.enabled", true)
+                )
+                strict.set(
+                    project.booleanProviderFromProjectProperty("helm.lint.strict")
+                )
 
-                    (helmExtension as ExtensionAware).extensions
-                            .add(Linting::class.java, HELM_LINT_EXTENSION_NAME, this)
-                }
+                (helmExtension as ExtensionAware).extensions
+                    .add(Linting::class.java, HELM_LINT_EXTENSION_NAME, this)
+            }
     }
 }

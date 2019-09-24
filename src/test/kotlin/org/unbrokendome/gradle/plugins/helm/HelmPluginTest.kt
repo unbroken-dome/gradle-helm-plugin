@@ -44,27 +44,27 @@ class HelmPluginTest : AbstractGradleProjectTest() {
     @Test
     fun `Plugin should create a helm repositories DSL extension`() {
         assert(project, name = "project")
-                .hasExtension<HelmExtension>("helm") {
-                    it.hasExtension<NamedDomainObjectContainer<HelmRepository>>("repositories")
-                }
+            .hasExtension<HelmExtension>("helm") {
+                it.hasExtension<NamedDomainObjectContainer<HelmRepository>>("repositories")
+            }
     }
 
 
     @Test
     fun `Plugin should create a helm filtering DSL extension`() {
         assert(project, name = "project")
-                .hasExtension<HelmExtension>("helm") {
-                    it.hasExtension<Filtering>("filtering")
-                }
+            .hasExtension<HelmExtension>("helm") {
+                it.hasExtension<Filtering>("filtering")
+            }
     }
 
 
     @Test
     fun `Plugin should create a helm charts DSL extension`() {
         assert(project, name = "project")
-                .hasExtension<HelmExtension>("helm") {
-                    it.hasExtension<NamedDomainObjectContainer<HelmChart>>("charts")
-                }
+            .hasExtension<HelmExtension>("helm") {
+                it.hasExtension<NamedDomainObjectContainer<HelmChart>>("charts")
+            }
     }
 
 

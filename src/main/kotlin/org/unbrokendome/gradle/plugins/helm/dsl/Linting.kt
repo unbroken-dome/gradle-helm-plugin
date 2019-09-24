@@ -50,17 +50,17 @@ private open class DefaultLinting
 @Inject constructor(objectFactory: ObjectFactory, projectLayout: ProjectLayout) : LintingInternal {
 
     override val enabled: Property<Boolean> =
-            objectFactory.property<Boolean>()
-                    .convention(true)
+        objectFactory.property<Boolean>()
+            .convention(true)
 
     override val strict: Property<Boolean> =
-            objectFactory.property()
+        objectFactory.property()
 
     override val values: MapProperty<String, Any> =
-            objectFactory.mapProperty()
+        objectFactory.mapProperty()
 
     override val valueFiles: ConfigurableFileCollection =
-            projectLayout.configurableFiles()
+        projectLayout.configurableFiles()
 
     override fun setParent(parent: Linting) {
         enabled.set(parent.enabled)
@@ -79,7 +79,7 @@ private open class DefaultLinting
  * @return the created [Linting] object
  */
 internal fun createLinting(objectFactory: ObjectFactory, parent: Linting? = null): Linting =
-        objectFactory.newInstance(DefaultLinting::class.java)
-                .apply {
-                    parent?.let(this::setParent)
-                }
+    objectFactory.newInstance(DefaultLinting::class.java)
+        .apply {
+            parent?.let(this::setParent)
+        }

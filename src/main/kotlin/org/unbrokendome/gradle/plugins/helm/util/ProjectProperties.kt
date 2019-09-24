@@ -19,8 +19,10 @@ import org.gradle.api.provider.Provider
  * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
  *         not exist
  */
-internal fun Project.providerFromProjectProperty(propertyName: String, defaultValue: String? = null,
-                                                 evaluateGString: Boolean = false): Provider<String> {
+internal fun Project.providerFromProjectProperty(
+    propertyName: String, defaultValue: String? = null,
+    evaluateGString: Boolean = false
+): Provider<String> {
     val provider = provider<String> {
         project.findProperty(propertyName)?.toString() ?: defaultValue
     }
@@ -49,15 +51,15 @@ internal fun Project.providerFromProjectProperty(propertyName: String, defaultVa
  *         not exist
  */
 fun Project.booleanProviderFromProjectProperty(propertyName: String, defaultValue: Boolean? = null): Provider<Boolean> =
-        provider {
-            project.findProperty(propertyName)?.let { value ->
-                when (value) {
-                    is Boolean -> value
-                    is String -> value.toBoolean()
-                    else -> throw IllegalArgumentException("Value cannot be converted to a Boolean: $value")
-                }
-            } ?: defaultValue
-        }
+    provider {
+        project.findProperty(propertyName)?.let { value ->
+            when (value) {
+                is Boolean -> value
+                is String -> value.toBoolean()
+                else -> throw IllegalArgumentException("Value cannot be converted to a Boolean: $value")
+            }
+        } ?: defaultValue
+    }
 
 
 /**
@@ -76,15 +78,15 @@ fun Project.booleanProviderFromProjectProperty(propertyName: String, defaultValu
  *         not exist
  */
 fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> =
-        provider {
-            project.findProperty(propertyName)?.let { value ->
-                when (value) {
-                    is Number -> value.toInt()
-                    is String -> value.toInt()
-                    else -> throw IllegalArgumentException("Value cannot be converted to an Integer: $value")
-                }
+    provider {
+        project.findProperty(propertyName)?.let { value ->
+            when (value) {
+                is Number -> value.toInt()
+                is String -> value.toInt()
+                else -> throw IllegalArgumentException("Value cannot be converted to an Integer: $value")
             }
         }
+    }
 
 
 /**
@@ -102,12 +104,14 @@ fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> 
  * @return a [Provider] that returns the project property value as a [Directory] if it exists, or is empty if the
  *         property does not exist
  */
-fun Project.dirProviderFromProjectProperty(propertyName: String,
-                                           evaluateGString: Boolean = false): Provider<Directory> =
-        providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
-                .let { pathProvider ->
-                    project.layout.projectDirectory.dir(pathProvider)
-                }
+fun Project.dirProviderFromProjectProperty(
+    propertyName: String,
+    evaluateGString: Boolean = false
+): Provider<Directory> =
+    providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
+        .let { pathProvider ->
+            project.layout.projectDirectory.dir(pathProvider)
+        }
 
 
 /**
@@ -125,9 +129,11 @@ fun Project.dirProviderFromProjectProperty(propertyName: String,
  * @return a [Provider] that returns the project property value as a [RegularFile] if it exists, or is empty if the
  *         property does not exist
  */
-fun Project.fileProviderFromProjectProperty(propertyName: String,
-                                            evaluateGString: Boolean = false): Provider<RegularFile> =
-        providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
-                .let { pathProvider ->
-                    project.layout.projectDirectory.file(pathProvider)
-                }
+fun Project.fileProviderFromProjectProperty(
+    propertyName: String,
+    evaluateGString: Boolean = false
+): Provider<RegularFile> =
+    providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
+        .let { pathProvider ->
+            project.layout.projectDirectory.file(pathProvider)
+        }

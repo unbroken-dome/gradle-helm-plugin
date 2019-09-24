@@ -18,21 +18,23 @@ internal object ChartDependenciesResolver {
             val configuration = project.configurations.findByName("helm${configuredChartName.capitalize()}Dependencies")
             if (configuration != null) {
                 return configuration.helmDependencies
-                        .mapValues { (_, dependency) ->
-                            when (dependency) {
-                                is Configuration ->
-                                    // dependency on chart in the same project -> no resolution required, just get the artifact
-                                    dependency.artifacts.files
-                                            .first()
-                                is Dependency ->
-                                    // dependency on chart in another project
-                                    configuration.resolvedConfiguration.getFiles { it == dependency }
-                                            .first()
-                                else ->
-                                    throw IllegalStateException("Invalid chart dependency: $dependency, " +
-                                            "must be of type Configuration or Dependency")
-                            }
+                    .mapValues { (_, dependency) ->
+                        when (dependency) {
+                            is Configuration ->
+                                // dependency on chart in the same project -> no resolution required, just get the artifact
+                                dependency.artifacts.files
+                                    .first()
+                            is Dependency ->
+                                // dependency on chart in another project
+                                configuration.resolvedConfiguration.getFiles { it == dependency }
+                                    .first()
+                            else ->
+                                throw IllegalStateException(
+                                    "Invalid chart dependency: $dependency, " +
+                                            "must be of type Configuration or Dependency"
+                                )
                         }
+                    }
             }
         }
 

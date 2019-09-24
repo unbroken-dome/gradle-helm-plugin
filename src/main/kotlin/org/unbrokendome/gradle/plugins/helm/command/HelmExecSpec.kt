@@ -121,7 +121,7 @@ interface HelmExecSpec {
      */
     @JvmDefault
     fun withExecSpec(action: ExecSpec.() -> Unit) =
-            withExecSpec(Action(action))
+        withExecSpec(Action(action))
 }
 
 
@@ -131,11 +131,11 @@ interface HelmExecSpec {
  * Uses Gradle's [Project.exec] to invoke the Helm CLI.
  */
 internal class DefaultHelmExecSpec(
-        private val execSpec: ExecSpec,
-        globalOptions: GlobalHelmOptions,
-        command: String,
-        subcommand: String?)
-    : HelmExecSpec {
+    private val execSpec: ExecSpec,
+    globalOptions: GlobalHelmOptions,
+    command: String,
+    subcommand: String?
+) : HelmExecSpec {
 
 
     init {
@@ -174,10 +174,10 @@ internal class DefaultHelmExecSpec(
 
     override fun flag(name: String, provider: Provider<Boolean>, defaultValue: Boolean) {
         provider.orNull
-                ?.takeIf { it != defaultValue }
-                ?.let { value ->
-                    execSpec.args(if (value) name else "$name=false")
-                }
+            ?.takeIf { it != defaultValue }
+            ?.let { value ->
+                execSpec.args(if (value) name else "$name=false")
+            }
     }
 
 

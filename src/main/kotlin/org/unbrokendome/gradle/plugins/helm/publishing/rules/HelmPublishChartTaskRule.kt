@@ -14,21 +14,21 @@ import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
  * Rule that creates a task for publishing a given chart to all known repositories.
  */
 internal class HelmPublishChartTaskRule(
-        private val project: Project,
-        private val charts: NamedDomainObjectCollection<HelmChart>,
-        private val repositories: Iterable<HelmPublishingRepository>)
-    : AbstractRule() {
+    private val project: Project,
+    private val charts: NamedDomainObjectCollection<HelmChart>,
+    private val repositories: Iterable<HelmPublishingRepository>
+) : AbstractRule() {
 
     internal companion object {
         fun getTaskName(chartName: String) =
-                "helmPublish${chartName.capitalize()}Chart"
+            "helmPublish${chartName.capitalize()}Chart"
     }
 
     private val regex = Regex(getTaskName("(\\p{Upper}.*)"))
 
 
     override fun getDescription(): String =
-            "Pattern: " + getTaskName("<Chart>")
+        "Pattern: " + getTaskName("<Chart>")
 
 
     override fun apply(taskName: String) {

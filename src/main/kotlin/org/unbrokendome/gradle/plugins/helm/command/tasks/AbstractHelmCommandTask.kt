@@ -17,7 +17,10 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.util.andThen
+import org.unbrokendome.gradle.plugins.helm.util.coalesceProvider
+import org.unbrokendome.gradle.plugins.helm.util.listProperty
+import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.ByteArrayOutputStream
 
 
@@ -37,26 +40,26 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
 
     @get:Input
     override val executable: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.helm.executable)
+        project.objects.property<String>()
+            .convention(project.helm.executable)
 
 
     @get:Internal
     override val home: DirectoryProperty =
-            project.objects.directoryProperty()
-                    .convention(project.helm.home)
+        project.objects.directoryProperty()
+            .convention(project.helm.home)
 
 
     @get:Console
     override val debug: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(false)
+        project.objects.property<Boolean>()
+            .convention(false)
 
 
     @get:Input
     override val extraArgs: ListProperty<String> =
-            project.objects.listProperty<String>()
-                    .apply { addAll(project.helm.extraArgs) }
+        project.objects.listProperty<String>()
+            .apply { addAll(project.helm.extraArgs) }
 
 
     /**
@@ -71,12 +74,12 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
 
 
     override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
-            execProviderSupport.execHelm(command, subcommand,
-                    action.andThen { modifyHelmExecSpec() })
+        execProviderSupport.execHelm(command, subcommand,
+            action.andThen { modifyHelmExecSpec() })
 
 
     protected fun execHelm(command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit): ExecResult =
-            execHelm(command, subcommand, Action(action))
+        execHelm(command, subcommand, Action(action))
 
 
     /**
@@ -85,18 +88,20 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
      */
     @get:Internal
     protected val actualHelmHome: Provider<Directory>
-        get() = project.coalesceProvider(home,
-                project.layout.projectDirectory.dir(actualHelmHomePathProvider()))
+        get() = project.coalesceProvider(
+            home,
+            project.layout.projectDirectory.dir(actualHelmHomePathProvider())
+        )
 
 
     private fun actualHelmHomePathProvider() =
-            project.provider {
-                val stdoutCapture = ByteArrayOutputStream()
-                execHelm("home") {
-                    withExecSpec {
-                        standardOutput = stdoutCapture
-                    }
+        project.provider {
+            val stdoutCapture = ByteArrayOutputStream()
+            execHelm("home") {
+                withExecSpec {
+                    standardOutput = stdoutCapture
                 }
-                String(stdoutCapture.toByteArray())
             }
+            String(stdoutCapture.toByteArray())
+        }
 }

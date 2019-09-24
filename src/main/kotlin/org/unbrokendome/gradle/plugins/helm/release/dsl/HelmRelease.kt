@@ -59,7 +59,7 @@ interface HelmRelease : Named {
      */
     @JvmDefault
     fun chart(name: String): ChartReference =
-            chart(project = null, chart = name)
+        chart(project = null, chart = name)
 
 
     /**
@@ -79,8 +79,10 @@ interface HelmRelease : Named {
      */
     @JvmDefault
     fun chart(notation: Map<*, *>): ChartReference =
-            chart(project = notation["project"]?.toString(),
-                    chart = notation["chart"]?.toString() ?: "main")
+        chart(
+            project = notation["project"]?.toString(),
+            chart = notation["chart"]?.toString() ?: "main"
+        )
 
 
     /**
@@ -211,88 +213,91 @@ interface HelmRelease : Named {
 
 private open class DefaultHelmRelease
 @Inject constructor(
-        private val name: String,
-        private val project: Project)
-    : HelmRelease {
+    private val name: String,
+    private val project: Project
+) : HelmRelease {
 
     override fun getName(): String =
-            name
+        name
 
 
     override val releaseName: Property<String> =
-            project.objects.property<String>()
-                    .convention(name)
+        project.objects.property<String>()
+            .convention(name)
 
 
     override val chart: Property<ChartReference> =
-            project.objects.property()
+        project.objects.property()
 
 
     override fun chart(project: String?, chart: String): ChartReference =
-            if (project == null) {
-                // Referring to a chart in the same project -> use a HelmChartReference
-                HelmChartReference(this.project, chart)
+        if (project == null) {
+            // Referring to a chart in the same project -> use a HelmChartReference
+            HelmChartReference(this.project, chart)
 
-            } else {
-                this.project.configurations.maybeCreate("helmRelease${name.capitalizeWords()}").let { configuration ->
-                    configuration.isVisible = false
+        } else {
+            this.project.configurations.maybeCreate("helmRelease${name.capitalizeWords()}").let { configuration ->
+                configuration.isVisible = false
 
-                    configuration.dependencies.clear()
+                configuration.dependencies.clear()
 
-                    val dependency = this.project.dependencies.project(mapOf(
-                            "path" to project,
-                            "configuration" to ChartDirArtifactRule.getConfigurationName(chart)))
-                    configuration.dependencies.add(dependency)
+                val dependency = this.project.dependencies.project(
+                    mapOf(
+                        "path" to project,
+                        "configuration" to ChartDirArtifactRule.getConfigurationName(chart)
+                    )
+                )
+                configuration.dependencies.add(dependency)
 
-                    ConfigurationChartReference(this.project, configuration.name)
-                }
+                ConfigurationChartReference(this.project, configuration.name)
             }
+        }
 
 
     override val repository: Property<URI> =
-            project.objects.property()
+        project.objects.property()
 
 
     override val namespace: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     override val version: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     override val dryRun: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
+        project.objects.property<Boolean>()
+            .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
 
     override val atomic: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
+        project.objects.property<Boolean>()
+            .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
 
     override val wait: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     override val replace: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(false)
+        project.objects.property<Boolean>()
+            .convention(false)
 
 
     override val purge: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(false)
+        project.objects.property<Boolean>()
+            .convention(false)
 
 
     override val values: MapProperty<String, Any> =
-            project.objects.mapProperty()
+        project.objects.mapProperty()
 
 
     override val valueFiles: ConfigurableFileCollection =
-            project.layout.configurableFiles()
+        project.layout.configurableFiles()
 
 
     override val dependsOn: SetProperty<String> =
-            project.objects.setProperty()
+        project.objects.setProperty()
 
 
     override fun from(notation: Any) {
@@ -305,12 +310,12 @@ private open class DefaultHelmRelease
 
 
     private fun notationToChartReference(notation: Any): ChartReference =
-            when (notation) {
-                is ChartReference -> notation
-                is FileCollection -> FileCollectionChartReference(notation)
-                is HelmChart -> HelmChartReference(project, notation.name)
-                else -> SimpleChartReference(notation.toString())
-            }
+        when (notation) {
+            is ChartReference -> notation
+            is FileCollection -> FileCollectionChartReference(notation)
+            is HelmChart -> HelmChartReference(project, notation.name)
+            else -> SimpleChartReference(notation.toString())
+        }
 }
 
 
@@ -321,6 +326,6 @@ private open class DefaultHelmRelease
  * @return the container for `HelmRelease`s
  */
 internal fun helmReleaseContainer(project: Project): NamedDomainObjectContainer<HelmRelease> =
-        project.container(HelmRelease::class.java) { name ->
-            project.objects.newInstance(DefaultHelmRelease::class.java, name, project)
-        }
+    project.container(HelmRelease::class.java) { name ->
+        project.objects.newInstance(DefaultHelmRelease::class.java, name, project)
+    }

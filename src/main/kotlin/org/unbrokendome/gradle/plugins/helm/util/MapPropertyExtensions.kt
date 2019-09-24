@@ -14,4 +14,4 @@ import org.gradle.api.provider.Provider
  * @param providerOfValue the provider of the value
  */
 internal fun <K : Any, V : Any> MapProperty<K, V>.putFrom(key: K, providerOfValue: Provider<out V>) =
-        put(key, providerOfValue)
+    put(key, providerOfValue)

@@ -4,11 +4,7 @@ import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 
 
 /**
@@ -24,7 +20,7 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of other properties")
     val chartDir: DirectoryProperty =
-            project.objects.directoryProperty()
+        project.objects.directoryProperty()
 
 
     /**
@@ -36,9 +32,9 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
     @get:[InputFiles SkipWhenEmpty]
     @Suppress("unused")
     val requirementsYamlFile: FileCollection =
-            chartDir.asFileTree.matching {
-                it.include("requirements.yaml")
-            }
+        chartDir.asFileTree.matching {
+            it.include("requirements.yaml")
+        }
 
 
     /**
@@ -50,7 +46,7 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
     @get:[InputFiles SkipWhenEmpty]
     @Suppress("unused")
     val requirementsLockFile: FileCollection =
-            chartDir.asFileTree.matching { it.include("requirements.lock") }
+        chartDir.asFileTree.matching { it.include("requirements.lock") }
 
 
     /**
@@ -59,7 +55,7 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
     @get:OutputDirectory
     @Suppress("unused")
     val subchartsDir: Provider<Directory> =
-            chartDir.dir("charts")
+        chartDir.dir("charts")
 
 
     init {

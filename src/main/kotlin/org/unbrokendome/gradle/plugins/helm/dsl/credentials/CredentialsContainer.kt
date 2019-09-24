@@ -109,8 +109,9 @@ interface CredentialsContainer {
      */
     @JvmDefault
     fun <T : Credentials> credentials(
-            @DelegatesTo.Target type: Class<T>,
-            @DelegatesTo(strategy = DELEGATE_FIRST, genericTypeIndex = 0) configClosure: Closure<*>) {
+        @DelegatesTo.Target type: Class<T>,
+        @DelegatesTo(strategy = DELEGATE_FIRST, genericTypeIndex = 0) configClosure: Closure<*>
+    ) {
         credentials(type, ConfigureUtil.configureUsing(configClosure))
     }
 
@@ -156,7 +157,8 @@ interface CredentialsContainer {
      */
     @JvmDefault
     fun credentials(
-            @DelegatesTo(PasswordCredentials::class, strategy = DELEGATE_FIRST) configClosure: Closure<*>) {
+        @DelegatesTo(PasswordCredentials::class, strategy = DELEGATE_FIRST) configClosure: Closure<*>
+    ) {
         credentials(ConfigureUtil.configureUsing(configClosure))
     }
 

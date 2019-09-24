@@ -26,7 +26,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val releaseName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -40,7 +40,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val chart: Property<Any> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -48,7 +48,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val dryRun: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -56,7 +56,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val install: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -65,7 +65,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val namespace: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -73,7 +73,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val recreatePods: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -81,7 +81,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val resetValues: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -90,7 +90,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val reuseValues: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -98,7 +98,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val values: MapProperty<String, Any> =
-            project.objects.mapProperty()
+        project.objects.mapProperty()
 
 
     /**
@@ -106,7 +106,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:InputFiles
     val valueFiles: ConfigurableFileCollection =
-            project.layout.configurableFiles()
+        project.layout.configurableFiles()
 
 
     /**
@@ -114,7 +114,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val version: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -123,7 +123,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     @TaskAction

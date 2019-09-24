@@ -29,20 +29,20 @@ class DirectoryBuilder(private val path: Path) {
     fun file(name: String, contents: CharSequence, charset: Charset = Charsets.UTF_8) {
         val filePath = this.path.resolve(name)
         Files.newBufferedWriter(filePath, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-                .use { writer ->
-                    writer.append(contents)
-                }
+            .use { writer ->
+                writer.append(contents)
+            }
     }
 }
 
 
 fun directory(basePath: Path, spec: DirectoryBuilder.() -> Unit) =
-        DirectoryBuilder(basePath).let(spec)
+    DirectoryBuilder(basePath).let(spec)
 
 
 fun directory(basePath: File, spec: DirectoryBuilder.() -> Unit) =
-        directory(basePath.toPath(), spec)
+    directory(basePath.toPath(), spec)
 
 
 fun directory(basePath: String, spec: DirectoryBuilder.() -> Unit) =
-        directory(Paths.get(basePath), spec)
+    directory(Paths.get(basePath), spec)

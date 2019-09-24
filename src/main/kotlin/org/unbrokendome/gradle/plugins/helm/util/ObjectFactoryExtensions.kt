@@ -1,7 +1,10 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.*
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 
 
 /**
@@ -11,7 +14,7 @@ import org.gradle.api.provider.*
  * @return the property
  */
 inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
-        property(T::class.javaObjectType)
+    property(T::class.javaObjectType)
 
 
 /**
@@ -20,7 +23,7 @@ inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
  * @param T the type of element
  */
 inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
-        listProperty(T::class.java)
+    listProperty(T::class.java)
 
 
 /**
@@ -29,7 +32,7 @@ inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
  * @param T the type of element
  */
 inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
-        setProperty(T::class.java)
+    setProperty(T::class.java)
 
 
 /**
@@ -39,4 +42,4 @@ inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
  * @param V the type of value
  */
 inline fun <reified K : Any, reified V : Any> ObjectFactory.mapProperty(): MapProperty<K, V> =
-        mapProperty(K::class.java, V::class.java)
+    mapProperty(K::class.java, V::class.java)

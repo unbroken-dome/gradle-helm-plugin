@@ -39,7 +39,11 @@ internal abstract class AbstractHttpHelmChartPublisher(
     protected abstract fun uploadPath(chartName: String, chartVersion: String): String
 
 
-    protected open fun additionalHeaders(chartName: String, chartVersion: String, chartFile: File): Map<String, String> =
+    protected open fun additionalHeaders(
+        chartName: String,
+        chartVersion: String,
+        chartFile: File
+    ): Map<String, String> =
         emptyMap()
 
 

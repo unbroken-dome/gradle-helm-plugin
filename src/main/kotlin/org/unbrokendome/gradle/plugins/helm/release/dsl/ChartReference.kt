@@ -16,7 +16,7 @@ interface ChartReference : Buildable {
 
     @JvmDefault
     override fun getBuildDependencies(): TaskDependency =
-            TaskDependency { emptySet() }
+        TaskDependency { emptySet() }
 }
 
 
@@ -25,13 +25,14 @@ interface ChartReference : Buildable {
  * and has no task dependencies.
  */
 internal class SimpleChartReference(
-        override val chartLocation: String) : ChartReference
+    override val chartLocation: String
+) : ChartReference
 
 
 internal class HelmChartReference(
-        private val project: Project,
-        private val chartName: String)
-    : ChartReference {
+    private val project: Project,
+    private val chartName: String
+) : ChartReference {
 
     private val configuration: Configuration
         get() = project.configurations.getByName(ChartDirArtifactRule.getConfigurationName(chartName))
@@ -46,9 +47,9 @@ internal class HelmChartReference(
 
 
     override fun getBuildDependencies(): TaskDependency =
-            TaskDependency { task ->
-                artifact.buildDependencies.getDependencies(task)
-            }
+        TaskDependency { task ->
+            artifact.buildDependencies.getDependencies(task)
+        }
 }
 
 
@@ -59,15 +60,15 @@ internal class HelmChartReference(
  * used by the chart reference.
  */
 internal class FileCollectionChartReference(
-        private val fileCollection: FileCollection)
-    : ChartReference {
+    private val fileCollection: FileCollection
+) : ChartReference {
 
     override val chartLocation: String
         get() = fileCollection.singleFile.absolutePath
 
 
     override fun getBuildDependencies(): TaskDependency =
-            fileCollection.buildDependencies
+        fileCollection.buildDependencies
 }
 
 
@@ -75,19 +76,19 @@ internal class FileCollectionChartReference(
  * Implementation of [ChartReference] for a configuration that is lazily resolved.
  */
 internal class ConfigurationChartReference(
-        private val project: Project,
-        private val configurationName: String)
-    : ChartReference {
+    private val project: Project,
+    private val configurationName: String
+) : ChartReference {
 
     override val chartLocation: String
         get() = project.configurations.getByName(configurationName)
-                .resolvedConfiguration
-                .files
-                .first()
-                .absolutePath
+            .resolvedConfiguration
+            .files
+            .first()
+            .absolutePath
 
 
     override fun getBuildDependencies(): TaskDependency =
-            project.configurations.getByName(configurationName)
-                    .buildDependencies
+        project.configurations.getByName(configurationName)
+            .buildDependencies
 }

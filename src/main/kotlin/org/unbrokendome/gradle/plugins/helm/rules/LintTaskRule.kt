@@ -5,7 +5,6 @@ import org.gradle.kotlin.dsl.lint
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.lint
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
 
 

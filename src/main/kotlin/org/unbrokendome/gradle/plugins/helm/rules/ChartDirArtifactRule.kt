@@ -13,11 +13,11 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
  * A rule that registers an artifact configuration and an artifact for a chart directory.
  */
 internal class ChartDirArtifactRule(
-        private val configurations: ConfigurationContainer,
-        private val tasks: TaskContainer,
-        private val artifacts: ArtifactHandler,
-        private val charts: Iterable<HelmChart>)
-    : AbstractRule() {
+    private val configurations: ConfigurationContainer,
+    private val tasks: TaskContainer,
+    private val artifacts: ArtifactHandler,
+    private val charts: Iterable<HelmChart>
+) : AbstractRule() {
 
     constructor(project: Project, charts: Iterable<HelmChart>)
             : this(project.configurations, project.tasks, project.artifacts, charts)
@@ -25,7 +25,7 @@ internal class ChartDirArtifactRule(
 
     internal companion object {
         fun getConfigurationName(chartName: String) =
-                "helm${chartName.capitalize()}"
+            "helm${chartName.capitalize()}"
     }
 
 
@@ -33,21 +33,22 @@ internal class ChartDirArtifactRule(
 
 
     override fun getDescription(): String =
-            "Pattern: " + getConfigurationName("<Chart>")
+        "Pattern: " + getConfigurationName("<Chart>")
 
 
     override fun apply(configurationName: String) {
         if (regex.matches(configurationName)) {
             charts.find { it.dirArtifactConfigurationName == configurationName }
-                    ?.let { chart ->
-                        configurations.create(configurationName)
+                ?.let { chart ->
+                    configurations.create(configurationName)
 
-                        val buildDependenciesTask = tasks.getByName(chart.updateDependenciesTaskName) as HelmBuildOrUpdateDependencies
-                        artifacts.add(configurationName, buildDependenciesTask.chartDir) {
-                            it.builtBy(buildDependenciesTask)
-                            it.name = chart.chartName.get()
-                        }
+                    val buildDependenciesTask =
+                        tasks.getByName(chart.updateDependenciesTaskName) as HelmBuildOrUpdateDependencies
+                    artifacts.add(configurationName, buildDependenciesTask.chartDir) {
+                        it.builtBy(buildDependenciesTask)
+                        it.name = chart.chartName.get()
                     }
+                }
         }
     }
 }

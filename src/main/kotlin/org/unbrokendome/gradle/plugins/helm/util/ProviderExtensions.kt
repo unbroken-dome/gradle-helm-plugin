@@ -1,7 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
 import groovy.lang.Closure
-import groovy.lang.GString
 import groovy.util.Eval
 import org.gradle.api.provider.Provider
 import java.net.URI
@@ -28,13 +27,13 @@ internal inline fun <T : Any> Provider<T>.ifPresent(action: (T) -> Unit) {
  * @return the new [Provider], returning the evaluated GString
  */
 internal fun Provider<String>.asGString(evalRoot: Any): Provider<String> =
-        map { value ->
-            @Suppress("UNCHECKED_CAST")
-            val closure = Eval.me("{ -> \"${value.replace("\"", "\\\"")}\" }") as Closure<CharSequence>
-            closure.delegate = evalRoot
-            closure.resolveStrategy = Closure.DELEGATE_ONLY
-            closure.call().toString()
-        }
+    map { value ->
+        @Suppress("UNCHECKED_CAST")
+        val closure = Eval.me("{ -> \"${value.replace("\"", "\\\"")}\" }") as Closure<CharSequence>
+        closure.delegate = evalRoot
+        closure.resolveStrategy = Closure.DELEGATE_ONLY
+        closure.call().toString()
+    }
 
 
 /**
@@ -44,4 +43,4 @@ internal fun Provider<String>.asGString(evalRoot: Any): Provider<String> =
  * @return the new [Provider], returning the URI
  */
 internal fun Provider<String>.toUri(): Provider<URI> =
-        map(URI::create)
+    map(URI::create)

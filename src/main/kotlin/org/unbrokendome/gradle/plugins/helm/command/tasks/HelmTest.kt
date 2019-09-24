@@ -17,7 +17,7 @@ class HelmTest : AbstractHelmServerCommandTask() {
      */
     @get:Input
     val releaseName: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -25,7 +25,7 @@ class HelmTest : AbstractHelmServerCommandTask() {
      */
     @get:Internal
     val cleanup: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     @TaskAction

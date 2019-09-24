@@ -18,8 +18,8 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:Input
     val clientOnly: Property<Boolean> =
-            project.objects.property<Boolean>()
-                    .convention(false)
+        project.objects.property<Boolean>()
+            .convention(false)
 
 
     /**
@@ -27,7 +27,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val forceUpgrade: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -35,7 +35,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val historyMax: Property<Int> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -43,7 +43,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val replicas: Property<Int> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -51,7 +51,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val serviceAccount: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -59,7 +59,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val skipRefresh: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -67,7 +67,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val tillerImage: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -75,7 +75,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val upgrade: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -83,7 +83,7 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:Internal
     val wait: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     init {

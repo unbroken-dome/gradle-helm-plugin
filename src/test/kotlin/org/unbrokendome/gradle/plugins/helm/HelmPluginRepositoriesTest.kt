@@ -24,7 +24,7 @@ class HelmPluginRepositoriesTest : AbstractGradleProjectTest() {
 
     @Test
     fun `Plugin should create a HelmAddRepository task for each repository`() {
-        with (project.helm.repositories) {
+        with(project.helm.repositories) {
             create("myRepo") { repo ->
                 repo.url.set(project.uri("http://repository.example.com"))
             }
@@ -34,15 +34,15 @@ class HelmPluginRepositoriesTest : AbstractGradleProjectTest() {
 
         val addRepoTask = project.tasks.findByName("helmAddMyRepoRepository")
         assert(addRepoTask, name = "add repository task")
-                .isInstanceOf(HelmAddRepository::class) {
-                    it.prop(HelmAddRepository::url).hasValueEqualTo(URI("http://repository.example.com"))
-                }
+            .isInstanceOf(HelmAddRepository::class) {
+                it.prop(HelmAddRepository::url).hasValueEqualTo(URI("http://repository.example.com"))
+            }
     }
 
 
     @Test
     fun `Plugin should create a helmAddRepositories task that registers all repos`() {
-        with (project.helm.repositories) {
+        with(project.helm.repositories) {
             create("myRepo1") { repo ->
                 repo.url.set(project.uri("http://repository1.example.com"))
             }
@@ -55,13 +55,13 @@ class HelmPluginRepositoriesTest : AbstractGradleProjectTest() {
 
         val addRepositoriesTask = project.tasks.findByName("helmAddRepositories")
         assert(addRepositoriesTask, name = "add repositories task")
-                .isNotNull {
-                    it.prop("dependencies") { it.taskDependencies.getDependencies(it) }
-                            .all {
-                                hasSize(2)
-                                each { it.isInstanceOf(HelmAddRepository::class) }
-                            }
-                }
+            .isNotNull {
+                it.prop("dependencies") { it.taskDependencies.getDependencies(it) }
+                    .all {
+                        hasSize(2)
+                        each { it.isInstanceOf(HelmAddRepository::class) }
+                    }
+            }
 
     }
 }

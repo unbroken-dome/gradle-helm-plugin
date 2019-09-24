@@ -33,30 +33,32 @@ interface HelmRepository : Named, CredentialsContainer {
 
 
 private open class DefaultHelmRepository
-private constructor(private val name: String,
-                    objectFactory: ObjectFactory,
-                    credentialsContainer: CredentialsContainer)
-    : HelmRepository, CredentialsContainer by credentialsContainer {
+private constructor(
+    private val name: String,
+    objectFactory: ObjectFactory,
+    credentialsContainer: CredentialsContainer
+) : HelmRepository, CredentialsContainer by credentialsContainer {
 
 
     private constructor(name: String, objectFactory: ObjectFactory, credentialsFactory: CredentialsFactory)
             : this(name, objectFactory, CredentialsContainerSupport(objectFactory, credentialsFactory))
 
 
-    @Inject constructor(name: String, objectFactory: ObjectFactory)
+    @Inject
+    constructor(name: String, objectFactory: ObjectFactory)
             : this(name, objectFactory, DefaultCredentialsFactory(objectFactory))
 
 
     override fun getName(): String =
-            name
+        name
 
 
     override val url: Property<URI> =
-            objectFactory.property()
+        objectFactory.property()
 
 
     override val caFile: RegularFileProperty =
-            objectFactory.fileProperty()
+        objectFactory.fileProperty()
 }
 
 
@@ -67,6 +69,6 @@ private constructor(private val name: String,
  * @return the container for `HelmRepository` objects
  */
 internal fun helmRepositoryContainer(project: Project): NamedDomainObjectContainer<HelmRepository> =
-        project.container(HelmRepository::class.java) { name ->
-            project.objects.newInstance(DefaultHelmRepository::class.java, name)
-        }
+    project.container(HelmRepository::class.java) { name ->
+        project.objects.newInstance(DefaultHelmRepository::class.java, name)
+    }

@@ -7,12 +7,12 @@ import org.gradle.api.provider.Provider
 /**
  * A [Provider] that returns the project's version.
  */
-val Project.versionProvider : Provider<String>
+val Project.versionProvider: Provider<String>
     get() = provider { version.toString() }
 
 
 fun <T : Any> Project.coalesceProvider(vararg providers: Provider<out T>): Provider<T> = provider {
     providers.asSequence()
-            .mapNotNull { it.orNull }
-            .firstOrNull()
+        .mapNotNull { it.orNull }
+        .firstOrNull()
 }

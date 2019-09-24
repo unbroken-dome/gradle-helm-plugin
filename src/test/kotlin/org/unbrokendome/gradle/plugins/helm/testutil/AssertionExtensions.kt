@@ -25,28 +25,31 @@ inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null, noinli
 
     val extension: E = if (name != null) {
         extensions.findByName(name)
-                .let {
-                    if (it == null) {
-                        return expected("to have an extension named \"$name\" of type ${show(E::class)}")
-                    }
-                    if (it !is E) {
-                        return expected("to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(it.javaClass)}")
-                    }
-                    it
+            .let {
+                if (it == null) {
+                    return expected("to have an extension named \"$name\" of type ${show(E::class)}")
                 }
+                if (it !is E) {
+                    return expected(
+                        "to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(
+                            it.javaClass
+                        )}"
+                    )
+                }
+                it
+            }
     } else {
         extensions.findByType(E::class.java)
-                .let {
-                    if (it == null) {
-                        return expected("to have an extension of type ${show(E::class)}")
-                    }
-                    it
+            .let {
+                if (it == null) {
+                    return expected("to have an extension of type ${show(E::class)}")
                 }
+                it
+            }
     } as E
 
-    assert(extension, name = "extension " + (name?.let { "\"$it\""} ?: show(E::class))).all(block)
+    assert(extension, name = "extension " + (name?.let { "\"$it\"" } ?: show(E::class))).all(block)
 }
-
 
 
 fun <T : Any> Assert<NamedDomainObjectCollection<T>>.containsItem(name: String, block: (Assert<T>) -> Unit = {}) {
@@ -60,7 +63,6 @@ fun <T : Any, S : T> Assert<T?>.isInstanceOf(kclass: KClass<S>, block: (Assert<S
         it.defaultIsInstanceOf(kclass, block)
     }
 }
-
 
 
 fun <T : Any> Assert<Provider<T>>.isPresent(block: (Assert<T>) -> Unit = {}) {
@@ -83,7 +85,7 @@ fun <T : Any> Assert<Provider<T>>.hasValueEqualTo(value: T) {
 fun Assert<Provider<RegularFile>>.hasFileValueEqualTo(path: File) {
     isPresent {
         it.prop(RegularFile::getAsFile)
-                .isEqualTo(path)
+            .isEqualTo(path)
     }
 }
 
@@ -96,7 +98,7 @@ fun Assert<Provider<RegularFile>>.hasFileValueEqualTo(path: String) {
 fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: File) {
     isPresent {
         it.prop(Directory::getAsFile)
-                .isEqualTo(path)
+            .isEqualTo(path)
     }
 }
 
@@ -104,7 +106,6 @@ fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: File) {
 fun Assert<Provider<Directory>>.hasDirValueEqualTo(path: String) {
     hasDirValueEqualTo(File(path))
 }
-
 
 
 fun <T> Assert<List<T>>.at(index: Int, block: (Assert<T>) -> Unit = {}) {

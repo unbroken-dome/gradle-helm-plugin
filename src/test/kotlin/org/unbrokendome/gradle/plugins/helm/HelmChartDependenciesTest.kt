@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.dsl.charts
-import org.unbrokendome.gradle.plugins.helm.dsl.dependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
 import org.unbrokendome.gradle.plugins.helm.testutil.*
@@ -52,7 +51,7 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
             filterSources.filterSources()
 
             val filteredRequirements = project.file("${project.buildDir}/helm/charts/bar/requirements.yaml")
-                    .reader().use { Yaml().load(it) }
+                .reader().use { Yaml().load(it) }
 
             assert(filteredRequirements).isMapOf<String, Any?> {
                 it.hasEntry("dependencies") {
@@ -98,7 +97,7 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
             filterSources.filterSources()
 
             val filteredRequirements = project.file("${project.buildDir}/helm/charts/bar/requirements.yaml")
-                    .reader().use { Yaml().load(it) }
+                .reader().use { Yaml().load(it) }
 
             assert(filteredRequirements).isMapOf<String, Any?> {
                 it.hasEntry("dependencies") {
@@ -120,25 +119,31 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
         private fun setupProjectFiles() {
             directory(project.projectDir) {
                 directory("src/helm/foo") {
-                    file("Chart.yaml", """
+                    file(
+                        "Chart.yaml", """
                         ---
                         name: foo
                         version: 1.2.3
-                        """.trimIndent())
+                        """.trimIndent()
+                    )
                 }
                 directory("src/helm/bar") {
-                    file("Chart.yaml", """
+                    file(
+                        "Chart.yaml", """
                         ---
                         name: bar
                         version: 3.2.1
-                        """.trimIndent())
-                    file("requirements.yaml", """
+                        """.trimIndent()
+                    )
+                    file(
+                        "requirements.yaml", """
                         ---
                         dependencies:
                           - name: fooDep
                             version: "*"
                             alias: fooAlias
-                        """.trimIndent())
+                        """.trimIndent()
+                    )
                 }
             }
         }
@@ -155,17 +160,17 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
         @BeforeEach
         fun createSubprojects() {
             fooProject = ProjectBuilder.builder()
-                    .withName("foo")
-                    .withParent(project)
-                    .withProjectDir(project.projectDir.resolve("foo"))
-                    .build()
+                .withName("foo")
+                .withParent(project)
+                .withProjectDir(project.projectDir.resolve("foo"))
+                .build()
             fooProject.applyHelmPlugin()
 
             barProject = ProjectBuilder.builder()
-                    .withName("bar")
-                    .withParent(project)
-                    .withProjectDir(project.projectDir.resolve("bar"))
-                    .build()
+                .withName("bar")
+                .withParent(project)
+                .withProjectDir(project.projectDir.resolve("bar"))
+                .build()
             barProject.applyHelmPlugin()
         }
 
@@ -174,7 +179,7 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
         fun `should resolve dependency`() {
             setupProjectFiles()
 
-            with (barProject.helm.charts.getByName("main")) {
+            with(barProject.helm.charts.getByName("main")) {
                 dependencies.add("foo", project = ":foo")
             }
 
@@ -184,7 +189,7 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
             filterSources.filterSources()
 
             val filteredRequirements = project.file("${barProject.buildDir}/helm/charts/bar/requirements.yaml")
-                    .reader().use { Yaml().load(it) }
+                .reader().use { Yaml().load(it) }
 
             assert(filteredRequirements).isMapOf<String, Any?> {
                 it.hasEntry("dependencies") {
@@ -207,7 +212,7 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
         fun `should resolve dependency using alias`() {
             setupProjectFiles()
 
-            with (barProject.helm.charts.getByName("main")) {
+            with(barProject.helm.charts.getByName("main")) {
                 dependencies.add("fooAlias", project = ":foo")
             }
 
@@ -217,7 +222,7 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
             filterSources.filterSources()
 
             val filteredRequirements = project.file("${barProject.buildDir}/helm/charts/bar/requirements.yaml")
-                    .reader().use { Yaml().load(it) }
+                .reader().use { Yaml().load(it) }
 
             assert(filteredRequirements).isMapOf<String, Any?> {
                 it.hasEntry("dependencies") {
@@ -239,27 +244,33 @@ class HelmChartDependenciesTest : AbstractGradleProjectTest() {
         private fun setupProjectFiles() {
             directory(fooProject.projectDir) {
                 directory("src/main/helm") {
-                    file("Chart.yaml", """
+                    file(
+                        "Chart.yaml", """
                     ---
                     name: foo
                     version: 1.2.3
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                 }
             }
             directory(barProject.projectDir) {
                 directory("src/main/helm") {
-                    file("Chart.yaml", """
+                    file(
+                        "Chart.yaml", """
                         ---
                         name: bar
                         version: 3.2.1
-                        """.trimIndent())
-                    file("requirements.yaml", """
+                        """.trimIndent()
+                    )
+                    file(
+                        "requirements.yaml", """
                         ---
                         dependencies:
                           - name: foo
                             version: "*"
                             alias: fooAlias
-                        """.trimIndent())
+                        """.trimIndent()
+                    )
                 }
             }
         }

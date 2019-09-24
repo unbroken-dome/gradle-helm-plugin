@@ -15,15 +15,16 @@ import org.gradle.api.provider.Provider
  * @param valueFiles a [FileCollection] of YAML files containing additional values to pass to the command.
  */
 fun HelmExecSpec.valuesOptions(
-        values: Provider<Map<String, Any>>,
-        valueFiles: FileCollection) {
+    values: Provider<Map<String, Any>>,
+    valueFiles: FileCollection
+) {
 
     val (stringValues, otherValues) = values.get().toList()
-            .partition { it.second is String }
-            .toList()
-            .map { items ->
-                items.joinToString(separator = ",") { "${it.first}=${it.second}" }
-            }
+        .partition { it.second is String }
+        .toList()
+        .map { items ->
+            items.joinToString(separator = ",") { "${it.first}=${it.second}" }
+        }
     if (stringValues.isNotEmpty()) {
         option("--set-string", stringValues)
     }

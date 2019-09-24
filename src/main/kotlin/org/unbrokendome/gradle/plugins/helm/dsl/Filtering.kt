@@ -61,22 +61,22 @@ private open class DefaultFiltering
 @Inject constructor(objectFactory: ObjectFactory) : FilteringInternal {
 
     override val enabled: Property<Boolean> =
-            objectFactory.property<Boolean>()
-                    .convention(true)
+        objectFactory.property<Boolean>()
+            .convention(true)
 
 
     override val placeholderPrefix: Property<String> =
-            objectFactory.property<String>()
-                    .convention(FILTERING_DEFAULT_PLACEHOLDER_PREFIX)
+        objectFactory.property<String>()
+            .convention(FILTERING_DEFAULT_PLACEHOLDER_PREFIX)
 
 
     override val placeholderSuffix: Property<String> =
-            objectFactory.property<String>()
-                    .convention(FILTERING_DEFAULT_PLACEHOLDER_SUFFIX)
+        objectFactory.property<String>()
+            .convention(FILTERING_DEFAULT_PLACEHOLDER_SUFFIX)
 
 
     override val values: MapProperty<String, Any> =
-            objectFactory.mapProperty<String, Any>().empty()
+        objectFactory.mapProperty<String, Any>().empty()
 
 
     override fun setParent(parent: Filtering) {
@@ -96,7 +96,7 @@ private open class DefaultFiltering
  * @return the created [Filtering] object
  */
 internal fun createFiltering(objectFactory: ObjectFactory, parent: Filtering? = null): Filtering =
-        objectFactory.newInstance(DefaultFiltering::class.java)
-                .apply {
-                    parent?.let(this::setParent)
-                }
+    objectFactory.newInstance(DefaultFiltering::class.java)
+        .apply {
+            parent?.let(this::setParent)
+        }

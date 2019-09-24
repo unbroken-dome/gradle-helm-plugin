@@ -17,16 +17,16 @@ abstract class AbstractGradleProjectTest {
     fun createProject(testInfo: TestInfo) {
 
         val annotation = testInfo.testMethod
-                .map { it.getAnnotation(GradleProjectName::class.java) }
-                .orElse(null)
+            .map { it.getAnnotation(GradleProjectName::class.java) }
+            .orElse(null)
 
         project = ProjectBuilder.builder()
-                .also { builder ->
-                    if (annotation != null) {
-                        builder.withName(annotation.value)
-                    }
+            .also { builder ->
+                if (annotation != null) {
+                    builder.withName(annotation.value)
                 }
-                .build()
+            }
+            .build()
     }
 
 

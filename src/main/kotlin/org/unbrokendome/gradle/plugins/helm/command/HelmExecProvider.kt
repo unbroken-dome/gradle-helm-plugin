@@ -36,28 +36,28 @@ interface HelmExecProvider {
  * @return an [ExecResult] indicating the result of the invocation
  */
 fun HelmExecProvider.execHelm(command: String, subcommand: String?, action: HelmExecSpec.() -> Unit): ExecResult =
-        execHelm(command, subcommand, Action(action))
+    execHelm(command, subcommand, Action(action))
 
 
 internal class HelmExecProviderSupport(
-        private val project: Project,
-        private val globalOptions: GlobalHelmOptions)
-    : HelmExecProvider {
+    private val project: Project,
+    private val globalOptions: GlobalHelmOptions
+) : HelmExecProvider {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
 
     override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
-            project.exec { execSpec ->
-                DefaultHelmExecSpec(execSpec, globalOptions, command, subcommand)
-                        .also { action.execute(it) }
+        project.exec { execSpec ->
+            DefaultHelmExecSpec(execSpec, globalOptions, command, subcommand)
+                .also { action.execute(it) }
 
-                globalOptions.extraArgs.ifPresent { extraArgs ->
-                    execSpec.args(extraArgs)
-                }
-
-                logger.info("Executing: {}", execSpec.maskedCommandLine)
+            globalOptions.extraArgs.ifPresent { extraArgs ->
+                execSpec.args(extraArgs)
             }
+
+            logger.info("Executing: {}", execSpec.maskedCommandLine)
+        }
 
 
     private val ExecSpec.maskedCommandLine: List<String>
@@ -68,5 +68,5 @@ internal class HelmExecProviderSupport(
 
 
     private fun shouldMaskOptionValue(arg: String) =
-            arg.startsWith("--") && arg.contains("password")
+        arg.startsWith("--") && arg.contains("password")
 }

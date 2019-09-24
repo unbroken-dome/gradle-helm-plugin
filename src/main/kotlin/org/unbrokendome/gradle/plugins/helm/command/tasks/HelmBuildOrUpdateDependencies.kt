@@ -32,7 +32,7 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of other properties")
     val chartDir: DirectoryProperty =
-            project.objects.directoryProperty()
+        project.objects.directoryProperty()
 
 
     /**
@@ -44,9 +44,9 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
     @get:[InputFiles]
     @Suppress("unused")
     val requirementsYamlFile: FileCollection =
-            chartDir.asFileTree.matching {
-                it.include("requirements.yaml")
-            }
+        chartDir.asFileTree.matching {
+            it.include("requirements.yaml")
+        }
 
 
     /**
@@ -58,9 +58,9 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
     @get:[InputFiles]
     @Suppress("unused")
     val requirementsLockFile: FileCollection =
-            chartDir.asFileTree.matching {
-                it.include("requirements.lock")
-            }
+        chartDir.asFileTree.matching {
+            it.include("requirements.lock")
+        }
 
 
     /**
@@ -69,7 +69,7 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
     @get:OutputDirectory
     @Suppress("unused")
     val subchartsDir: Provider<Directory> =
-            chartDir.dir("charts")
+        chartDir.dir("charts")
 
 
     /**
@@ -77,7 +77,7 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
      */
     @Internal
     val skipRefresh: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     @TaskAction
@@ -90,7 +90,7 @@ open class HelmBuildOrUpdateDependencies : AbstractHelmCommandTask() {
         } else {
             requirementsYamlFile.singleFile.let { requirementsYaml ->
                 val lockFileIsPresentAndNewer = requirementsLockFile.firstOrNull()
-                        ?.let { it.lastModified() > requirementsYaml.lastModified() } ?: false
+                    ?.let { it.lastModified() > requirementsYaml.lastModified() } ?: false
 
                 if (lockFileIsPresentAndNewer) {
                     execHelm("dependency", "build") {

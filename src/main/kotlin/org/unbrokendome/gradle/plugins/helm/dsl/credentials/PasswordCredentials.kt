@@ -25,12 +25,11 @@ interface PasswordCredentials : Credentials {
 
 
 internal open class DefaultPasswordCredentials
-@Inject constructor(objectFactory: ObjectFactory)
-    : PasswordCredentials {
+@Inject constructor(objectFactory: ObjectFactory) : PasswordCredentials {
 
     override val username: Property<String> =
-            objectFactory.property()
+        objectFactory.property()
 
     override val password: Property<String> =
-            objectFactory.property()
+        objectFactory.property()
 }

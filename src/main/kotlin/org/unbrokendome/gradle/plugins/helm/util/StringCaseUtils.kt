@@ -52,14 +52,14 @@ internal fun String.splitIntoWords(): List<String> {
  * @return the resulting string
  */
 internal fun String.capitalizeWords(capitalizeFirst: Boolean = true): String =
-        buildString {
-            splitIntoWords().iterator()
-                    .also {
-                        if (!capitalizeFirst && it.hasNext()) {
-                            append(it.next())
-                        }
-                    }
-                    .forEachRemaining { word ->
-                        append(word.capitalize())
-                    }
-        }
+    buildString {
+        splitIntoWords().iterator()
+            .also {
+                if (!capitalizeFirst && it.hasNext()) {
+                    append(it.next())
+                }
+            }
+            .forEachRemaining { word ->
+                append(word.capitalize())
+            }
+    }

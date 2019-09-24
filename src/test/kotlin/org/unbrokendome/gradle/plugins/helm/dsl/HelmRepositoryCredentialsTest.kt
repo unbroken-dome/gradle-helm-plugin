@@ -29,7 +29,7 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
 
     @Test
     fun `Repository with password credentials`() {
-        with (project.helm.repositories) {
+        with(project.helm.repositories) {
             create("myRepo") { repo ->
                 repo.url.set(project.uri("http://repository.example.com"))
                 repo.credentials {
@@ -41,19 +41,19 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
 
         val repository = project.helm.repositories.getByName("myRepo")
         assert(repository, name = "repository")
-                .prop(CredentialsContainer::configuredCredentials)
-                .isPresent {
-                    it.isInstanceOf(PasswordCredentials::class) {
-                        it.prop(PasswordCredentials::username).hasValueEqualTo("username")
-                        it.prop(PasswordCredentials::password).hasValueEqualTo("password")
-                    }
+            .prop(CredentialsContainer::configuredCredentials)
+            .isPresent {
+                it.isInstanceOf(PasswordCredentials::class) {
+                    it.prop(PasswordCredentials::username).hasValueEqualTo("username")
+                    it.prop(PasswordCredentials::password).hasValueEqualTo("password")
                 }
+            }
     }
 
 
     @Test
     fun `Repository with certificate credentials`() {
-        with (project.helm.repositories) {
+        with(project.helm.repositories) {
             create("myRepo") { repo ->
                 repo.url.set(project.uri("http://repository.example.com"))
                 repo.credentials(CertificateCredentials::class) {
@@ -65,20 +65,20 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
 
         val repository = project.helm.repositories.getByName("myRepo")
         assert(repository, name = "repository")
-                .prop(CredentialsContainer::configuredCredentials)
-                .isPresent {
-                    it.isInstanceOf(CertificateCredentials::class) {
-                        it.prop(CertificateCredentials::certificateFile)
-                                .isPresent {
-                                    it.prop("asFile", RegularFile::getAsFile)
-                                            .isEqualTo(File("/path/to/certificate"))
-                                }
-                        it.prop(CertificateCredentials::keyFile)
-                                .isPresent {
-                                    it.prop("asFile", RegularFile::getAsFile)
-                                            .isEqualTo(File("/path/to/key"))
-                                }
-                    }
+            .prop(CredentialsContainer::configuredCredentials)
+            .isPresent {
+                it.isInstanceOf(CertificateCredentials::class) {
+                    it.prop(CertificateCredentials::certificateFile)
+                        .isPresent {
+                            it.prop("asFile", RegularFile::getAsFile)
+                                .isEqualTo(File("/path/to/certificate"))
+                        }
+                    it.prop(CertificateCredentials::keyFile)
+                        .isPresent {
+                            it.prop("asFile", RegularFile::getAsFile)
+                                .isEqualTo(File("/path/to/key"))
+                        }
                 }
+            }
     }
 }

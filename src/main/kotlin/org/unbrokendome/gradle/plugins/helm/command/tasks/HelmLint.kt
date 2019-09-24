@@ -5,16 +5,12 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.util.GFileUtils
 import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.util.ifPresent
+import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
@@ -29,7 +25,7 @@ open class HelmLint : AbstractHelmCommandTask() {
     @get:[InputDirectory SkipWhenEmpty]
     @Suppress("LeakingThis")
     val chartDir: DirectoryProperty =
-            project.objects.directoryProperty()
+        project.objects.directoryProperty()
 
 
     /**
@@ -37,7 +33,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val strict: Property<Boolean> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -45,7 +41,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:Input
     val values: MapProperty<String, Any> =
-            project.objects.mapProperty()
+        project.objects.mapProperty()
 
 
     /**
@@ -53,7 +49,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:InputFiles
     val valueFiles: ConfigurableFileCollection =
-            project.layout.configurableFiles()
+        project.layout.configurableFiles()
 
 
     /**
@@ -64,7 +60,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:[OutputFile Optional]
     val outputMarkerFile: RegularFileProperty =
-            project.objects.fileProperty()
+        project.objects.fileProperty()
 
 
     init {

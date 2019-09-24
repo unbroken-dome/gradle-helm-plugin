@@ -14,8 +14,8 @@ internal interface ChartDescriptor {
 
 
 private class DefaultChartDescriptor(
-        private val map: Map<String, Any?>)
-    : ChartDescriptor {
+    private val map: Map<String, Any?>
+) : ChartDescriptor {
 
     override val name
         get() = map["name"] as String?
@@ -41,22 +41,22 @@ internal object ChartDescriptorYaml {
 
 
     fun loading(from: Provider<RegularFile>): Provider<ChartDescriptor> =
-            from.map(this::load)
+        from.map(this::load)
 
 
     fun load(file: RegularFile): ChartDescriptor =
-            load(file.asFile)
+        load(file.asFile)
 
 
     fun load(file: File): ChartDescriptor =
         file.takeIf { it.exists() }
-                ?.reader()?.use(this::load)
-                ?: EmptyChartDescriptor
+            ?.reader()?.use(this::load)
+            ?: EmptyChartDescriptor
 
 
     @Suppress("UNCHECKED_CAST")
     fun load(reader: Reader): ChartDescriptor =
-            (yaml.load(reader) as? Map<String, Any?>)
-                    ?.let(::DefaultChartDescriptor)
-                    ?: EmptyChartDescriptor
+        (yaml.load(reader) as? Map<String, Any?>)
+            ?.let(::DefaultChartDescriptor)
+            ?: EmptyChartDescriptor
 }

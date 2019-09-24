@@ -39,37 +39,38 @@ interface HelmChart : Named, Buildable {
 
 private open class DefaultHelmChart
 @Inject constructor(
-        private val name: String,
-        project: Project)
-    : HelmChart {
+    private val name: String,
+    project: Project
+) : HelmChart {
 
     override fun getName(): String =
-            name
+        name
 
 
     override val chartName: Property<String> =
-            project.objects.property<String>()
-                    .convention(name)
+        project.objects.property<String>()
+            .convention(name)
 
 
     override val chartVersion: Property<String> =
-            project.objects.property<String>()
-                    .convention(project.versionProvider)
+        project.objects.property<String>()
+            .convention(project.versionProvider)
 
 
     override val sourceDir: DirectoryProperty =
-            project.objects.directoryProperty()
+        project.objects.directoryProperty()
 
 
     override fun getBuildDependencies(): TaskDependency =
-            TaskDependency { task ->
-                if (task != null) {
-                    setOf(
-                            task.project.tasks.getByName(packageTaskName))
-                } else {
-                    emptySet()
-                }
+        TaskDependency { task ->
+            if (task != null) {
+                setOf(
+                    task.project.tasks.getByName(packageTaskName)
+                )
+            } else {
+                emptySet()
             }
+        }
 }
 
 
@@ -80,6 +81,6 @@ private open class DefaultHelmChart
  * @return the container for `HelmChart`s
  */
 internal fun helmChartContainer(project: Project): NamedDomainObjectContainer<HelmChart> =
-        project.container(HelmChart::class.java) { name ->
-            project.objects.newInstance(DefaultHelmChart::class.java, name, project)
-        }
+    project.container(HelmChart::class.java) { name ->
+        project.objects.newInstance(DefaultHelmChart::class.java, name, project)
+    }

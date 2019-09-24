@@ -24,12 +24,11 @@ interface CertificateCredentials : Credentials {
 
 
 internal open class DefaultCertificateCredentials
-@Inject constructor(objectFactory: ObjectFactory)
-    : CertificateCredentials {
+@Inject constructor(objectFactory: ObjectFactory) : CertificateCredentials {
 
     override val certificateFile: RegularFileProperty =
-            objectFactory.fileProperty()
+        objectFactory.fileProperty()
 
     override val keyFile: RegularFileProperty =
-            objectFactory.fileProperty()
+        objectFactory.fileProperty()
 }
