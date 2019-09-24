@@ -16,10 +16,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependenciesRe
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
-import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
-import org.unbrokendome.gradle.plugins.helm.util.extension
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.putFrom
+import org.unbrokendome.gradle.plugins.helm.util.*
 import java.io.File
 import java.io.Reader
 import java.io.StringReader
@@ -119,6 +116,7 @@ open class HelmFilterSources : DefaultTask() {
                 .apply {
                     values.putFrom("chartName", chartName)
                     values.putFrom("chartVersion", chartVersion)
+                    values.putFrom("projectVersion", project.versionProvider)
                     extensions.add(Filtering::class.java, "filtering", this)
                 }
 
