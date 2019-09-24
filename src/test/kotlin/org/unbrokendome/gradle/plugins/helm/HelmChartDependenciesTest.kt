@@ -4,6 +4,7 @@ import assertk.assert
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

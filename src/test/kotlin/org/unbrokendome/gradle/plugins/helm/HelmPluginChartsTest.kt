@@ -3,6 +3,8 @@ package org.unbrokendome.gradle.plugins.helm
 import assertk.all
 import assertk.assert
 import assertk.assertions.*
+import org.gradle.kotlin.dsl.filtering
+import org.gradle.kotlin.dsl.lint
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildDependencies

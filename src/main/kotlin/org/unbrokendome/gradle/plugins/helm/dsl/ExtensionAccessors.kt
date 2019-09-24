@@ -2,14 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
-import org.unbrokendome.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_DEPENDENCIES_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_REPOSITORIES_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_TILLLER_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
+import org.unbrokendome.gradle.plugins.helm.*
 import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 
 
@@ -53,45 +46,3 @@ internal val HelmExtension.charts: NamedDomainObjectContainer<HelmChart>
  */
 internal val HelmExtension.filtering: Filtering
     get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
-
-
-/**
- * Gets the chart's [Linting] extension.
- */
-internal val HelmChart.lint: Linting
-    get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
-
-
-/**
- * Configures the chart linting.
- */
-internal fun HelmChart.lint(configure: (Linting).() -> Unit) =
-        (this as ExtensionAware).extensions.configure(HELM_LINT_EXTENSION_NAME, configure)
-
-
-/**
- * Gets the chart's [Filtering] extension.
- */
-internal val HelmChart.filtering: Filtering
-    get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
-
-
-/**
- * Configures the chart filtering.
- */
-internal fun HelmChart.filtering(configure: (Filtering).() -> Unit) =
-        (this as ExtensionAware).extensions.configure(HELM_FILTERING_EXTENSION_NAME, configure)
-
-
-/**
- * Gets the chart's `dependencies` extension.
- */
-internal val HelmChart.dependencies: ChartDependencyHandler
-    get() = requiredExtension(HELM_DEPENDENCIES_EXTENSION_NAME)
-
-
-/**
- * Configures the chart dependencies.
- */
-internal fun HelmChart.dependencies(configure: (ChartDependencyHandler).() -> Unit) =
-        (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)

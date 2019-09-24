@@ -1,6 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.kotlin.dsl.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.FilteringInternal
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.filtering
