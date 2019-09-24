@@ -51,7 +51,7 @@ helm.charts {
     }
 
     create("bar") {
-        chartVersion = '3.2.1'
+        chartVersion.set("3.2.1")
         sourceDir.set(file("src/helm/bar"))
 
         dependencies {

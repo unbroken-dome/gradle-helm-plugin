@@ -45,8 +45,8 @@ helm {
         values.put 'authorName', 'A. U. Thor'
     }
 
-    charts {
-        main {
+    (charts) {
+        "main" {
             filtering {
                 // add a custom value that can be resolved only inside this chart's YAML files.
                 values.put 'dockerImage', 'busybox'
