@@ -26,11 +26,18 @@ class DirectoryBuilder(private val path: Path) {
         DirectoryBuilder(subPath).let(spec)
     }
 
-    fun file(name: String, contents: CharSequence, charset: Charset = Charsets.UTF_8) {
+    fun file(name: String, contents: String, append: Boolean = false, charset: Charset = Charsets.UTF_8) {
         val filePath = this.path.resolve(name)
-        Files.newBufferedWriter(filePath, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+
+        val options = arrayOf(
+            StandardOpenOption.CREATE,
+            StandardOpenOption.WRITE,
+            if (append) StandardOpenOption.APPEND else StandardOpenOption.TRUNCATE_EXISTING
+        )
+
+        Files.newBufferedWriter(filePath, charset, *options)
             .use { writer ->
-                writer.append(contents)
+                writer.append(contents.trimIndent())
             }
     }
 }

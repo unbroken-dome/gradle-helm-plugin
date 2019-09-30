@@ -1,19 +1,20 @@
 package org.unbrokendome.gradle.plugins.helm
 
 import assertk.all
-import assertk.assert
+import assertk.assertThat
 import assertk.assertions.*
+import org.gradle.api.Task
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.repositories
-import org.unbrokendome.gradle.plugins.helm.testutil.hasValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.testutil.isInstanceOf
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.taskDependencies
 import java.net.URI
 
 
-@Suppress("NestedLambdaShadowedImplicitParameter")
 class HelmPluginRepositoriesTest : AbstractGradleProjectTest() {
 
     @BeforeEach
@@ -32,11 +33,10 @@ class HelmPluginRepositoriesTest : AbstractGradleProjectTest() {
 
         evaluateProject()
 
-        val addRepoTask = project.tasks.findByName("helmAddMyRepoRepository")
-        assert(addRepoTask, name = "add repository task")
-            .isInstanceOf(HelmAddRepository::class) {
-                it.prop(HelmAddRepository::url).hasValueEqualTo(URI("http://repository.example.com"))
-            }
+        assertThat(project)
+            .containsTask<HelmAddRepository>("helmAddMyRepoRepository")
+            .prop(HelmAddRepository::url)
+            .isPresent().isEqualTo(URI("http://repository.example.com"))
     }
 
 
@@ -53,15 +53,11 @@ class HelmPluginRepositoriesTest : AbstractGradleProjectTest() {
 
         evaluateProject()
 
-        val addRepositoriesTask = project.tasks.findByName("helmAddRepositories")
-        assert(addRepositoriesTask, name = "add repositories task")
-            .isNotNull {
-                it.prop("dependencies") { it.taskDependencies.getDependencies(it) }
-                    .all {
-                        hasSize(2)
-                        each { it.isInstanceOf(HelmAddRepository::class) }
-                    }
+        assertThat(project)
+            .containsTask<Task>("helmAddRepositories")
+            .taskDependencies.all {
+                each { it.isInstanceOf(HelmAddRepository::class) }
+                extracting { it.name }.containsOnly("helmAddMyRepo1Repository", "helmAddMyRepo2Repository")
             }
-
     }
 }

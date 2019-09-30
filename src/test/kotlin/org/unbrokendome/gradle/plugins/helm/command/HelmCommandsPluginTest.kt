@@ -1,13 +1,14 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
-import assertk.assert
+import assertk.assertThat
 import assertk.assertions.hasSize
-import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import assertk.assertions.isSuccess
+import assertk.assertions.prop
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.AbstractGradleProjectTest
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.testutil.hasExtension
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
 
 
 class HelmCommandsPluginTest : AbstractGradleProjectTest() {
@@ -16,9 +17,7 @@ class HelmCommandsPluginTest : AbstractGradleProjectTest() {
     fun `Project can be evaluated successfully`() {
         applyPlugin()
 
-        assertDoesNotThrow {
-            evaluateProject()
-        }
+        assertThat { evaluateProject() }.isSuccess()
     }
 
 
@@ -26,7 +25,8 @@ class HelmCommandsPluginTest : AbstractGradleProjectTest() {
     fun `Plugin should create a helm DSL extension`() {
         applyPlugin()
 
-        assert(project, name = "project").hasExtension<HelmExtension>("helm")
+        assertThat(this::project)
+            .hasExtension<HelmExtension>("helm")
     }
 
 
@@ -34,19 +34,20 @@ class HelmCommandsPluginTest : AbstractGradleProjectTest() {
     fun `Plugin should create a helm lint DSL extension`() {
         applyPlugin()
 
-        assert(project, name = "project")
-            .hasExtension<HelmExtension>("helm") {
-                it.hasExtension<Linting>("lint")
-            }
+        assertThat(this::project)
+            .hasExtension<HelmExtension>("helm")
+            .hasExtension<Linting>("lint")
     }
 
 
     @Test
     fun `Plugin should not create any tasks`() {
         val taskCountBefore = project.tasks.size
+
         applyPlugin()
 
-        assert(project.tasks, name = "tasks")
+        assertThat(this::project)
+            .prop("tasks") { it.tasks }
             .hasSize(taskCountBefore)
     }
 

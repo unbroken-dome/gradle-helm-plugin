@@ -29,7 +29,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.11")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
+    testImplementation("com.jayway.jsonpath:json-path:2.4.0")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
 
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))

@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.tasks
 
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
@@ -238,8 +239,21 @@ open class HelmFilterSources : DefaultTask() {
         TaskDependency { task ->
             if (resolveDependencies.getOrElse(false)) {
                 configuredChartName.orNull?.let { configuredChartName ->
+
                     project.configurations.findByName(chartDependenciesConfigurationName(configuredChartName))
-                        ?.buildDependencies?.getDependencies(task)
+                        ?.let { chartDependenciesConfiguration ->
+
+                            val externalDependencies: Set<Task> =
+                                chartDependenciesConfiguration.buildDependencies.getDependencies(task)
+
+                            // Unfortunately just calling Configuration.getBuildDependencies() isn't enough,
+                            // because that doesn't consider artifacts in the same project.
+                            val internalDependencies: Set<Task> =
+                                chartDependenciesConfiguration.allArtifacts.buildDependencies.getDependencies(task)
+
+                            externalDependencies + internalDependencies
+                        }
+
                 } ?: emptySet()
             } else {
                 emptySet()

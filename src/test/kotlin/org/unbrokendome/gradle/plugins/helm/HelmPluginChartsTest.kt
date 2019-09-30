@@ -1,10 +1,10 @@
 package org.unbrokendome.gradle.plugins.helm
 
 import assertk.all
-import assertk.assert
+import assertk.assertThat
 import assertk.assertions.*
-import org.gradle.kotlin.dsl.filtering
-import org.gradle.kotlin.dsl.lint
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Task
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
@@ -12,13 +12,9 @@ import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
 import org.unbrokendome.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
-import org.unbrokendome.gradle.plugins.helm.testutil.hasDirValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.testutil.hasExtension
-import org.unbrokendome.gradle.plugins.helm.testutil.hasValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.testutil.isInstanceOf
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.*
 
 
-@Suppress("NestedLambdaShadowedImplicitParameter")
 class HelmPluginChartsTest : AbstractGradleProjectTest() {
 
     @BeforeEach
@@ -26,13 +22,17 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
         project.plugins.apply(HelmPlugin::class.java)
     }
 
+    private val helmCharts: NamedDomainObjectContainer<HelmChart>
+        get() = project.helm.charts
+
 
     @Test
     fun `Plugin should add a lint extension to each chart`() {
         addChart()
 
-        val chart = project.helm.charts.getByName("myChart")
-        assert(chart, name = "chart").hasExtension<Linting>("lint")
+        assertThat(this::helmCharts)
+            .containsItem("myChart")
+            .hasExtension<Linting>("lint")
     }
 
 
@@ -43,12 +43,11 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
             values.put("foo", "bar")
         }
 
-        val chart = project.helm.charts.getByName("myChart")
-        val lintValues = chart.lint.values.orNull
-        assert(lintValues, name = "lint.values")
-            .isNotNull {
-                it.contains("foo", "bar")
-            }
+        assertThat(this::helmCharts)
+            .containsItem("myChart")
+            .hasExtension<Linting>("lint")
+            .prop(Linting::values).isPresent()
+            .contains("foo", "bar")
     }
 
 
@@ -56,8 +55,9 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Plugin should add a filtering extension to each chart`() {
         addChart()
 
-        val chart = project.helm.charts.getByName("myChart")
-        assert(chart, name = "chart").hasExtension<Filtering>("filtering")
+        assertThat(this::helmCharts)
+            .containsItem("myChart")
+            .hasExtension<Filtering>("filtering")
     }
 
 
@@ -68,9 +68,11 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
             placeholderPrefix.set("_O_o_")
         }
 
-        val chart = project.helm.charts.getByName("myChart")
-        val filterPrefix = chart.filtering.placeholderPrefix.get()
-        assert(filterPrefix, name = "chart.filtering.placeholderPrefix").isEqualTo("_O_o_")
+        assertThat(this::helmCharts)
+            .containsItem("myChart")
+            .hasExtension<Filtering>("filtering")
+            .prop(Filtering::placeholderPrefix).isPresent()
+            .isEqualTo("_O_o_")
     }
 
 
@@ -78,13 +80,13 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Plugin should create a HelmFilterSources task for each chart`() {
         addChart()
 
-        val filterSourcesTask = project.tasks.findByName("helmFilterMyChartChartSources")
-        assert(filterSourcesTask)
-            .isInstanceOf(HelmFilterSources::class) {
-                it.prop(HelmFilterSources::chartName).hasValueEqualTo("my-chart")
-                it.prop(HelmFilterSources::chartVersion).hasValueEqualTo("1.2.3")
-                it.prop(HelmFilterSources::sourceDir)
-                    .hasDirValueEqualTo(project.projectDir.resolve("src/my-chart"))
+        assertThat(this::project)
+            .containsTask<HelmFilterSources>("helmFilterMyChartChartSources")
+            .all {
+                prop(HelmFilterSources::chartName).isPresent().isEqualTo("my-chart")
+                prop(HelmFilterSources::chartVersion).isPresent().isEqualTo("1.2.3")
+                prop(HelmFilterSources::sourceDir).dirValue()
+                    .isEqualTo(project.projectDir.resolve("src/my-chart"))
             }
     }
 
@@ -93,11 +95,11 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Plugin should create a HelmBuildOrUpdateDependencies task for each chart`() {
         addChart()
 
-        val buildDependenciesTask = project.tasks.findByName("helmUpdateMyChartChartDependencies")
-        assert(buildDependenciesTask)
-            .isInstanceOf(HelmBuildOrUpdateDependencies::class) {
-                it.prop(HelmBuildOrUpdateDependencies::chartDir)
-                    .hasDirValueEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+        assertThat(this::project)
+            .containsTask<HelmBuildOrUpdateDependencies>("helmUpdateMyChartChartDependencies")
+            .all {
+                prop(HelmBuildOrUpdateDependencies::chartDir).dirValue()
+                    .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
             }
     }
 
@@ -106,11 +108,11 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Plugin should create a HelmLint task for each chart`() {
         addChart()
 
-        val lintTask = project.tasks.findByName("helmLintMyChartChart")
-        assert(lintTask)
-            .isInstanceOf(HelmLint::class) {
-                it.prop(HelmLint::chartDir)
-                    .hasDirValueEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+        assertThat(this::project)
+            .containsTask<HelmLint>("helmLintMyChartChart")
+            .all {
+                prop(HelmLint::chartDir).dirValue()
+                    .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
             }
     }
 
@@ -119,11 +121,13 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Plugin should create a HelmPackage task for each chart`() {
         addChart()
 
-        val packageTask = project.tasks.findByName("helmPackageMyChartChart")
-        assert(packageTask)
-            .isInstanceOf(HelmPackage::class) {
-                it.prop(HelmPackage::sourceDir)
-                    .hasDirValueEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+        assertThat(this::project)
+            .containsTask<HelmPackage>("helmPackageMyChartChart")
+            .all {
+                prop(HelmPackage::chartName).isPresent().isEqualTo("my-chart")
+                prop(HelmPackage::chartVersion).isPresent().isEqualTo("1.2.3")
+                prop(HelmPackage::sourceDir).dirValue()
+                    .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
             }
     }
 
@@ -133,16 +137,11 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
         addChart(name = "foo", chartName = "foo")
         addChart(name = "bar", chartName = "bar")
 
-        val packageAllTask = project.tasks.findByName("helmPackage")
-        assert(packageAllTask)
-            .isNotNull {
-                it.prop("dependencies") { it.taskDependencies.getDependencies(it) }
-                    .all {
-                        hasSize(2)
-                        each {
-                            it.isInstanceOf(HelmPackage::class)
-                        }
-                    }
+        assertThat(this::project)
+            .containsTask<Task>("helmPackage")
+            .taskDependencies.all {
+                each { it.isInstanceOf(HelmPackage::class) }
+                extracting { it.name }.containsOnly("helmPackageFooChart", "helmPackageBarChart")
             }
     }
 
@@ -155,12 +154,13 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
 
         evaluateProject()
 
-        val mainChart = project.helm.charts.findByName("main")
-        assert(mainChart, name = "main chart")
-            .isNotNull {
-                it.prop(HelmChart::chartName).hasValueEqualTo("awesome")
-                it.prop(HelmChart::chartVersion).hasValueEqualTo("2.5.9")
-                it.prop(HelmChart::sourceDir).hasDirValueEqualTo(project.projectDir.resolve("src/main/helm"))
+        assertThat(this::helmCharts)
+            .containsItem("main")
+            .all {
+                prop(HelmChart::chartName).isPresent().isEqualTo("awesome")
+                prop(HelmChart::chartVersion).isPresent().isEqualTo("2.5.9")
+                prop(HelmChart::sourceDir).dirValue()
+                    .isEqualTo(project.projectDir.resolve("src/main/helm"))
             }
     }
 
@@ -170,9 +170,8 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
         addChart()
         evaluateProject()
 
-        assert(project.helm.charts, name = "charts")
-            .prop("main") { it.findByName("main") }
-            .isNull()
+        assertThat(this::helmCharts)
+            .doesNotContainItem("main")
     }
 
 
