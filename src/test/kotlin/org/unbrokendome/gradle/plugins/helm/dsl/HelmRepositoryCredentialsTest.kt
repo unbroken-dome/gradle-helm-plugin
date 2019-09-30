@@ -1,9 +1,11 @@
 package org.unbrokendome.gradle.plugins.helm.dsl
 
-import assertk.assert
+import assertk.all
+import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
-import org.gradle.api.file.RegularFile
+import org.gradle.api.NamedDomainObjectContainer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.AbstractGradleProjectTest
@@ -12,13 +14,12 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentia
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
-import org.unbrokendome.gradle.plugins.helm.testutil.hasValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.testutil.isInstanceOf
-import org.unbrokendome.gradle.plugins.helm.testutil.isPresent
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsItem
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.fileValue
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
 import java.io.File
 
 
-@Suppress("NestedLambdaShadowedImplicitParameter")
 class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
 
     @BeforeEach
@@ -27,8 +28,13 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
     }
 
 
+    val repositories: NamedDomainObjectContainer<HelmRepository>
+        get() = project.helm.repositories
+
+
     @Test
     fun `Repository with password credentials`() {
+
         with(project.helm.repositories) {
             create("myRepo") { repo ->
                 repo.url.set(project.uri("http://repository.example.com"))
@@ -39,14 +45,13 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
             }
         }
 
-        val repository = project.helm.repositories.getByName("myRepo")
-        assert(repository, name = "repository")
+        assertThat(this::repositories)
+            .containsItem("myRepo")
             .prop(CredentialsContainer::configuredCredentials)
-            .isPresent {
-                it.isInstanceOf(PasswordCredentials::class) {
-                    it.prop(PasswordCredentials::username).hasValueEqualTo("username")
-                    it.prop(PasswordCredentials::password).hasValueEqualTo("password")
-                }
+            .isPresent().isInstanceOf(PasswordCredentials::class)
+            .all {
+                prop(PasswordCredentials::username).isPresent().isEqualTo("username")
+                prop(PasswordCredentials::password).isPresent().isEqualTo("password")
             }
     }
 
@@ -63,22 +68,15 @@ class HelmRepositoryCredentialsTest : AbstractGradleProjectTest() {
             }
         }
 
-        val repository = project.helm.repositories.getByName("myRepo")
-        assert(repository, name = "repository")
+        assertThat(this::repositories)
+            .containsItem("myRepo")
             .prop(CredentialsContainer::configuredCredentials)
-            .isPresent {
-                it.isInstanceOf(CertificateCredentials::class) {
-                    it.prop(CertificateCredentials::certificateFile)
-                        .isPresent {
-                            it.prop("asFile", RegularFile::getAsFile)
-                                .isEqualTo(File("/path/to/certificate"))
-                        }
-                    it.prop(CertificateCredentials::keyFile)
-                        .isPresent {
-                            it.prop("asFile", RegularFile::getAsFile)
-                                .isEqualTo(File("/path/to/key"))
-                        }
-                }
+            .isPresent().isInstanceOf(CertificateCredentials::class)
+            .all {
+                prop(CertificateCredentials::certificateFile).fileValue()
+                    .isEqualTo(File("/path/to/certificate"))
+                prop(CertificateCredentials::keyFile).fileValue()
+                    .isEqualTo(File("/path/to/key"))
             }
     }
 }

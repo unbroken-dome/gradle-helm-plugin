@@ -49,7 +49,7 @@ interface ChartDependencyHandler {
         name = requireNotNull(notation["name"]?.toString()) {
             "The \"name\" parameter is required when declaring a chart dependency."
         },
-        chart = notation["name"]?.toString() ?: "main",
+        chart = notation["chart"]?.toString() ?: "main",
         project = notation["project"]?.toString()
     )
 
@@ -130,8 +130,10 @@ private open class DefaultChartDependencyHandler
     /**
      * Variant of [add] that uses the dynamic method name as dependency name in Groovy.
      */
-    fun methodMissing(name: String, arg: Any?): Any? {
-        val args: Map<*, *> = (arg as Map<*, *>?) ?: emptyMap<Any?, Any?>()
+    @Suppress("UNCHECKED_CAST")
+    fun methodMissing(name: String, arg: Any): Any? {
+        val args: Map<String, *> = ((arg as Array<Any?>).firstOrNull() as? Map<String, Any?>?)
+            ?: emptyMap<String, Any?>()
         return add(args + mapOf("name" to name))
     }
 
@@ -148,7 +150,7 @@ internal fun createChartDependencyHandler(chart: HelmChart, project: Project): C
 /**
  * Name of the `helmDependencies` extension on [Configuration] objects.
  */
-private const val HELM_DEPENDENCIES_CONF_EXTENSION_NAME = "helmDependencies"
+internal const val HELM_DEPENDENCIES_CONF_EXTENSION_NAME = "helmDependencies"
 
 
 internal val Configuration.helmDependencies: MutableMap<String, Any>

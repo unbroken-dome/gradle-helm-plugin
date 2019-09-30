@@ -1,11 +1,12 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
-import assertk.assert
+import assertk.assertThat
 import assertk.assertions.isDirectory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.unbrokendome.gradle.plugins.helm.AbstractGradleProjectTest
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
+
 
 class HelmInitTest : AbstractGradleProjectTest() {
 
@@ -25,6 +26,6 @@ class HelmInitTest : AbstractGradleProjectTest() {
 
         task.helmInit()
 
-        assert(project.buildDir.resolve("helm/home")).isDirectory()
+        assertThat(project.buildDir.resolve("helm/home")).isDirectory()
     }
 }
