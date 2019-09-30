@@ -83,17 +83,23 @@ private open class DefaultChartDependencyHandler
     private val project: Project
 ) : ChartDependencyHandler {
 
-
     private val chartDependenciesConfiguration: Configuration
         get() {
-            val configurationName = "helm${chart.name.capitalize()}Dependencies"
+            val configurationName = chart.dependenciesConfigurationName
             return project.configurations.run {
                 findByName(configurationName) ?: create(configurationName) { configuration ->
                     configuration.isVisible = false
+
+                    // Add a custom extension on the configuration, which is a map of chart names to
+                    // objects of type ChartDependency, allowing us to resolve the correct chart artifacts
+                    // by chart name.
+                    // It would be nicer if we could just store the chart name with each Dependency, but
+                    // this is not possible because dependencies within the same project are not realized
+                    // as explicit Dependency objects but rather with Configuration.extendsFrom.
                     (configuration as ExtensionAware).extensions.add(
                         MutableMap::class.java,
                         HELM_DEPENDENCIES_CONF_EXTENSION_NAME,
-                        mutableMapOf<String, Any>()
+                        mutableMapOf<String, ChartDependency>()
                     )
                 }
             }
@@ -102,27 +108,26 @@ private open class DefaultChartDependencyHandler
 
     override fun add(name: String, chart: String, project: String?) {
 
-        if (chart == this.chart.name && project == null) {
-            throw IllegalArgumentException("A chart cannot have a dependency on itself.")
-        }
+        require(chart != this.chart.name || project != null) { "A chart cannot have a dependency on itself." }
 
-        val dependencyNotation: Any =
+        val chartDependency: ChartDependency =
             if (project != null) {
                 // dependency on a chart in another project
-                this.project.dependencies.project(
-                    mapOf(
-                        "path" to project,
-                        "configuration" to chartDirArtifactConfigurationName(chart)
-                    )
+                val dependency = this.project.dependencies.project(
+                    mapOf("path" to project, "configuration" to chartDirArtifactConfigurationName(chart))
                 )
+                ChartDependency.External(dependency)
+
             } else {
                 // dependency on a chart in the same project
-                this.project.configurations.getByName(chartDirArtifactConfigurationName(chart))
+                val artifactConfiguration =
+                    this.project.configurations.getByName(chartDirArtifactConfigurationName(chart))
+                ChartDependency.Internal(artifactConfiguration)
             }
 
         chartDependenciesConfiguration.let { configuration ->
-            configuration.helmDependencies[name] = dependencyNotation
-            this.project.dependencies.add(configuration.name, dependencyNotation)
+            configuration.helmDependencies[name] = chartDependency
+            this.project.dependencies.add(configuration.name, chartDependency.dependencyNotation)
         }
     }
 
@@ -130,7 +135,7 @@ private open class DefaultChartDependencyHandler
     /**
      * Variant of [add] that uses the dynamic method name as dependency name in Groovy.
      */
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unused", "UNCHECKED_CAST")
     fun methodMissing(name: String, arg: Any): Any? {
         val args: Map<String, *> = ((arg as Array<Any?>).firstOrNull() as? Map<String, Any?>?)
             ?: emptyMap<String, Any?>()
@@ -153,5 +158,5 @@ internal fun createChartDependencyHandler(chart: HelmChart, project: Project): C
 internal const val HELM_DEPENDENCIES_CONF_EXTENSION_NAME = "helmDependencies"
 
 
-internal val Configuration.helmDependencies: MutableMap<String, Any>
+internal val Configuration.helmDependencies: MutableMap<String, ChartDependency>
     get() = this.requiredExtension(HELM_DEPENDENCIES_CONF_EXTENSION_NAME)

@@ -99,8 +99,12 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
             val filteredRequirementsFile = buildDir.resolve("helm/charts/bar/requirements.yaml")
             assertThat(filteredRequirementsFile, "requirements.yaml")
                 .yamlContents().all {
-                    jsonPath<String>("$.dependencies[0].name").isEqualTo("fooDep")
-                    jsonPath<String>("$.dependencies[0].repository").isEqualTo("file://../foo")
+                    jsonPath<String>("$.dependencies[0].name")
+                        .isEqualTo("fooDep")
+                    jsonPath<String>("$.dependencies[0].version")
+                        .isEqualTo("1.2.3")
+                    jsonPath<String>("$.dependencies[0].repository")
+                        .isEqualTo("file://../foo")
                 }
         }
 
@@ -129,8 +133,12 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
             val filteredRequirementsFile = buildDir.resolve("helm/charts/bar/requirements.yaml")
             assertThat(filteredRequirementsFile, "requirements.yaml")
                 .yamlContents().all {
-                    jsonPath<String>("$.dependencies[0].name").isEqualTo("fooDep")
-                    jsonPath<String>("$.dependencies[0].repository").isEqualTo("file://../foo")
+                    jsonPath<String>("$.dependencies[0].name")
+                        .isEqualTo("fooDep")
+                    jsonPath<String>("$.dependencies[0].version")
+                        .isEqualTo("1.2.3")
+                    jsonPath<String>("$.dependencies[0].repository")
+                        .isEqualTo("file://../foo")
                 }
         }
     }
@@ -156,6 +164,12 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                             id('org.unbroken-dome.helm')
                         }
                         
+                        helm.charts {
+                            main {
+                                chartName = 'foo'
+                                chartVersion = '1.2.3'
+                            }
+                        }
                         """
                     )
 
@@ -177,6 +191,13 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                             id('org.unbroken-dome.helm')
                         }
                         
+                        helm.charts {
+                            main { 
+                                chartName = 'bar'
+                                chartVersion = '3.2.1'
+                            }
+                        }
+                        
                         """
                     )
 
@@ -184,8 +205,8 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                         file(
                             "Chart.yaml", """
                             ---
-                            name: foo
-                            version: 1.2.3
+                            name: bar
+                            version: 3.2.1
                             """
                         )
 
@@ -197,7 +218,7 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                                 version: "*"
                                 alias: fooAlias
                             """
-                            )
+                        )
                     }
                 }
             }
@@ -233,6 +254,8 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                 .yamlContents().all {
                     jsonPath<String>("$.dependencies[0].name")
                         .isEqualTo("foo")
+                    jsonPath<String>("$.dependencies[0].version")
+                        .isEqualTo("1.2.3")
                     jsonPath<String>("$.dependencies[0].repository")
                         .isEqualTo("file://../../../../../foo/build/helm/charts/foo")
                 }
@@ -268,6 +291,8 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                 .yamlContents().all {
                     jsonPath<String>("$.dependencies[0].name")
                         .isEqualTo("foo")
+                    jsonPath<String>("$.dependencies[0].version")
+                        .isEqualTo("1.2.3")
                     jsonPath<String>("$.dependencies[0].repository")
                         .isEqualTo("file://../../../../../foo/build/helm/charts/foo")
                 }

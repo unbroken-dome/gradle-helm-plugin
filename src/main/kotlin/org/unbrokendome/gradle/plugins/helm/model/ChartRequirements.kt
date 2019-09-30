@@ -38,12 +38,13 @@ internal interface ChartRequirements {
 
         /**
          * Returns a new instance of [Dependency], where all attributes are equal to the current instance, except
-         * that [repository] has been replaced with the given value.
+         * that [repository] and [version] have been replaced with the given values.
          *
          * @param repository the new `repository` value
+         * @param version the new `version` value
          * @returns the new [Dependency] instance
          */
-        fun withRepository(repository: String): Dependency
+        fun withRepositoryAndVersion(repository: String, version: String): Dependency
 
         /**
          * Returns this dependency as a [Map], which can be rendered directly into the _requirements.yaml_ file.
@@ -98,8 +99,8 @@ private class DefaultChartRequirements(
             get() = map["alias"] as String?
 
 
-        override fun withRepository(repository: String): ChartRequirements.Dependency =
-            DefaultDependency(map + ("repository" to repository))
+        override fun withRepositoryAndVersion(repository: String, version: String): ChartRequirements.Dependency =
+            DefaultDependency(map + mapOf("repository" to repository, "version" to version))
 
 
         override fun toMap(): Map<String, Any?> =

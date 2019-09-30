@@ -13,15 +13,13 @@ import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
-import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependenciesResolver
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ResolvedChartDependency
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
+import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.helmDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
-import org.unbrokendome.gradle.plugins.helm.util.DelegateReader
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.putFrom
-import org.unbrokendome.gradle.plugins.helm.util.versionProvider
+import org.unbrokendome.gradle.plugins.helm.util.*
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
@@ -213,19 +211,23 @@ open class HelmFilterSources : DefaultTask() {
     private fun applyDependencyResolution(spec: CopySpec) {
         if (resolveDependencies.get()) {
 
-            val chartDependenciesMap = ChartDependenciesResolver.chartDependenciesMap(
-                project, configuredChartName.orNull
-            )
+            configuredChartName.ifPresent { configuredChartName ->
 
+                project.configurations.findByName(chartDependenciesConfigurationName(configuredChartName))
+                    ?.let { configuration ->
+                        val chartDependenciesMap = configuration.helmDependencies
+                            .mapValues { (_, dependency) -> dependency.resolve(project, configuration) }
 
-            spec.filesMatching("requirements.yaml") {
-                it.filter(
-                    mapOf(
-                        "basePath" to targetDir.get().file(it.path).asFile,
-                        "chartDependenciesMap" to chartDependenciesMap
-                    ),
-                    RequirementsResolvingFilterReader::class.java
-                )
+                        spec.filesMatching("requirements.yaml") {
+                            it.filter(
+                                mapOf(
+                                    "basePath" to targetDir.get().file(it.path).asFile,
+                                    "chartDependenciesMap" to chartDependenciesMap
+                                ),
+                                RequirementsResolvingFilterReader::class.java
+                            )
+                        }
+                    }
             }
         }
     }
@@ -310,10 +312,9 @@ open class HelmFilterSources : DefaultTask() {
         lateinit var basePath: File
 
         /**
-         * A map of chart dependency names to the [File]s pointing to the chart directories.
-         * @see ChartDependenciesResolver.chartDependenciesMap
+         * A map of chart dependency names to the [ResolvedChartDependency]s.
          */
-        lateinit var chartDependenciesMap: Map<String, File>
+        lateinit var chartDependenciesMap: Map<String, ResolvedChartDependency>
 
 
         override val delegate: Reader by lazy(LazyThreadSafetyMode.NONE) {
@@ -321,13 +322,15 @@ open class HelmFilterSources : DefaultTask() {
             val resolvedRequirementsYaml = ChartRequirementsYaml.load(`in`)
                 .withMappedDependencies { dependency ->
 
-                    val resolvedRepository: File? = chartDependenciesMap[dependency.name]
+                    val resolved = chartDependenciesMap[dependency.name]
                         ?: dependency.alias?.let { alias -> chartDependenciesMap[alias] }
 
-                    if (resolvedRepository != null) {
-                        dependency.withRepository(
-                            "file://" + resolvedRepository.relativeTo(basePath.parentFile).path
+                    if (resolved != null) {
+                        dependency.withRepositoryAndVersion(
+                            repository = "file://" + resolved.file.relativeTo(basePath.parentFile).path,
+                            version = resolved.version
                         )
+
                     } else {
                         dependency
                     }

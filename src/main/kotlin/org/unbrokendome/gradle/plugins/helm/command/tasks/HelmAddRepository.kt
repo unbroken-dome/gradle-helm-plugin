@@ -112,7 +112,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
 
     @Suppress("UNCHECKED_CAST")
     private fun checkUpToDate(): Boolean {
-        val repositoriesYaml = actualHelmHome.get()
+        val repositoriesYaml = home.get()
             .file("repository/repositories.yaml")
             .asFile
             .reader().use {

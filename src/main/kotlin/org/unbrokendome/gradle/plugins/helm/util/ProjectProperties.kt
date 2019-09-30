@@ -14,6 +14,7 @@ import org.gradle.api.provider.Provider
  *
  * @receiver the Gradle [Project]
  * @param propertyName the name of the property
+ * @param defaultValue the default value; will be used if the project property is not set
  * @param evaluateGString if `true`, the string is evaluated as if it was a Groovy GString, with the [Project]
  *        as evaluation context
  * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
@@ -25,6 +26,36 @@ internal fun Project.providerFromProjectProperty(
 ): Provider<String> {
     val provider = provider<String> {
         project.findProperty(propertyName)?.toString() ?: defaultValue
+    }
+    return if (evaluateGString) {
+        provider.asGString(this)
+    } else {
+        provider
+    }
+}
+
+
+/**
+ * Returns a [Provider] that provides the given project property if it is available, using `toString` to convert
+ * it to a string.
+ *
+ * The project property is resolved as per [Project.property].
+ *
+ * @receiver the Gradle [Project]
+ * @param propertyName the name of the property
+ * @param defaultValueProvider a [Provider] for the default value; will be queried if the project property is not set
+ * @param evaluateGString if `true`, the string is evaluated as if it was a Groovy GString, with the [Project]
+ *        as evaluation context
+ * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
+ *         not exist
+ */
+internal fun Project.providerFromProjectProperty(
+    propertyName: String,
+    defaultValueProvider: Provider<String>,
+    evaluateGString: Boolean = false
+): Provider<String> {
+    val provider = provider<String> {
+        project.findProperty(propertyName)?.toString() ?: defaultValueProvider.orNull
     }
     return if (evaluateGString) {
         provider.asGString(this)
@@ -112,6 +143,35 @@ fun Project.dirProviderFromProjectProperty(
         .let { pathProvider ->
             project.layout.projectDirectory.dir(pathProvider)
         }
+
+
+/**
+ * Returns a [Provider] that provides the given project property if it is available, interpreting as the path of
+ * a directory.
+ *
+ * The project property is resolved as per [Project.property].
+ *
+ * If the property contains a relative path, it is resolved from the project directory.
+ *
+ * @receiver the Gradle [Project]
+ * @param propertyName the name of the property
+ * @param evaluateGString if `true`, the string is evaluated as if it was a Groovy GString, with the [Project]
+ *        as evaluation context
+ * @return a [Provider] that returns the project property value as a [Directory] if it exists, or is empty if the
+ *         property does not exist
+ */
+fun Project.dirProviderFromProjectProperty(
+    propertyName: String,
+    defaultValueProvider: Provider<String>,
+    evaluateGString: Boolean = false
+): Provider<Directory> {
+    val pathProvider = providerFromProjectProperty(
+        propertyName,
+        defaultValueProvider = defaultValueProvider,
+        evaluateGString = evaluateGString
+    )
+    return project.layout.projectDirectory.dir(pathProvider)
+}
 
 
 /**
