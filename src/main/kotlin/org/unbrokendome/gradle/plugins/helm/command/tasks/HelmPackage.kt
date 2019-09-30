@@ -123,8 +123,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
 
 
     init {
-        @Suppress("LeakingThis")
-        inputs.dir(actualHelmHome)
+        registerHelmHomeAsInputDir()
     }
 
 

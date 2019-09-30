@@ -2,14 +2,13 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
@@ -18,10 +17,8 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.util.andThen
-import org.unbrokendome.gradle.plugins.helm.util.coalesceProvider
 import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
-import java.io.ByteArrayOutputStream
 
 
 /**
@@ -48,6 +45,14 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
     override val home: DirectoryProperty =
         project.objects.directoryProperty()
             .convention(project.helm.home)
+
+
+    /**
+     * Register the [home] property as an input directory for this task.
+     */
+    protected fun registerHelmHomeAsInputDir() {
+        inputs.dir(home).withPropertyName("home").withPathSensitivity(PathSensitivity.ABSOLUTE)
+    }
 
 
     @get:Console
@@ -80,28 +85,4 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
 
     protected fun execHelm(command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit): ExecResult =
         execHelm(command, subcommand, Action(action))
-
-
-    /**
-     * A [Provider] that returns the path to the actual Helm home directory. This will be the value of the [home]
-     * property if it is set, or the result of calling `helm home` otherwise.
-     */
-    @get:Internal
-    protected val actualHelmHome: Provider<Directory>
-        get() = project.coalesceProvider(
-            home,
-            project.layout.projectDirectory.dir(actualHelmHomePathProvider())
-        )
-
-
-    private fun actualHelmHomePathProvider() =
-        project.provider {
-            val stdoutCapture = ByteArrayOutputStream()
-            execHelm("home") {
-                withExecSpec {
-                    standardOutput = stdoutCapture
-                }
-            }
-            String(stdoutCapture.toByteArray())
-        }
 }

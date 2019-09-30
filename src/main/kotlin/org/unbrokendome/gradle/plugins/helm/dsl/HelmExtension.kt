@@ -94,9 +94,17 @@ private open class DefaultHelmExtension
             .convention(project.booleanProviderFromProjectProperty("helm.debug"))
 
 
+    private val defaultHelmHomePath: Provider<String> =
+        project.provider { System.getProperty("user.home") + "/.helm" }
+
+
     final override val home: DirectoryProperty =
         objects.directoryProperty()
-            .convention(project.dirProviderFromProjectProperty("helm.home", evaluateGString = true))
+            .convention(
+                project.dirProviderFromProjectProperty(
+                    "helm.home", defaultValueProvider = defaultHelmHomePath, evaluateGString = true
+                )
+            )
 
 
     final override val host: Property<String> =
