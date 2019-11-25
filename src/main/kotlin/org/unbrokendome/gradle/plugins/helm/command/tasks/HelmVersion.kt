@@ -28,7 +28,7 @@ open class HelmVersion : AbstractHelmCommandTask() {
     var serverVersion: Semver = Semver("0.0.0")
 
     @TaskAction
-    fun helmInit() {
+    fun helmVersion() {
         //2.0.0 output
         //Client: &version.Version{SemVer:"v2.14.3", GitCommit:"0e7f3b6637f7af8fcfddb3d2941fcc7cbebb0085", GitTreeState:"clean"}
         //Server: &version.Version{SemVer:"v2.14.3", GitCommit:"0e7f3b6637f7af8fcfddb3d2941fcc7cbebb0085", GitTreeState:"clean"}
