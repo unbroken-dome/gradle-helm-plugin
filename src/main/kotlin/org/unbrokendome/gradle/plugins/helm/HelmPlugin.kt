@@ -7,6 +7,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmVersion
 import org.unbrokendome.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
@@ -25,6 +26,7 @@ class HelmPlugin
     internal companion object {
         const val initClientTaskName = "helmInitClient"
         const val initServerTaskName = "helmInitServer"
+        const val clientVersionTaskName = "helmClientVersion"
         const val addRepositoriesTaskName = "helmAddRepositories"
     }
 
@@ -38,6 +40,7 @@ class HelmPlugin
         createFilteringExtension(project)
         configureCharts(project)
 
+        createVersionTask(project)
         createInitClientTask(project)
         createInitServerTask(project, tiller)
     }
@@ -282,7 +285,13 @@ class HelmPlugin
                 }
             }
     }
-
+    /**
+     * Creates the `helmVersion` task.
+     */
+    private fun createVersionTask(project: Project) {
+        project.tasks.create(clientVersionTaskName, HelmVersion::class.java) { task ->
+        }
+    }
 
     /**
      * Creates the `helmInitClient` task.
