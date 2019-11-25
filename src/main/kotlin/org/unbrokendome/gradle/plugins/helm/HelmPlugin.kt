@@ -18,6 +18,7 @@ import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectPrope
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.toUri
+import com.vdurmont.semver4j.Semver
 
 
 class HelmPlugin
@@ -40,9 +41,9 @@ class HelmPlugin
         createFilteringExtension(project)
         configureCharts(project)
 
-        createVersionTask(project)
-        createInitClientTask(project)
-        createInitServerTask(project, tiller)
+        val versionTask = createVersionTask(project)
+        createInitClientTask(project, versionTask)
+        createInitServerTask(project, tiller, versionTask)
     }
 
 
@@ -50,11 +51,11 @@ class HelmPlugin
      * Creates and installs the `helm.tiller` sub-extension.
      */
     private fun createTillerExtension(project: Project) =
-        project.createTiller()
-            .apply {
-                (project.helm as ExtensionAware)
-                    .extensions.add(HELM_TILLLER_EXTENSION_NAME, this)
-            }
+            project.createTiller()
+                    .apply {
+                        (project.helm as ExtensionAware)
+                                .extensions.add(HELM_TILLLER_EXTENSION_NAME, this)
+                    }
 
 
     /**
@@ -63,21 +64,21 @@ class HelmPlugin
      * @param project the current Gradle [Project]
      */
     private fun configureRepositories(project: Project) =
-        createRepositoriesExtension(project)
-            .let { repositories ->
+            createRepositoriesExtension(project)
+                    .let { repositories ->
 
-                project.tasks.addRule(AddRepositoryTaskRule(project.tasks, repositories))
+                        project.tasks.addRule(AddRepositoryTaskRule(project.tasks, repositories))
 
-                project.tasks.create(addRepositoriesTaskName) { task ->
-                    task.group = HELM_GROUP
-                    task.description = "Registers all configured Helm repositories."
-                    task.dependsOn(TaskDependency {
-                        repositories.map { repository ->
-                            project.tasks.getByName(repository.registerTaskName)
-                        }.toSet()
-                    })
-                }
-            }
+                        project.tasks.create(addRepositoriesTaskName) { task ->
+                            task.group = HELM_GROUP
+                            task.description = "Registers all configured Helm repositories."
+                            task.dependsOn(TaskDependency {
+                                repositories.map { repository ->
+                                    project.tasks.getByName(repository.registerTaskName)
+                                }.toSet()
+                            })
+                        }
+                    }
 
 
     /**
@@ -138,43 +139,43 @@ class HelmPlugin
      * Creates and installs the `helm.repositories` sub-extension.
      */
     private fun createRepositoriesExtension(project: Project) =
-        project.helmRepositoryContainer()
-            .apply {
-                (project.helm as ExtensionAware)
-                    .extensions.add(HELM_REPOSITORIES_EXTENSION_NAME, this)
-            }
+            project.helmRepositoryContainer()
+                    .apply {
+                        (project.helm as ExtensionAware)
+                                .extensions.add(HELM_REPOSITORIES_EXTENSION_NAME, this)
+                    }
 
 
     /**
      * Creates and installs the `helm.charts` sub-extension.
      */
     private fun createChartsExtension(project: Project) =
-        project.helmChartContainer()
-            .apply {
-                (project.helm as ExtensionAware)
-                    .extensions.add(HELM_CHARTS_EXTENSION_NAME, this)
-            }
+            project.helmChartContainer()
+                    .apply {
+                        (project.helm as ExtensionAware)
+                                .extensions.add(HELM_CHARTS_EXTENSION_NAME, this)
+                    }
 
 
     /**
      * Creates and installs the `helm.filtering` sub-extension.
      */
     private fun createFilteringExtension(project: Project) =
-        project.objects.createFiltering()
-            .apply {
-                enabled.set(
-                    project.booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true)
-                )
-                placeholderPrefix.set(
-                    project.providerFromProjectProperty("helm.filtering.placeholderPrefix", defaultValue = "\${")
-                )
-                placeholderSuffix.set(
-                    project.providerFromProjectProperty("helm.filtering.placeholderSuffix", defaultValue = "}")
-                )
+            project.objects.createFiltering()
+                    .apply {
+                        enabled.set(
+                                project.booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true)
+                        )
+                        placeholderPrefix.set(
+                                project.providerFromProjectProperty("helm.filtering.placeholderPrefix", defaultValue = "\${")
+                        )
+                        placeholderSuffix.set(
+                                project.providerFromProjectProperty("helm.filtering.placeholderSuffix", defaultValue = "}")
+                        )
 
-                (project.helm as ExtensionAware)
-                    .extensions.add(Filtering::class.java, HELM_FILTERING_EXTENSION_NAME, this)
-            }
+                        (project.helm as ExtensionAware)
+                                .extensions.add(Filtering::class.java, HELM_FILTERING_EXTENSION_NAME, this)
+                    }
 
 
     /**
@@ -199,11 +200,11 @@ class HelmPlugin
      */
     private fun HelmChart.createFilteringExtension(objectFactory: ObjectFactory, helmExtension: HelmExtension) {
         (this as ExtensionAware).extensions
-            .add(
-                Filtering::class.java,
-                "filtering",
-                objectFactory.createFiltering(parent = helmExtension.filtering)
-            )
+                .add(
+                        Filtering::class.java,
+                        "filtering",
+                        objectFactory.createFiltering(parent = helmExtension.filtering)
+                )
     }
 
 
@@ -216,11 +217,11 @@ class HelmPlugin
      */
     private fun HelmChart.createLintingExtension(objectFactory: ObjectFactory, helmExtension: HelmExtension) {
         (this as ExtensionAware).extensions
-            .add(
-                Linting::class.java,
-                "lint",
-                objectFactory.createLinting(parent = helmExtension.lint)
-            )
+                .add(
+                        Linting::class.java,
+                        "lint",
+                        objectFactory.createLinting(parent = helmExtension.lint)
+                )
     }
 
 
@@ -232,11 +233,11 @@ class HelmPlugin
      */
     private fun HelmChart.createDependenciesExtension(project: Project) {
         (this as ExtensionAware).extensions
-            .add(
-                ChartDependencyHandler::class.java,
-                "dependencies",
-                createChartDependencyHandler(this, project)
-            )
+                .add(
+                        ChartDependencyHandler::class.java,
+                        "dependencies",
+                        createChartDependencyHandler(this, project)
+                )
     }
 
 
@@ -248,12 +249,12 @@ class HelmPlugin
      */
     private fun createRepositoriesFromProjectProperties(project: Project) {
         project.properties.keys
-            .filter { it.startsWith("helm.repositories.") }
-            .mapNotNull { it.split('.').drop(2).firstOrNull() }
-            .distinct()
-            .forEach { repositoryName ->
-                createRepositoryFromProjectProperties(project, repositoryName)
-            }
+                .filter { it.startsWith("helm.repositories.") }
+                .mapNotNull { it.split('.').drop(2).firstOrNull() }
+                .distinct()
+                .forEach { repositoryName ->
+                    createRepositoryFromProjectProperties(project, repositoryName)
+                }
     }
 
 
@@ -267,38 +268,40 @@ class HelmPlugin
     private fun createRepositoryFromProjectProperties(project: Project, name: String) {
         val prefix = "helm.repositories.$name"
         project.helm.repositories
-            .create(name) { repository ->
-                repository.url.set(
-                    project.providerFromProjectProperty("$prefix.url").toUri()
-                )
+                .create(name) { repository ->
+                    repository.url.set(
+                            project.providerFromProjectProperty("$prefix.url").toUri()
+                    )
 
-                if (project.hasProperty("$prefix.credentials.username")) {
-                    repository.credentials {
-                        username.set(project.providerFromProjectProperty("$prefix.credentials.username"))
-                        password.set(project.providerFromProjectProperty("$prefix.credentials.password"))
-                    }
-                } else if (project.hasProperty("$prefix.credentials.certificateFile")) {
-                    repository.credentials(CertificateCredentials::class) {
-                        certificateFile.set(project.fileProviderFromProjectProperty("$prefix.credentials.certificateFile"))
-                        keyFile.set(project.fileProviderFromProjectProperty("$prefix.credentials.keyFile"))
+                    if (project.hasProperty("$prefix.credentials.username")) {
+                        repository.credentials {
+                            username.set(project.providerFromProjectProperty("$prefix.credentials.username"))
+                            password.set(project.providerFromProjectProperty("$prefix.credentials.password"))
+                        }
+                    } else if (project.hasProperty("$prefix.credentials.certificateFile")) {
+                        repository.credentials(CertificateCredentials::class) {
+                            certificateFile.set(project.fileProviderFromProjectProperty("$prefix.credentials.certificateFile"))
+                            keyFile.set(project.fileProviderFromProjectProperty("$prefix.credentials.keyFile"))
+                        }
                     }
                 }
-            }
     }
+
     /**
      * Creates the `helmVersion` task.
      */
-    private fun createVersionTask(project: Project) {
-        project.tasks.create(clientVersionTaskName, HelmVersion::class.java) { task ->
-        }
+    private fun createVersionTask(project: Project) : HelmVersion {
+        return project.tasks.create(clientVersionTaskName, HelmVersion::class.java)
     }
 
     /**
      * Creates the `helmInitClient` task.
      */
-    private fun createInitClientTask(project: Project) {
+    private fun createInitClientTask(project: Project, versionTask: HelmVersion) {
         project.tasks.create(initClientTaskName, HelmInit::class.java) { task ->
+            task.dependsOn(versionTask)
             task.clientOnly.set(true)
+            task.onlyIf { versionTask.clientVersion.isLowerThan(Semver("3.0.0")) }
         }
     }
 
@@ -306,9 +309,11 @@ class HelmPlugin
     /**
      * Creates the `helmInitServer` task.
      */
-    private fun createInitServerTask(project: Project, tiller: Tiller) {
+    private fun createInitServerTask(project: Project, tiller: Tiller, versionTask: HelmVersion) {
         project.tasks.create(initServerTaskName, HelmInit::class.java) { task ->
+            task.dependsOn(versionTask)
             task.onlyIf { tiller.install.getOrElse(true) }
+            task.onlyIf { versionTask.clientVersion.isLowerThan(Semver("3.0.0")) }
             task.forceUpgrade.set(tiller.forceUpgrade)
             task.historyMax.set(tiller.historyMax)
             task.replicas.set(tiller.replicas)

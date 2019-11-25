@@ -22,10 +22,10 @@ open class HelmVersion : AbstractHelmCommandTask() {
     }
 
     @get:[Internal]
-    var clientVersion: Semver? = Semver("0.0.0")
+    var clientVersion: Semver = Semver("0.0.0")
 
     @get:[Internal]
-    var serverVersion: Semver? = Semver("0.0.0")
+    var serverVersion: Semver = Semver("0.0.0")
 
     @TaskAction
     fun helmInit() {
