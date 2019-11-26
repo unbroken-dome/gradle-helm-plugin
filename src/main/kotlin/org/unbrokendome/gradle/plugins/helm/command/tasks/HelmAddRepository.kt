@@ -112,6 +112,9 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
 
     @Suppress("UNCHECKED_CAST")
     private fun checkUpToDate(): Boolean {
+        if(!home.get().file("repository/repositories.yaml").asFile.exists()) {
+            return false
+        }
         val repositoriesYaml = home.get()
             .file("repository/repositories.yaml")
             .asFile

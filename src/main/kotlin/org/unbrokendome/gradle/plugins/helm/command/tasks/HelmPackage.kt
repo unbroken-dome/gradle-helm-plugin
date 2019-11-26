@@ -138,7 +138,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
             option("--app-version", appVersion)
             flag("--dependency-update", updateDependencies)
             option("--destination", destinationDir)
-            flag("--save", saveToLocalRepo, true)
+            flag("--save", saveToLocalRepo, false)
             args(sourceDir)
         }
     }

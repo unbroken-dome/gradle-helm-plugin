@@ -19,6 +19,13 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
     val releaseName: Property<String> =
         project.objects.property()
 
+    /**
+     * Namespace to install the release into. Defaults to the current kube config namespace. Helm 3.0.0
+     */
+    @get:Internal
+    val namespace: Property<String> =
+            project.objects.property()
+
 
     /**
      * If `true`, simulate a delete.
@@ -44,7 +51,13 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
     @TaskAction
     fun deleteRelease() {
         execHelm("delete") {
+
+            //required for Helm 3.0.0
+            option("--namespace", namespace)
+
+            //not supported for Helm 3.0.0
             flag("--purge", purge)
+
             flag("--dry-run", dryRun)
             args(releaseName)
         }

@@ -38,9 +38,9 @@ open class HelmVersion : AbstractHelmCommandTask() {
 
         val stdOut = ByteArrayOutputStream()
         val execResult: ExecResult = execHelm("version") {
+            assertSuccess(false)
             withExecSpec {
                 standardOutput = stdOut
-                setIgnoreExitValue(true)
             }
         }
         if (execResult.exitValue == 0) {
