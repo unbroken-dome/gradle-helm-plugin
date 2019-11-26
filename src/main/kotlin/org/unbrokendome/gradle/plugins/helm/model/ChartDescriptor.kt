@@ -10,6 +10,8 @@ import java.io.Reader
 internal interface ChartDescriptor {
     val name: String?
     val version: String?
+    val apiVersion: String?
+    val dependencies: ChartRequirements?
 }
 
 
@@ -17,20 +19,32 @@ private class DefaultChartDescriptor(
     private val map: Map<String, Any?>
 ) : ChartDescriptor {
 
+    override val apiVersion
+        get() = map["apiVersion"] as String?
+
     override val name
         get() = map["name"] as String?
 
     override val version
         get() = map["version"] as String?
+
+    override val dependencies
+        get() = map["dependencies"] as ChartRequirements?
 }
 
 
 private object EmptyChartDescriptor : ChartDescriptor {
 
+    override val apiVersion: String?
+        get() = null
+
     override val name: String?
         get() = null
 
     override val version: String?
+        get() = null
+
+    override val dependencies: ChartRequirements?
         get() = null
 }
 
