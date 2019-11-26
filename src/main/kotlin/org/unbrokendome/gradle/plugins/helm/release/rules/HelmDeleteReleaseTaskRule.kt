@@ -1,10 +1,12 @@
 package org.unbrokendome.gradle.plugins.helm.release.rules
 
+import com.vdurmont.semver4j.Semver
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmDelete
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmVersion
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
@@ -43,9 +45,31 @@ internal class HelmDeleteReleaseTaskRule(
 
                         task.releaseName.set(release.releaseName)
                         task.dryRun.set(release.dryRun)
-                        task.purge.set(release.purge)
+                        task.purge.set(
+                                task.project.provider<Boolean> {
+                                    val versionTask: HelmVersion =
+                                            this.tasks.findByName(HelmPlugin.clientVersionTaskName) as HelmVersion
+                                    if(versionTask.clientVersion.isGreaterThanOrEqualTo(Semver("3.0.0"))){
+                                        false
+                                    } else {
+                                        release.purge.get()
+                                    }
+                                }
+                        )
 
-                        task.dependsOn(HelmPlugin.initServerTaskName)
+                        task.namespace.set(
+                                task.project.provider<String> {
+                                    val versionTask: HelmVersion =
+                                            this.tasks.findByName(HelmPlugin.clientVersionTaskName) as HelmVersion
+                                    if(versionTask.clientVersion.isGreaterThanOrEqualTo(Semver("3.0.0"))){
+                                        release.namespace.orNull
+                                    } else {
+                                        null
+                                    }
+                                }
+                        )
+
+                        task.dependsOn(HelmPlugin.initServerTaskName, HelmPlugin.clientVersionTaskName)
 
                         // Make sure all dependent releases are deleted first
                         task.dependsOn(TaskDependency {
