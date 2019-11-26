@@ -48,6 +48,7 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                     file(
                         "Chart.yaml", """
                         ---
+                        apiVersion: v2
                         name: foo
                         version: 1.2.3
                         """
@@ -57,8 +58,13 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                     file(
                         "Chart.yaml", """
                         ---
+                        apiVersion: v2
                         name: bar
                         version: 3.2.1
+                        dependencies:
+                          - name: fooDep
+                            version: "*"
+                            alias: fooAlias
                         """
                     )
                     file(
@@ -177,6 +183,7 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                         file(
                             "Chart.yaml", """
                             ---
+                            apiVersion: v1
                             name: foo
                             version: 1.2.3
                             """
@@ -205,6 +212,7 @@ class HelmChartDependenciesIntegrationTest : AbstractGradleIntegrationTest() {
                         file(
                             "Chart.yaml", """
                             ---
+                            apiVersion: v1
                             name: bar
                             version: 3.2.1
                             """
