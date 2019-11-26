@@ -91,7 +91,8 @@ open class HelmInit : AbstractHelmCommandTask() {
      */
     @get:Internal
     val createDirectoryOnly: Property<Boolean> =
-            project.objects.property()
+            project.objects.property<Boolean>()
+                    .convention(false)
 
     init {
         outputs.upToDateWhen { clientOnly.get() }
