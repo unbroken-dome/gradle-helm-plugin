@@ -15,6 +15,8 @@ open class HelmVersion : AbstractHelmCommandTask() {
         const val clientPrefix2 = "Client: &version.Version"
         const val serverPrefix2 = "Server: &version.Version"
         const val clientPrefix3 = "version.BuildInfo"
+        val version0 = Semver("0.0.0")
+        val version3 = Semver("3.0.0")
     }
 
     init {
@@ -22,10 +24,10 @@ open class HelmVersion : AbstractHelmCommandTask() {
     }
 
     @get:[Internal]
-    var clientVersion: Semver = Semver("0.0.0")
+    var clientVersion: Semver = version0
 
     @get:[Internal]
-    var serverVersion: Semver = Semver("0.0.0")
+    var serverVersion: Semver = version0
 
     @TaskAction
     fun helmVersion() {

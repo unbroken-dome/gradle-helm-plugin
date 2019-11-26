@@ -26,7 +26,7 @@ class HelmInitTest : AbstractGradleProjectTest() {
         versionTask.helmVersion()
 
         //skip if we are 3.0.0 or higher
-        Assumptions.assumeTrue(versionTask.clientVersion.isLowerThan(Semver("3.0.0")))
+        Assumptions.assumeTrue(versionTask.clientVersion.isLowerThan(HelmVersion.version3))
 
         val task = project.tasks.create("helmInit", HelmInit::class.java) { task ->
             task.clientOnly.set(true)
