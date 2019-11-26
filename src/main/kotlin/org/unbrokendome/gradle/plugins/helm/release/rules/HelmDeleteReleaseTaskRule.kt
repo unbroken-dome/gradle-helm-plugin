@@ -49,7 +49,7 @@ internal class HelmDeleteReleaseTaskRule(
                                 task.project.provider<Boolean> {
                                     val versionTask: HelmVersion =
                                             this.tasks.findByName(HelmPlugin.clientVersionTaskName) as HelmVersion
-                                    if(versionTask.clientVersion.isGreaterThanOrEqualTo(Semver("3.0.0"))){
+                                    if(versionTask.clientVersion.isGreaterThanOrEqualTo(HelmVersion.version3)){
                                         false
                                     } else {
                                         release.purge.get()
@@ -61,7 +61,7 @@ internal class HelmDeleteReleaseTaskRule(
                                 task.project.provider<String> {
                                     val versionTask: HelmVersion =
                                             this.tasks.findByName(HelmPlugin.clientVersionTaskName) as HelmVersion
-                                    if(versionTask.clientVersion.isGreaterThanOrEqualTo(Semver("3.0.0"))){
+                                    if(versionTask.clientVersion.isGreaterThanOrEqualTo(HelmVersion.version3)){
                                         release.namespace.orNull
                                     } else {
                                         null

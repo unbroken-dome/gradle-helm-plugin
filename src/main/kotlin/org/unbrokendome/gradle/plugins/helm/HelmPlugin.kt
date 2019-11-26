@@ -302,7 +302,7 @@ class HelmPlugin
             task.dependsOn(versionTask)
             task.clientOnly.set(true)
             task.createDirectoryOnly.set(project.provider {
-                versionTask.clientVersion.isGreaterThanOrEqualTo(Semver("3.0.0"))
+                versionTask.clientVersion.isGreaterThanOrEqualTo(HelmVersion.version3)
             })
         }
     }
@@ -315,7 +315,7 @@ class HelmPlugin
         project.tasks.create(initServerTaskName, HelmInit::class.java) { task ->
             task.dependsOn(versionTask)
             task.onlyIf { tiller.install.getOrElse(true) }
-            task.onlyIf { versionTask.clientVersion.isLowerThan(Semver("3.0.0")) }
+            task.onlyIf { versionTask.clientVersion.isLowerThan(HelmVersion.version3) }
             task.forceUpgrade.set(tiller.forceUpgrade)
             task.historyMax.set(tiller.historyMax)
             task.replicas.set(tiller.replicas)
