@@ -86,6 +86,13 @@ open class HelmInit : AbstractHelmCommandTask() {
         project.objects.property()
 
 
+    /**
+     * If `true`, block until Tiller is running and ready to receive requests.
+     */
+    @get:Internal
+    val createDirectoryOnly: Property<Boolean> =
+            project.objects.property()
+
     init {
         outputs.upToDateWhen { clientOnly.get() }
         outputs.upToDateWhen { home.orNull?.asFile?.isDirectory ?: true }
@@ -94,16 +101,20 @@ open class HelmInit : AbstractHelmCommandTask() {
 
     @TaskAction
     fun helmInit() {
-        execHelm("init") {
-            flag("--client-only", clientOnly)
-            flag("--force-upgrade", forceUpgrade)
-            option("--history-max", historyMax)
-            option("--replicas", replicas)
-            option("--service-account", serviceAccount)
-            flag("--skip-refresh", skipRefresh)
-            option("--tiller-image", tillerImage)
-            flag("--upgrade", upgrade)
-            flag("--wait", wait)
+        if(createDirectoryOnly.get()) {
+            home.get().asFile.mkdirs()
+        } else {
+            execHelm("init") {
+                flag("--client-only", clientOnly)
+                flag("--force-upgrade", forceUpgrade)
+                option("--history-max", historyMax)
+                option("--replicas", replicas)
+                option("--service-account", serviceAccount)
+                flag("--skip-refresh", skipRefresh)
+                option("--tiller-image", tillerImage)
+                flag("--upgrade", upgrade)
+                flag("--wait", wait)
+            }
         }
     }
 }

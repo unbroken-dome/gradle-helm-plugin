@@ -301,7 +301,9 @@ class HelmPlugin
         project.tasks.create(initClientTaskName, HelmInit::class.java) { task ->
             task.dependsOn(versionTask)
             task.clientOnly.set(true)
-            task.onlyIf { versionTask.clientVersion.isLowerThan(Semver("3.0.0")) }
+            task.createDirectoryOnly.set(project.provider {
+                versionTask.clientVersion.isGreaterThanOrEqualTo(Semver("3.0.0"))
+            })
         }
     }
 
