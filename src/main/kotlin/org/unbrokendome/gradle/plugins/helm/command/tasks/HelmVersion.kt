@@ -13,7 +13,6 @@ import java.io.ByteArrayOutputStream
 open class HelmVersion : AbstractHelmCommandTask() {
     internal companion object {
         const val clientPrefix2 = "Client: &version.Version"
-        const val serverPrefix2 = "Server: &version.Version"
         const val clientPrefix3 = "version.BuildInfo"
         val version0 = Semver("0.0.0")
         val version3 = Semver("3.0.0")
@@ -26,18 +25,8 @@ open class HelmVersion : AbstractHelmCommandTask() {
     @get:[Internal]
     var clientVersion: Semver = version0
 
-    @get:[Internal]
-    var serverVersion: Semver = version0
-
     @TaskAction
     fun helmVersion() {
-        //2.0.0 output
-        //Client: &version.Version{SemVer:"v2.14.3", GitCommit:"0e7f3b6637f7af8fcfddb3d2941fcc7cbebb0085", GitTreeState:"clean"}
-        //Server: &version.Version{SemVer:"v2.14.3", GitCommit:"0e7f3b6637f7af8fcfddb3d2941fcc7cbebb0085", GitTreeState:"clean"}
-
-        //3.0.0 output
-        //version.BuildInfo{Version:"v3.0.0", GitCommit:"e29ce2a54e96cd02ccfce88bee4f58bb6e2a28b6", GitTreeState:"clean", GoVersion:"go1.13.4"}
-
         val stdOut = ByteArrayOutputStream()
         val execResult: ExecResult = execHelm("version") {
             assertSuccess(false)
@@ -49,27 +38,22 @@ open class HelmVersion : AbstractHelmCommandTask() {
             val outputLines: List<String> = stdOut.toString().trim().lines()
             outputLines.forEach {
                 if (it.startsWith(clientPrefix3)) {
-                    //helm 3.x clent prefix
+                    //helm 3.x client prefix
+                    //version.BuildInfo{Version:"v3.0.0", GitCommit:"e29ce2a54e96cd02ccfce88bee4f58bb6e2a28b6", GitTreeState:"clean", GoVersion:"go1.13.4"}
                     var version: String? = "Version\\:\\\"v(\\d+\\.\\d+\\.\\d+)\\\"".toRegex().find(it)?.groupValues?.get(1)
                     if (version != null) {
                         clientVersion = Semver(version)
                     }
                 } else if (it.startsWith(clientPrefix2)) {
-                    //helm 2.x server prefix
+                    //helm 2.x client prefix
+                    //Client: &version.Version{SemVer:"v2.14.3", GitCommit:"0e7f3b6637f7af8fcfddb3d2941fcc7cbebb0085", GitTreeState:"clean"}
                     var version: String? = "SemVer\\:\\\"v(\\d+\\.\\d+\\.\\d+)\\\"".toRegex().find(it)?.groupValues?.get(1)
                     if (version != null) {
                         clientVersion = Semver(version)
                     }
-                } else if (it.startsWith(serverPrefix2)) {
-                    //helm 2.x server prefix
-                    var version: String? = "SemVer\\:\\\"v(\\d+\\.\\d+\\.\\d+)\\\"".toRegex().find(it)?.groupValues?.get(1)
-                    if (version != null) {
-                        serverVersion = Semver(version)
-                    }
                 }
             }
             logger.info("Client: ${clientVersion}")
-            logger.info("Server: ${serverVersion}")
         }
     }
 }
