@@ -18,7 +18,6 @@ import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectPrope
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.toUri
-import com.vdurmont.semver4j.Semver
 
 
 class HelmPlugin

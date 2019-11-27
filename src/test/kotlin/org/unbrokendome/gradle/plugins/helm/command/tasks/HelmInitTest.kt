@@ -2,7 +2,6 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import assertk.assertThat
 import assertk.assertions.isDirectory
-import com.vdurmont.semver4j.Semver
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
