@@ -138,6 +138,11 @@ interface HelmRelease : Named {
      * If `true`, any action for this release will only be simulated.
      */
     val dryRun: Property<Boolean>
+    
+    /**
+     * If `true`, any action for this release will only be simulated.
+     */
+    val atomic: Property<Boolean>
 
 
     /**
@@ -267,7 +272,9 @@ private open class DefaultHelmRelease
             project.objects.property(
                     project.booleanProviderFromProjectProperty("helm.dryRun"))
 
-
+    override val atomic: Property<Boolean> =
+            project.objects.emptyProperty()
+    
     override val wait: Property<Boolean> =
             project.objects.emptyProperty()
 

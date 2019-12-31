@@ -79,6 +79,13 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
     @get:Internal
     val dryRun: Property<Boolean> =
             project.objects.emptyProperty()
+    
+    /**
+     * If `true`, simulate an install.
+     */
+    @get:Internal
+    val atomic: Property<Boolean> =
+            project.objects.emptyProperty()
 
 
     /**
@@ -150,6 +157,7 @@ open class HelmInstall : AbstractHelmServerCommandTask() {
 
             flag("--replace", replace)
             flag("--dry-run", dryRun)
+            flag("--atomic", atomic)
 
             flag("--wait", wait)
 

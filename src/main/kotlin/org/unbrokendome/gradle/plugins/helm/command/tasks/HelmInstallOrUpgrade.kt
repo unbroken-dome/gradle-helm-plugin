@@ -51,6 +51,13 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
     @get:Internal
     val dryRun: Property<Boolean> =
             project.objects.emptyProperty()
+    
+    /**
+     * If set them atomic install.
+     */
+    @get:Internal
+    val atomic: Property<Boolean> =
+            project.objects.emptyProperty()
 
 
     /**
@@ -136,6 +143,7 @@ open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
         option("--namespace", namespace)
         option("--repo", repository)
         flag("--dry-run", dryRun)
+        flag("--atomic", atomic)
         flag("--wait", wait)
         valuesOptions(values, valueFiles)
     }

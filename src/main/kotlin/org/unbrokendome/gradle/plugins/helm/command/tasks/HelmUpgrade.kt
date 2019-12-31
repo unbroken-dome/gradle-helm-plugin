@@ -50,6 +50,13 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
     @get:Internal
     val dryRun: Property<Boolean> =
             project.objects.emptyProperty()
+    
+    /**
+     * If `true`, simulate an upgrade.
+     */
+    @get:Internal
+    val atomic: Property<Boolean> =
+            project.objects.emptyProperty()
 
 
     /**
@@ -139,6 +146,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
             flag("--reuse-values", reuseValues)
             flag("--wait", wait)
             flag("--dry-run", dryRun)
+            flag("--atomic", atomic)
             args(releaseName)
             args(chart)
         }
