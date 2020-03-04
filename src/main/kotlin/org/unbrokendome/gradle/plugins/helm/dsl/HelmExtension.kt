@@ -27,8 +27,6 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
 
     override val debug: Property<Boolean>
 
-    override val home: DirectoryProperty
-
     /**
      * Address of Tiller, in the format `host:port`.
      *
@@ -92,19 +90,6 @@ private open class DefaultHelmExtension
     final override val debug: Property<Boolean> =
         objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.debug"))
-
-
-    private val defaultHelmHomePath: Provider<String> =
-        project.provider { System.getProperty("user.home") + "/.helm" }
-
-
-    final override val home: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.home", defaultValueProvider = defaultHelmHomePath, evaluateGString = true
-                )
-            )
 
 
     final override val host: Property<String> =

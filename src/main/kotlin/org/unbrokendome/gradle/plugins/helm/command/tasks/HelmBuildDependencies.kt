@@ -58,11 +58,6 @@ open class HelmBuildDependencies : AbstractHelmCommandTask() {
         chartDir.dir("charts")
 
 
-    init {
-        registerHelmHomeAsInputDir()
-    }
-
-
     @TaskAction
     fun buildDependencies() {
         execHelm("dependency", "build") {

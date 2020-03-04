@@ -2,13 +2,10 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
@@ -39,20 +36,6 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
     override val executable: Property<String> =
         project.objects.property<String>()
             .convention(project.helm.executable)
-
-
-    @get:Internal
-    override val home: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(project.helm.home)
-
-
-    /**
-     * Register the [home] property as an input directory for this task.
-     */
-    protected fun registerHelmHomeAsInputDir() {
-        inputs.dir(home).withPropertyName("home").withPathSensitivity(PathSensitivity.ABSOLUTE)
-    }
 
 
     @get:Console

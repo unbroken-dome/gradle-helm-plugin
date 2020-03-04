@@ -7,7 +7,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.property
-import org.yaml.snakeyaml.Yaml
 import java.net.URI
 
 
@@ -92,11 +91,6 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
         project.objects.property()
 
 
-    init {
-        outputs.upToDateWhen { checkUpToDate() }
-    }
-
-
     @TaskAction
     fun addRepository() {
         execHelm("repo", "add") {
@@ -107,27 +101,5 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
             args(repositoryName)
             args(url)
         }
-    }
-
-
-    @Suppress("UNCHECKED_CAST")
-    private fun checkUpToDate(): Boolean {
-        val repositoriesYaml = home.get()
-            .file("repository/repositories.yaml")
-            .asFile
-            .reader().use {
-                Yaml().load(it) as Map<String, Any>
-            }
-        val name = repositoryName.get()
-        val repositoryData = (repositoriesYaml["repositories"] as List<Map<String, String>>)
-            .find { it["name"] == name }
-            ?: return false
-
-        return repositoryData["url"] == url.get().toString() &&
-                repositoryData["caFile"] == caFile.orNull?.toString().orEmpty() &&
-                repositoryData["username"] == username.orNull.orEmpty() &&
-                repositoryData["password"] == password.orNull.orEmpty() &&
-                repositoryData["certFile"] == certificateFile.orNull?.toString().orEmpty() &&
-                repositoryData["keyFile"] == keyFile.orNull?.toString().orEmpty()
     }
 }

@@ -63,11 +63,6 @@ open class HelmLint : AbstractHelmCommandTask() {
         project.objects.fileProperty()
 
 
-    init {
-        registerHelmHomeAsInputDir()
-    }
-
-
     @TaskAction
     fun lint() {
 

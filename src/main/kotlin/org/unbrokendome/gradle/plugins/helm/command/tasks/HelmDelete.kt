@@ -36,11 +36,6 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
         project.objects.property()
 
 
-    init {
-        registerHelmHomeAsInputDir()
-    }
-
-
     @TaskAction
     fun deleteRelease() {
         execHelm("delete") {

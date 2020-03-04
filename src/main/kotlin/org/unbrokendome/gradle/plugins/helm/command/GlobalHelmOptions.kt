@@ -1,6 +1,5 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
-import org.gradle.api.file.Directory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 
@@ -20,12 +19,6 @@ interface GlobalHelmOptions {
      * Indicates whether to use the verbose output (`--debug` flag) when invoking commands.
      */
     val debug: Provider<Boolean>
-
-    /**
-     * The path of the Helm home directory. If this provider has a value, it will be used to set the
-     * `HELM_HOME` environment variable for each Helm invocation.
-     */
-    val home: Provider<Directory>
 
     /**
      * Additional command-line arguments to pass to the Helm CLI.

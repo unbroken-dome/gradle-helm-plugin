@@ -122,11 +122,6 @@ open class HelmPackage : AbstractHelmCommandTask() {
             .convention(false)
 
 
-    init {
-        registerHelmHomeAsInputDir()
-    }
-
-
     @TaskAction
     fun helmPackage() {
 

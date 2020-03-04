@@ -144,7 +144,6 @@ internal class DefaultHelmExecSpec(
         execSpec.args(command)
         subcommand?.let { execSpec.args(it) }
 
-        environment("HELM_HOME", globalOptions.home)
         flag("--debug", globalOptions.debug)
     }
 
