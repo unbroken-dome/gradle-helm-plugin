@@ -28,14 +28,6 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
     override val debug: Property<Boolean>
 
     /**
-     * Address of Tiller, in the format `host:port`.
-     *
-     * If this property is set, its value will be used to set the `HELM_HOST` environment variable for each
-     * Helm invocation.
-     */
-    val host: Property<String>
-
-    /**
      * Name of the kubeconfig context to use.
      *
      * Corresponds to the `--kube-context` command line option in the Helm CLI.
@@ -115,11 +107,6 @@ private open class DefaultHelmExtension
     final override val debug: Property<Boolean> =
         objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.debug"))
-
-
-    final override val host: Property<String> =
-        objects.property<String>()
-            .convention(project.providerFromProjectProperty("helm.host"))
 
 
     final override val kubeContext: Property<String> =

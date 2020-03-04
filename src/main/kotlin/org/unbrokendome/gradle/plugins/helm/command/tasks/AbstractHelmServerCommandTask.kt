@@ -64,7 +64,6 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
     override fun HelmExecSpec.modifyHelmExecSpec() {
         option("--kube-context", kubeContext)
         option("--timeout", timeoutSeconds)
-        environment("HELM_HOST", host)
         environment("KUBECONFIG", kubeConfig)
     }
 }
