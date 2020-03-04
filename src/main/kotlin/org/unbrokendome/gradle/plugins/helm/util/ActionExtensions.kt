@@ -10,7 +10,7 @@ import org.gradle.api.Action
  * @param other the other action to execute
  * @return the combined action
  */
-fun <T> Action<T>.andThen(other: Action<T>): Action<T> =
+internal fun <T> Action<T>.andThen(other: Action<T>): Action<T> =
     Action {
         this.execute(it)
         other.execute(it)
@@ -24,5 +24,5 @@ fun <T> Action<T>.andThen(other: Action<T>): Action<T> =
  * @param other the other action to execute
  * @return the combined action
  */
-fun <T> Action<T>.andThen(other: T.() -> Unit): Action<T> =
+internal fun <T> Action<T>.andThen(other: T.() -> Unit): Action<T> =
     andThen(Action(other))
