@@ -145,6 +145,10 @@ internal class DefaultHelmExecSpec(
         subcommand?.let { execSpec.args(it) }
 
         flag("--debug", globalOptions.debug)
+
+        environment("XDG_DATA_HOME", globalOptions.xdgDataHome)
+        environment("XDG_CONFIG_HOME", globalOptions.xdgConfigHome)
+        environment("XDG_CACHE_HOME", globalOptions.xdgCacheHome)
     }
 
 
