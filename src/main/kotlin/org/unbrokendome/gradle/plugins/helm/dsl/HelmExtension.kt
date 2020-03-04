@@ -8,13 +8,13 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.util.*
+import java.time.Duration
 import javax.inject.Inject
 
 
@@ -43,11 +43,11 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
     val kubeConfig: RegularFileProperty
 
     /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
+     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is `5m0s`.
      *
      * Corresponds to the `--timeout` command line option in the Helm CLI.
      */
-    val timeoutSeconds: Provider<Int>
+    val remoteTimeout: Property<Duration>
 
     /**
      * Base output directory for Helm charts.
@@ -119,9 +119,9 @@ private open class DefaultHelmExtension
             .convention(project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
 
 
-    final override val timeoutSeconds: Property<Int> =
-        objects.property<Int>()
-            .convention(project.intProviderFromProjectProperty("helm.timeoutSeconds"))
+    final override val remoteTimeout: Property<Duration> =
+        objects.property<Duration>()
+            .convention(project.durationProviderFromProjectProperty("helm.remoteTimeout"))
 
 
     final override val extraArgs: ListProperty<String> =

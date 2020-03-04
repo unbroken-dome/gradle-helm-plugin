@@ -23,6 +23,8 @@ open class HelmPackage : AbstractHelmCommandTask() {
 
     /**
      * Set the appVersion on the chart to this version.
+     *
+     * Corresponds to the `--app-version` CLI option.
      */
     @get:[Input Optional]
     val appVersion: Property<String> =
@@ -30,7 +32,9 @@ open class HelmPackage : AbstractHelmCommandTask() {
 
 
     /**
-     * Update dependencies from "requirements.yaml" to dir "charts/" before packaging.
+     * Update dependencies from "Chart.yaml" to dir "charts/" before packaging.
+     *
+     * Corresponds to the `--dependency-update` CLI option.
      */
     @get:Input
     val updateDependencies: Property<Boolean> =
@@ -41,7 +45,6 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * The directory that contains the sources for the Helm chart.
      */
     @get:InputDirectory
-    @Suppress("LeakingThis")
     val sourceDir: DirectoryProperty =
         project.objects.directoryProperty()
 
@@ -111,17 +114,6 @@ open class HelmPackage : AbstractHelmCommandTask() {
         destinationDir.file(chartFileName)
 
 
-    /**
-     * Indicates whether the chart should also be saved to the local repository after packaging.
-     *
-     * Corresponds to the `--save` command line parameter. Defaults to `false`.
-     */
-    @get:Input
-    val saveToLocalRepo: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(false)
-
-
     @TaskAction
     fun helmPackage() {
 
@@ -129,11 +121,10 @@ open class HelmPackage : AbstractHelmCommandTask() {
         this.destinationDir.get().asFile.mkdirs()
 
         execHelm("package") {
-            option("--version", chartVersion)
             option("--app-version", appVersion)
             flag("--dependency-update", updateDependencies)
             option("--destination", destinationDir)
-            flag("--save", saveToLocalRepo, true)
+            option("--version", chartVersion)
             args(sourceDir)
         }
     }

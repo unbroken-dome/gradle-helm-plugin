@@ -72,14 +72,14 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
      * The default implementation does nothing. Subclasses can override this if they need to modify each
      * invocation of a Helm CLI command.
      *
-     * @receiver the [HelmExecSpec] to be executed
+     * @param exec the [HelmExecSpec] to be executed
      */
-    protected open fun HelmExecSpec.modifyHelmExecSpec() {}
+    protected open fun modifyHelmExecSpec(exec: HelmExecSpec) {}
 
 
     override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
         execProviderSupport.execHelm(command, subcommand,
-            action.andThen { modifyHelmExecSpec() })
+            action.andThen { modifyHelmExecSpec(this) })
 
 
     protected fun execHelm(command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit): ExecResult =

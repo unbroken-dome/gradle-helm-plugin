@@ -2,7 +2,6 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.property
 
@@ -20,18 +19,12 @@ class HelmTest : AbstractHelmServerCommandTask() {
         project.objects.property()
 
 
-    /**
-     * If `true`, delete test pods upon completion.
-     */
-    @get:Internal
-    val cleanup: Property<Boolean> =
-        project.objects.property()
+
 
 
     @TaskAction
     fun test() {
         execHelm("test") {
-            flag("--cleanup", cleanup)
             args(releaseName)
         }
     }

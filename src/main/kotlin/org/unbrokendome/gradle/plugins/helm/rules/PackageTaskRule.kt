@@ -40,7 +40,6 @@ internal class PackageTaskRule(
                         task.chartName.set(chart.chartName)
                         task.chartVersion.set(chart.chartVersion)
                         task.sourceDir.set(filterSourcesTask.targetDir)
-                        task.saveToLocalRepo.set(false)
                         task.updateDependencies.set(false)
                         task.chartOutputPath
                     }

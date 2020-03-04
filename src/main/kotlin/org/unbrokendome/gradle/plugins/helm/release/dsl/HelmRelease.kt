@@ -135,10 +135,12 @@ interface HelmRelease : Named {
      */
     val dryRun: Property<Boolean>
 
+
     /**
      * If `true`, will execute the release atomically.
      */
     val atomic: Property<Boolean>
+
 
     /**
      * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
@@ -157,12 +159,12 @@ interface HelmRelease : Named {
 
 
     /**
-     * If `true`, the associated `helmDelete` task will purge the release, completely removing the release from the
-     * store and making its name free for later use.
+     * If `true`, the associated `helmUninstall` task will retain the delete history
+     * (using the `--keep-history` flag).
      *
      * Defaults to `false`.
      */
-    val purge: Property<Boolean>
+    val keepHistoryOnUninstall: Property<Boolean>
 
 
     /**
@@ -270,9 +272,11 @@ private open class DefaultHelmRelease
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
 
+
     final override val atomic: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
+
 
     final override val wait: Property<Boolean> =
         project.objects.property()
@@ -283,7 +287,7 @@ private open class DefaultHelmRelease
             .convention(false)
 
 
-    final override val purge: Property<Boolean> =
+    final override val keepHistoryOnUninstall: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(false)
 

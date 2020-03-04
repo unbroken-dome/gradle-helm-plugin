@@ -8,24 +8,14 @@ import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.toHelmString
+import java.time.Duration
 
 
 /**
  * Base class for tasks representing Helm CLI commands that communicate with the remote Kubernetes cluster.
  */
 abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
-
-    /**
-     * Address of Tiller, in the format `host:port`.
-     *
-     * If this property is set, its value will be used to set the `HELM_HOST` environment variable for each
-     * Helm invocation.
-     */
-    @get:[Input Optional]
-    val host: Property<String> =
-        project.objects.property<String>()
-            .convention(project.helm.host)
-
 
     /**
      * Path to the Kubernetes configuration file.
@@ -56,14 +46,25 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      * Corresponds to the `--timeout` command line option in the Helm CLI.
      */
     @get:Internal
-    val timeoutSeconds: Property<Int> =
-        project.objects.property<Int>()
-            .convention(project.helm.timeoutSeconds)
+    val remoteTimeout: Property<Duration> =
+        project.objects.property<Duration>()
+            .convention(project.helm.remoteTimeout)
 
 
-    override fun HelmExecSpec.modifyHelmExecSpec() {
+    /**
+     * Namespace scope for this request.
+     *
+     * Corresponds to the `--namespace` CLI parameter.
+     */
+    @get:Internal
+    val namespace: Property<String> =
+        project.objects.property()
+
+
+    override fun modifyHelmExecSpec(exec: HelmExecSpec) = exec.run {
         option("--kube-context", kubeContext)
-        option("--timeout", timeoutSeconds)
+        option("--namespace", namespace)
+        option("--timeout", remoteTimeout.map { it.toHelmString() })
         environment("KUBECONFIG", kubeConfig)
     }
 }

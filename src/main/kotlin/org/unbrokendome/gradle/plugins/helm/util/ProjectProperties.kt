@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
+import java.time.Duration
 
 
 /**
@@ -81,7 +82,7 @@ internal fun Project.providerFromProjectProperty(
  * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
  *         not exist
  */
-fun Project.booleanProviderFromProjectProperty(propertyName: String, defaultValue: Boolean? = null): Provider<Boolean> =
+internal fun Project.booleanProviderFromProjectProperty(propertyName: String, defaultValue: Boolean? = null): Provider<Boolean> =
     provider {
         project.findProperty(propertyName)?.let { value ->
             when (value) {
@@ -108,7 +109,7 @@ fun Project.booleanProviderFromProjectProperty(propertyName: String, defaultValu
  * @return a [Provider] that returns the project property value if it exists, or is empty if the property does
  *         not exist
  */
-fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> =
+internal fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> =
     provider {
         project.findProperty(propertyName)?.let { value ->
             when (value) {
@@ -135,7 +136,7 @@ fun Project.intProviderFromProjectProperty(propertyName: String): Provider<Int> 
  * @return a [Provider] that returns the project property value as a [Directory] if it exists, or is empty if the
  *         property does not exist
  */
-fun Project.dirProviderFromProjectProperty(
+internal fun Project.dirProviderFromProjectProperty(
     propertyName: String,
     evaluateGString: Boolean = false
 ): Provider<Directory> =
@@ -160,7 +161,7 @@ fun Project.dirProviderFromProjectProperty(
  * @return a [Provider] that returns the project property value as a [Directory] if it exists, or is empty if the
  *         property does not exist
  */
-fun Project.dirProviderFromProjectProperty(
+internal fun Project.dirProviderFromProjectProperty(
     propertyName: String,
     defaultValueProvider: Provider<String>,
     evaluateGString: Boolean = false
@@ -189,7 +190,7 @@ fun Project.dirProviderFromProjectProperty(
  * @return a [Provider] that returns the project property value as a [RegularFile] if it exists, or is empty if the
  *         property does not exist
  */
-fun Project.fileProviderFromProjectProperty(
+internal fun Project.fileProviderFromProjectProperty(
     propertyName: String,
     evaluateGString: Boolean = false
 ): Provider<RegularFile> =
@@ -197,3 +198,36 @@ fun Project.fileProviderFromProjectProperty(
         .let { pathProvider ->
             project.layout.projectDirectory.file(pathProvider)
         }
+
+
+/**
+ * Returns a [Provider] that provides the given project property if it is available, interpreting as
+ * a duration.
+ *
+ * The property may be either a [Duration], a number or numeric string (in which case it is interpreted as a
+ * seconds duration), a string in ISO-8601 duration format (e.g. "PT3M30S") or a string in Helm duration format
+ * (e.g. "3m30s")
+ *
+ * The project property is resolved as per [Project.property].
+ *
+ * @receiver the Gradle [Project]
+ * @param propertyName the name of the property
+ * @return a [Provider] that returns the project property value as a [Duration] if it exists, or is empty if the
+ *         property does not exist
+ */
+internal fun Project.durationProviderFromProjectProperty(
+    propertyName: String
+): Provider<Duration> = provider {
+    project.findProperty(propertyName)?.let { value ->
+        when (value) {
+            is Duration -> value
+            is Number -> Duration.ofSeconds(value.toLong())
+            else -> {
+                val s = value.toString()
+                s.toLongOrNull()?.let { Duration.ofSeconds(it) }
+                    ?: tryParseHelmDuration(s)
+                    ?: s.takeIf { it.startsWith("P") }?.let { Duration.parse(it) }
+            }
+        }
+    }
+}

@@ -42,7 +42,7 @@ internal class HelmDeleteReleaseTaskRule(
 
                         task.releaseName.set(release.releaseName)
                         task.dryRun.set(release.dryRun)
-                        task.purge.set(release.purge)
+                        task.keepHistory.set(release.keepHistoryOnUninstall)
 
                         // Make sure all dependent releases are deleted first
                         task.dependsOn(TaskDependency {

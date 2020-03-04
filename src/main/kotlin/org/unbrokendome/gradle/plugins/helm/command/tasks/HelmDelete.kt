@@ -29,19 +29,21 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
 
 
     /**
-     * If `true`, remove the release from the store and make its name free for later use.
+     * If `true`. remove all associated resources and mark the release as deleted, but retain the release history.
+     *
+     * Corresponds to the `--keep-history` CLI parameter.
      */
     @get:Internal
-    val purge: Property<Boolean> =
+    val keepHistory: Property<Boolean> =
         project.objects.property()
 
 
     @TaskAction
     fun deleteRelease() {
-        execHelm("delete") {
-            flag("--purge", purge)
-            flag("--dry-run", dryRun)
+        execHelm("uninstall") {
             args(releaseName)
+            flag("--dry-run", dryRun)
+            flag("--keep-history", keepHistory)
         }
     }
 }

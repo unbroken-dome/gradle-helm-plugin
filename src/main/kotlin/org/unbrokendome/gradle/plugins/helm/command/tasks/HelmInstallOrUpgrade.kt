@@ -1,144 +1,66 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.property
-import java.net.URI
 
 
 /**
  * Installs a chart into a remote Kubernetes cluster as a new release, or upgrades an existing release.
  */
-open class HelmInstallOrUpgrade : AbstractHelmServerCommandTask() {
-
-    /**
-     * The chart to be installed. This can be any of the forms accepted by the Helm CLI.
-     *
-     * - chart reference: e.g. `stable/mariadb`
-     * - path to a packaged chart
-     * - path to an unpacked chart directory
-     * - absolute URL: e.g. `https://example.com/charts/nginx-1.2.3.tgz`
-     * - simple chart reference, e.g. `mariadb` (you must also set the [repository] property in this case)
-     */
-    @get:Input
-    val chart: Property<String> =
-        project.objects.property()
-
-
-    /**
-     * Chart repository URL where to locate the requested chart. Corresponds to the `--repo` Helm CLI parameter.
-     *
-     * Use this when the [chart] property contains only a simple chart reference, without a symbolic repository name.
-     */
-    @get:[Input Optional]
-    val repository: Property<URI> =
-        project.objects.property()
-
-
-    /**
-     * If `true`, simulate an install.
-     */
-    @get:Internal
-    val dryRun: Property<Boolean> =
-        project.objects.property()
-
-    /**
-     * If `true`, install or upgrade atomically.
-     */
-    @get:Internal
-    val atomic: Property<Boolean> =
-        project.objects.property()
-
-    /**
-     * Release name. If unspecified, Helm will auto-generate a name.
-     */
-    @get:Internal
-    val releaseName: Property<String> =
-        project.objects.property()
-
-
-    /**
-     * Namespace to install the release into. Defaults to the current kube config namespace.
-     */
-    @get:Internal
-    val namespace: Property<String> =
-        project.objects.property()
-
+open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
 
     /**
      * If `true`, re-use the given release name, even if that name is already used.
+     *
+     * If this is `true`, the task will perform a `helm install --replace` command. If it is `false` (default), then
+     * it will perform a `helm upgrade --install` command instead.
      */
     @get:Internal
     val replace: Property<Boolean> =
+        project.objects.property<Boolean>()
+            .convention(false)
+
+
+    /**
+     * If `true`, reset the values to the ones built into the chart when upgrading.
+     *
+     * Corresponds to the `--reset-values` parameter of the `helm upgrade` CLI command.
+     *
+     * If [replace] is set to `true`, this property will be ignored.
+     */
+    @get:Internal
+    val resetValues: Property<Boolean> =
         project.objects.property()
 
 
     /**
-     * Values to be used for the release.
-     */
-    @get:Input
-    val values: MapProperty<String, Any> =
-        project.objects.mapProperty()
+     * If `true`, reuse the last release's values, and merge in any new values. If [resetValues] is specified,
+     * this is ignored.
 
-
-    /**
-     * A collection of YAML files containing values for this release.
-     */
-    @get:InputFiles
-    val valueFiles: ConfigurableFileCollection =
-        project.objects.fileCollection()
-
-
-    /**
-     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
+     * Corresponds to the `--reuse-values` parameter of the `helm upgrade` CLI command.
+     *
+     * If [replace] is set to `true`, this property will be ignored.
      */
     @get:Internal
-    val version: Property<String> =
-        project.objects.property()
-
-
-    /**
-     * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
-     * state before marking the release as successful. It will wait for as along as [timeoutSeconds].
-     */
-    @get:Internal
-    val wait: Property<Boolean> =
+    val reuseValues: Property<Boolean> =
         project.objects.property()
 
 
     @TaskAction
     fun installOrUpgrade() {
-        if (replace.getOrElse(false)) {
+        if (replace.get()) {
             execHelm("install") {
                 flag("--replace")
-                option("--name", releaseName)
-                commonOptions()
-                args(chart)
             }
 
         } else {
             execHelm("upgrade") {
                 flag("--install")
-                commonOptions()
-                args(releaseName)
-                args(chart)
+                flag("--reset-values", resetValues)
+                flag("--reuse-values", reuseValues)
             }
         }
-    }
-
-
-    private fun HelmExecSpec.commonOptions() {
-        option("--version", version)
-        option("--namespace", namespace)
-        option("--repo", repository)
-        flag("--dry-run", dryRun)
-        flag("--atomic", atomic)
-        flag("--wait", wait)
-        valuesOptions(values, valueFiles)
     }
 }
