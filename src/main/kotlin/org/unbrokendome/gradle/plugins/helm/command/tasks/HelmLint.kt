@@ -49,7 +49,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      */
     @get:InputFiles
     val valueFiles: ConfigurableFileCollection =
-        project.layout.configurableFiles()
+        project.objects.fileCollection()
 
 
     /**

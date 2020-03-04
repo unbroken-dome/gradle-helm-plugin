@@ -106,7 +106,7 @@ open class HelmUpgrade : AbstractHelmServerCommandTask() {
      */
     @get:InputFiles
     val valueFiles: ConfigurableFileCollection =
-        project.layout.configurableFiles()
+        project.objects.fileCollection()
 
 
     /**
