@@ -7,12 +7,11 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.tiller
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
- * Base class for tasks representing Helm CLI commands that communicate with Tiller.
+ * Base class for tasks representing Helm CLI commands that communicate with the remote Kubernetes cluster.
  */
 abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
 
@@ -52,18 +51,6 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
 
 
     /**
-     * Namespace of Tiller.
-     *
-     * If this property is set, its value will be used to set the `TILLER_NAMESPACE` environment variable for
-     * each Helm invocation.
-     */
-    @get:[Input Optional]
-    val tillerNamespace: Property<String> =
-        project.objects.property<String>()
-            .convention(project.helm.tiller.namespace)
-
-
-    /**
      * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
      *
      * Corresponds to the `--timeout` command line option in the Helm CLI.
@@ -78,7 +65,6 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
         option("--kube-context", kubeContext)
         option("--timeout", timeoutSeconds)
         environment("HELM_HOST", host)
-        environment("TILLER_NAMESPACE", tillerNamespace)
         environment("KUBECONFIG", kubeConfig)
     }
 }

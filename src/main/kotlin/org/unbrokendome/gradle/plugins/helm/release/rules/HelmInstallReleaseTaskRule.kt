@@ -3,7 +3,6 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskDependency
-import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
 import org.unbrokendome.gradle.plugins.helm.release.dsl.ChartReference
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
@@ -53,8 +52,6 @@ class HelmInstallReleaseTaskRule(
                         task.values.set(release.values)
                         task.valueFiles.from(release.valueFiles)
                         task.wait.set(release.wait)
-
-                        task.dependsOn(HelmPlugin.initServerTaskName)
 
                         task.dependsOn(TaskDependency {
                             release.chart.orNull

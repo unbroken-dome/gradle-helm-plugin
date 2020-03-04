@@ -1,7 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
@@ -57,8 +56,6 @@ internal class AddRepositoryTaskRule(
                                     )
                             }
                         }
-
-                        task.dependsOn(HelmPlugin.initClientTaskName)
                     }
                 }
         }

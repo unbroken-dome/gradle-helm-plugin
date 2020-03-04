@@ -6,7 +6,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
 import org.unbrokendome.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
@@ -23,8 +22,6 @@ class HelmPlugin
     : Plugin<Project> {
 
     internal companion object {
-        const val initClientTaskName = "helmInitClient"
-        const val initServerTaskName = "helmInitServer"
         const val addRepositoriesTaskName = "helmAddRepositories"
     }
 
@@ -33,25 +30,10 @@ class HelmPlugin
 
         project.plugins.apply(HelmCommandsPlugin::class.java)
 
-        val tiller = createTillerExtension(project)
         configureRepositories(project)
         createFilteringExtension(project)
         configureCharts(project)
-
-        createInitClientTask(project)
-        createInitServerTask(project, tiller)
     }
-
-
-    /**
-     * Creates and installs the `helm.tiller` sub-extension.
-     */
-    private fun createTillerExtension(project: Project) =
-        project.createTiller()
-            .apply {
-                (project.helm as ExtensionAware)
-                    .extensions.add(HELM_TILLLER_EXTENSION_NAME, this)
-            }
 
 
     /**
@@ -281,33 +263,5 @@ class HelmPlugin
                     }
                 }
             }
-    }
-
-
-    /**
-     * Creates the `helmInitClient` task.
-     */
-    private fun createInitClientTask(project: Project) {
-        project.tasks.create(initClientTaskName, HelmInit::class.java) { task ->
-            task.clientOnly.set(true)
-        }
-    }
-
-
-    /**
-     * Creates the `helmInitServer` task.
-     */
-    private fun createInitServerTask(project: Project, tiller: Tiller) {
-        project.tasks.create(initServerTaskName, HelmInit::class.java) { task ->
-            task.onlyIf { tiller.install.getOrElse(true) }
-            task.forceUpgrade.set(tiller.forceUpgrade)
-            task.historyMax.set(tiller.historyMax)
-            task.replicas.set(tiller.replicas)
-            task.serviceAccount.set(tiller.serviceAccount)
-            task.tillerImage.set(tiller.image)
-            task.upgrade.set(tiller.upgrade)
-            task.wait.set(tiller.wait)
-            task.skipRefresh.set(true)
-        }
     }
 }
