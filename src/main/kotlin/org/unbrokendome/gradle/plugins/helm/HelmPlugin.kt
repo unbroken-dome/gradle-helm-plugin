@@ -6,12 +6,35 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.*
+import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
+import org.unbrokendome.gradle.plugins.helm.dsl.Linting
+import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
+import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.createChartDependencyHandler
-import org.unbrokendome.gradle.plugins.helm.rules.*
+import org.unbrokendome.gradle.plugins.helm.dsl.filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.helmChartContainer
+import org.unbrokendome.gradle.plugins.helm.dsl.helmRepositoryHandler
+import org.unbrokendome.gradle.plugins.helm.dsl.lint
+import org.unbrokendome.gradle.plugins.helm.dsl.repositories
+import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.BuildDependenciesTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
+import org.unbrokendome.gradle.plugins.helm.rules.ChartPackagedArtifactRule
+import org.unbrokendome.gradle.plugins.helm.rules.FilterSourcesTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.MainChartRule
+import org.unbrokendome.gradle.plugins.helm.rules.PackageTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
+import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
+import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
+import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
@@ -117,7 +140,7 @@ class HelmPlugin
      * Creates and installs the `helm.repositories` sub-extension.
      */
     private fun createRepositoriesExtension(project: Project) =
-        project.helmRepositoryContainer()
+        project.helmRepositoryHandler()
             .apply {
                 (project.helm as ExtensionAware)
                     .extensions.add(HELM_REPOSITORIES_EXTENSION_NAME, this)

@@ -26,7 +26,7 @@ internal val HelmExtension.lint: Linting
 /**
  * Gets the `repositories` sub-extension.
  */
-internal val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
+internal val HelmExtension.repositories: HelmRepositoryHandler
     get() = requiredExtension(HELM_REPOSITORIES_EXTENSION_NAME)
 
 
