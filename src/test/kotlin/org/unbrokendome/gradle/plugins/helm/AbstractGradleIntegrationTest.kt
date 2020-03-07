@@ -54,7 +54,6 @@ abstract class AbstractGradleIntegrationTest {
         GradleRunner.create()
             .withProjectDir(projectDir)
             .withPluginClasspath()
-            .withDebug(true)
             .withArguments(listOf(*args) + "--stacktrace")
             .build()
 

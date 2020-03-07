@@ -220,7 +220,8 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
     override fun modifyHelmExecSpec(exec: HelmExecSpec) {
         super.modifyHelmExecSpec(exec)
         exec.run {
-            args(releaseName, chart)
+            args(releaseName)
+            args(chart)
 
             flag("--atomic", atomic)
             option("--ca-file", caFile)

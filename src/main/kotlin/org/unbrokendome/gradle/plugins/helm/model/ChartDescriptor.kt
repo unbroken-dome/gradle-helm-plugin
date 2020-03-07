@@ -7,38 +7,60 @@ import java.io.File
 import java.io.Reader
 
 
-internal interface ChartDescriptor {
+internal interface ChartDescriptor : ChartModelDependencies {
+
+    /** The API version of the chart. */
+    val apiVersion: String
+
+    /** The name of the chart. */
     val name: String?
+
+    /** The version of the chart. */
     val version: String?
+
+    companion object {
+        fun fromMap(map: Map<String, Any?>): ChartDescriptor {
+            val apiVersion = (map["apiVersion"] as String?) ?: ChartApiVersion.DEFAULT
+
+            return DefaultChartDescriptor(
+                apiVersion = apiVersion,
+                name = map["name"] as String?,
+                version = map["version"]?.toString(),
+                dependencies = if (apiVersion != ChartApiVersion.V1) {
+                    ChartModelDependencies.fromMap(map).dependencies
+                } else emptyList()
+            )
+        }
+    }
 }
 
 
-private class DefaultChartDescriptor(
-    private val map: Map<String, Any?>
+private data class DefaultChartDescriptor(
+    override val apiVersion: String,
+    override val name: String?,
+    override val version: String?,
+    override val dependencies: List<ChartModelDependency> = emptyList()
 ) : ChartDescriptor {
-
-    override val name
-        get() = map["name"] as String?
-
-    override val version
-        get() = map["version"] as String?
 }
 
 
 private object EmptyChartDescriptor : ChartDescriptor {
+
+    override val apiVersion: String
+        get() = ChartApiVersion.DEFAULT
 
     override val name: String?
         get() = null
 
     override val version: String?
         get() = null
+
+    override val dependencies: List<ChartModelDependency>
+        get() = emptyList()
 }
 
 
 internal object ChartDescriptorYaml {
-
-    private val yaml = Yaml()
-
 
     fun loading(from: Provider<RegularFile>): Provider<ChartDescriptor> =
         from.map(this::load)
@@ -56,7 +78,7 @@ internal object ChartDescriptorYaml {
 
     @Suppress("UNCHECKED_CAST")
     fun load(reader: Reader): ChartDescriptor =
-        (yaml.load(reader) as? Map<String, Any?>)
-            ?.let(::DefaultChartDescriptor)
+        (Yaml().load(reader) as? Map<String, Any?>)
+            ?.let { map -> ChartDescriptor.fromMap(map) }
             ?: EmptyChartDescriptor
 }
