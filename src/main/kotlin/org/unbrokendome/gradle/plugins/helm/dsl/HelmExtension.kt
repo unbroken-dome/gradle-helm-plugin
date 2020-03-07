@@ -13,7 +13,14 @@ import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.coalesceProvider
+import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.listProperty
+import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import java.time.Duration
 import javax.inject.Inject
 
@@ -180,7 +187,7 @@ private open class DefaultHelmExtension
             .convention(xdgConfigHome.file("helm/repositories.yaml"))
 
 
-    final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
+    final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =
         execProviderSupport.execHelm(command, subcommand, action)
 }
 

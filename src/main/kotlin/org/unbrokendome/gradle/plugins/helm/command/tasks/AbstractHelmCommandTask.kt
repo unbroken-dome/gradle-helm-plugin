@@ -77,9 +77,13 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
     protected open fun modifyHelmExecSpec(exec: HelmExecSpec) {}
 
 
-    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
-        execProviderSupport.execHelm(command, subcommand,
-            action.andThen { modifyHelmExecSpec(this) })
+    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult {
+        val modifyAction = Action<HelmExecSpec> { modifyHelmExecSpec(it) }
+        return execProviderSupport.execHelm(
+            command, subcommand,
+            action?.andThen(modifyAction) ?: modifyAction
+        )
+    }
 
 
     protected fun execHelm(command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit): ExecResult =
