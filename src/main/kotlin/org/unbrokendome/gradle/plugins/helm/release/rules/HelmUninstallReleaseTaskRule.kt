@@ -3,16 +3,16 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskDependency
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmDelete
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
 
 
 /**
- * A rule that creates a [HelmDelete] task for a release.
+ * A rule that creates a [HelmUninstall] task for a release.
  */
-internal class HelmDeleteReleaseTaskRule(
+internal class HelmUninstallReleaseTaskRule(
     private val tasks: TaskContainer,
     private val releases: NamedDomainObjectContainer<HelmRelease>
 ) : AbstractRule() {
@@ -20,7 +20,7 @@ internal class HelmDeleteReleaseTaskRule(
 
     internal companion object {
 
-        const val TaskNamePrefix = "helmDelete"
+        const val TaskNamePrefix = "helmUninstall"
 
         fun getTaskName(releaseName: String) =
             TaskNamePrefix + releaseName.capitalizeWords()
@@ -37,14 +37,14 @@ internal class HelmDeleteReleaseTaskRule(
             releases.find { getTaskName(it.name) == taskName }
                 ?.let { release ->
 
-                    tasks.create(taskName, HelmDelete::class.java) { task ->
-                        task.description = "Deletes the ${release.name} release."
+                    tasks.create(taskName, HelmUninstall::class.java) { task ->
+                        task.description = "Uninstalls the ${release.name} release."
 
                         task.releaseName.set(release.releaseName)
                         task.dryRun.set(release.dryRun)
                         task.keepHistory.set(release.keepHistoryOnUninstall)
 
-                        // Make sure all dependent releases are deleted first
+                        // Make sure all dependent releases are uninstalled first
                         task.dependsOn(TaskDependency {
                             releases
                                 .matching { otherRelease ->
@@ -52,7 +52,7 @@ internal class HelmDeleteReleaseTaskRule(
                                             release.name in otherRelease.dependsOn.get()
                                 }
                                 .mapNotNull { dependentRelease ->
-                                    tasks.findByName(dependentRelease.deleteTaskName)
+                                    tasks.findByName(dependentRelease.uninstallTaskName)
                                 }
                                 .toSet()
                         })
@@ -64,7 +64,7 @@ internal class HelmDeleteReleaseTaskRule(
 
 
 /**
- * The name of the [HelmDelete] task associated with this release.
+ * The name of the [HelmUninstall] task associated with this release.
  */
-val HelmRelease.deleteTaskName: String
-    get() = HelmDeleteReleaseTaskRule.getTaskName(name)
+val HelmRelease.uninstallTaskName: String
+    get() = HelmUninstallReleaseTaskRule.getTaskName(name)

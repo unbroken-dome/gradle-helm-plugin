@@ -13,14 +13,18 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
+import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.setProperty
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
 
 
 /**
- * Represents a release to be installed into or deleted from a Kubernetes cluster.
+ * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
  */
 interface HelmRelease : Named {
 
@@ -159,7 +163,7 @@ interface HelmRelease : Named {
 
 
     /**
-     * If `true`, the associated `helmUninstall` task will retain the delete history
+     * If `true`, the associated `helmUninstall` task will retain the release history
      * (using the `--keep-history` flag).
      *
      * Defaults to `false`.
@@ -183,7 +187,7 @@ interface HelmRelease : Named {
      * Names of other releases that this release depends on.
      *
      * A dependency between two releases will create task dependencies such that the dependency will be installed
-     * before, and deleted after, the dependent release.
+     * before, and uninstalled after, the dependent release.
      *
      * Currently such dependencies can be expressed only within the same project.
      */
@@ -194,7 +198,7 @@ interface HelmRelease : Named {
      * Express a dependency on another release.
      *
      * A dependency between two releases will create task dependencies such that the dependency will be installed
-     * before, and deleted after, the dependent release.
+     * before, and uninstalled after, the dependent release.
      *
      * Currently such dependencies can be expressed only within the same project.
      */

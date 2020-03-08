@@ -50,7 +50,7 @@ This will call `helm init` which also installs Tiller in the remote cluster. Onl
 communicate with Tiller (like
 link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-install/[`HelmInstall`]
 or
-link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-delete/[`HelmDelete`]
+link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-uninstall/[`HelmUninstall`]
 depend on this.
 
 

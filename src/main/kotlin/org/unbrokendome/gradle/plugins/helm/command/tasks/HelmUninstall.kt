@@ -8,12 +8,12 @@ import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
- * Deletes a release from the cluster. Corresponds to the `helm delete` CLI command.
+ * Uninstalls a release from the cluster. Corresponds to the `helm uninstall` CLI command.
  */
-open class HelmDelete : AbstractHelmServerCommandTask() {
+open class HelmUninstall : AbstractHelmServerCommandTask() {
 
     /**
-     * The name of the release to be deleted.
+     * The name of the release to be uninstalled.
      */
     @get:Input
     val releaseName: Property<String> =
@@ -21,7 +21,7 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
 
 
     /**
-     * If `true`, simulate a delete.
+     * If `true`, simulate an uninstall.
      */
     @get:Internal
     val dryRun: Property<Boolean> =
@@ -39,7 +39,7 @@ open class HelmDelete : AbstractHelmServerCommandTask() {
 
 
     @TaskAction
-    fun deleteRelease() {
+    fun uninstallRelease() {
         execHelm("uninstall") {
             args(releaseName)
             flag("--dry-run", dryRun)

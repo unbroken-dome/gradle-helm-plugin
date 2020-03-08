@@ -10,10 +10,10 @@ import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.helmReleaseContainer
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmDeleteReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.deleteTaskName
+import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.installTaskName
+import org.unbrokendome.gradle.plugins.helm.release.rules.uninstallTaskName
 
 
 class HelmReleasesPlugin : Plugin<Project> {
@@ -21,7 +21,7 @@ class HelmReleasesPlugin : Plugin<Project> {
 
     internal companion object {
         const val installAllTaskName = "helmInstall"
-        const val deleteAllTaskName = "helmDelete"
+        const val uninstallAllTaskName = "helmUninstall"
     }
 
 
@@ -33,11 +33,11 @@ class HelmReleasesPlugin : Plugin<Project> {
 
         project.tasks.run {
             addRule(HelmInstallReleaseTaskRule(this, releases))
-            addRule(HelmDeleteReleaseTaskRule(this, releases))
+            addRule(HelmUninstallReleaseTaskRule(this, releases))
         }
 
         createInstallAllReleasesTask(project, releases)
-        createDeleteAllReleasesTask(project, releases)
+        createUninstallAllReleasesTask(project, releases)
     }
 
 
@@ -58,11 +58,11 @@ class HelmReleasesPlugin : Plugin<Project> {
     }
 
 
-    private fun createDeleteAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
-        project.tasks.create(deleteAllTaskName) { task ->
+    private fun createUninstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
+        project.tasks.create(uninstallAllTaskName) { task ->
             task.group = HELM_GROUP
-            task.description = "Deletes all Helm releases."
-            task.dependsOn(allReleasesTaskDependency(project, releases, HelmRelease::deleteTaskName))
+            task.description = "Uninstalls all Helm releases."
+            task.dependsOn(allReleasesTaskDependency(project, releases, HelmRelease::uninstallTaskName))
         }
     }
 
