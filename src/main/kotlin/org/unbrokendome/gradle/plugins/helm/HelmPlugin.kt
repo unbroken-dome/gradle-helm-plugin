@@ -6,6 +6,8 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
+import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateRepositories
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
@@ -46,6 +48,7 @@ class HelmPlugin
 
     internal companion object {
         const val addRepositoriesTaskName = "helmAddRepositories"
+        const val updateRepositoriesTaskName = "helmUpdateRepositories"
     }
 
 
@@ -64,22 +67,36 @@ class HelmPlugin
      *
      * @param project the current Gradle [Project]
      */
-    private fun configureRepositories(project: Project) =
-        createRepositoriesExtension(project)
-            .let { repositories ->
+    private fun configureRepositories(project: Project) {
+        val repositories = createRepositoriesExtension(project)
 
-                project.tasks.addRule(AddRepositoryTaskRule(project.tasks, repositories))
+        project.tasks.addRule(AddRepositoryTaskRule(project.tasks, repositories))
 
-                project.tasks.create(addRepositoriesTaskName) { task ->
-                    task.group = HELM_GROUP
-                    task.description = "Registers all configured Helm repositories."
-                    task.dependsOn(TaskDependency {
-                        repositories.map { repository ->
-                            project.tasks.getByName(repository.registerTaskName)
-                        }.toSet()
-                    })
-                }
-            }
+        val addRepositoriesTask = project.tasks.create(addRepositoriesTaskName) { task ->
+            task.group = HELM_GROUP
+            task.description = "Registers all configured Helm repositories."
+            task.dependsOn(TaskDependency {
+                repositories.map { repository ->
+                    project.tasks.getByName(repository.registerTaskName)
+                }.toSet()
+            })
+        }
+
+        val updateRepositoriesTask =
+            project.tasks.create(updateRepositoriesTaskName, HelmUpdateRepositories::class.java) { task ->
+            task.dependsOn(addRepositoriesTask)
+        }
+
+        // helm install/upgrade tasks that reference a symbolic repository name should depend on
+        // helmUpdateRepositories
+        project.tasks.withType(AbstractHelmInstallationCommandTask::class.java) { task ->
+            task.dependsOn(TaskDependency {
+                if (task.chart.getOrElse("").contains('/')) {
+                    setOf(updateRepositoriesTask)
+                } else emptySet()
+            })
+        }
+    }
 
 
     /**
