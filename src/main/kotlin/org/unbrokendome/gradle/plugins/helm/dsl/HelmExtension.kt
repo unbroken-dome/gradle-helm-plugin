@@ -57,6 +57,13 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
     val remoteTimeout: Property<Duration>
 
     /**
+     * The namespace scope for remote Kubernetes operations.
+     *
+     * Corresponds to the `--namespace` option in the Helm CLI.
+     */
+    val namespace: Property<String>
+
+    /**
      * Base output directory for Helm charts.
      *
      * Defaults to `"${project.buildDir}/helm/charts"`.
@@ -129,6 +136,11 @@ private open class DefaultHelmExtension
     final override val remoteTimeout: Property<Duration> =
         objects.property<Duration>()
             .convention(project.durationProviderFromProjectProperty("helm.remoteTimeout"))
+
+
+    final override val namespace: Property<String> =
+        objects.property<String>()
+            .convention(project.providerFromProjectProperty("helm.namespace"))
 
 
     final override val extraArgs: ListProperty<String> =
