@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
+import org.gradle.api.Task
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -7,6 +8,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.yaml.snakeyaml.Yaml
 import java.net.URI
 
 
@@ -100,6 +102,100 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
             flag("--no-update", failIfExists)
             args(repositoryName)
             args(url)
+        }
+    }
+
+
+    init {
+        outputs.file(repositoryConfigFile)
+            .withPropertyName("repositoryConfigFile")
+            .optional()
+        outputs.upToDateWhen { task -> checkUpToDate(task) }
+    }
+
+
+    private fun checkUpToDate(task: Task): Boolean {
+
+        // If we should fail if the repo exists, let Helm handle it
+        if (failIfExists.getOrElse(false)) {
+            logger.debug("{} is not up-to-date because the \"failIfExists\" flag is set.", task)
+            return false
+        }
+
+        val actualConfig = loadRepositoryConfig()
+        if (actualConfig == null) {
+            logger.debug("{} is not up-to-date because the desired repository configuration does not exist.", task)
+            return false
+        }
+
+        val expectedConfig = RepositoryConfig(
+            name = repositoryName.getOrElse(""),
+            url = url.map { it.toString() }.getOrElse(""),
+            username = username.getOrElse(""),
+            password = password.getOrElse(""),
+            caFile = caFile.map { it.asFile.absolutePath }.getOrElse(""),
+            certFile = certificateFile.map { it.asFile.absolutePath }.getOrElse(""),
+            keyFile = keyFile.map { it.asFile.absolutePath }.getOrElse("")
+        )
+
+        return if (actualConfig == expectedConfig) {
+            logger.debug(
+                "{} is up-to-date because the current repository configuration matches the desired one.", task
+            )
+            true
+        } else {
+            logger.debug(
+                "{} is not up-to-date because the current repository configuration does not match the desired one.",
+                task
+            )
+            false
+        }
+    }
+
+
+    @Suppress("UNCHECKED_CAST")
+    private fun loadRepositoryConfig(): RepositoryConfig? {
+
+        val repositoryName = this.repositoryName.get()
+
+        return project.file(this.repositoryConfigFile)
+            .takeIf { it.exists() }
+            ?.run {
+                runCatching {
+                    inputStream().use { input ->
+                        val map = Yaml().loadAs(input, Map::class.java)
+                        val repositories = map["repositories"] as List<Map<String, String>>
+                        repositories.asSequence()
+                            .filter { it["name"] == repositoryName }
+                            .map { RepositoryConfig.fromMap(it) }
+                            .firstOrNull()
+                    }
+                }.getOrNull()
+            }
+    }
+
+
+    private data class RepositoryConfig(
+        val name: String,
+        val url: String,
+        val username: String,
+        val password: String,
+        val caFile: String,
+        val certFile: String,
+        val keyFile: String
+    ) {
+
+        companion object {
+
+            fun fromMap(map: Map<String, String?>) = RepositoryConfig(
+                name = map["name"] ?: "",
+                url = map["url"] ?: "",
+                username = map["username"] ?: "",
+                password = map["password"] ?: "",
+                caFile = map["caFile"] ?: "",
+                certFile = map["certFile"] ?: "",
+                keyFile = map["keyFile"] ?: ""
+            )
         }
     }
 }
