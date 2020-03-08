@@ -50,6 +50,7 @@ class HelmInstallReleaseTaskRule(
                         task.atomic.set(release.atomic)
                         task.replace.set(release.replace)
                         task.values.set(release.values)
+                        task.fileValues.set(release.fileValues)
                         task.valueFiles.from(release.valueFiles)
                         task.wait.set(release.wait)
 

@@ -173,12 +173,33 @@ interface HelmRelease : Named {
 
     /**
      * Values to be used for the release.
+     *
+     * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
+     * `--set` option (for all other types).
      */
     val values: MapProperty<String, Any>
 
 
     /**
+     * Values read from the contents of files, to be used for the release.
+     *
+     * Corresponds to the `--set-file` CLI option.
+     *
+     * The values of the map can be of any type that is accepted by [Project.file]. Additionally, when adding a
+     * [Provider] that represents an output file of another task, the corresponding install/upgrade task will
+     * automatically have a task dependency on the producing task.
+     *
+     * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
+     */
+    val fileValues: MapProperty<String, Any>
+
+
+    /**
      * A collection of YAML files containing values for this release.
+     *
+     * Corresponds to the `--values` CLI option.
+     *
+     * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     val valueFiles: ConfigurableFileCollection
 
@@ -297,6 +318,10 @@ private open class DefaultHelmRelease
 
 
     final override val values: MapProperty<String, Any> =
+        project.objects.mapProperty()
+
+
+    final override val fileValues: MapProperty<String, Any> =
         project.objects.mapProperty()
 
 

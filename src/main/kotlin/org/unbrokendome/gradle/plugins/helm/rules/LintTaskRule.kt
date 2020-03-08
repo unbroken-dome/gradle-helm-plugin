@@ -43,6 +43,7 @@ internal class LintTaskRule(
                             task.onlyIf { chartLint.enabled.get() }
                             task.strict.set(chartLint.strict)
                             task.values.putAll(chartLint.values)
+                            task.fileValues.putAll(chartLint.fileValues)
                             task.valueFiles.from(chartLint.valueFiles)
                         }
 
