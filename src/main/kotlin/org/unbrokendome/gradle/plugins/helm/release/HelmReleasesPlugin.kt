@@ -50,7 +50,7 @@ class HelmReleasesPlugin : Plugin<Project> {
 
 
     private fun createInstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
-        project.tasks.create(installAllTaskName) { task ->
+        project.tasks.register(installAllTaskName) { task ->
             task.group = HELM_GROUP
             task.description = "Installs all Helm releases."
             task.dependsOn(allReleasesTaskDependency(project, releases, HelmRelease::installTaskName))
@@ -59,7 +59,7 @@ class HelmReleasesPlugin : Plugin<Project> {
 
 
     private fun createUninstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
-        project.tasks.create(uninstallAllTaskName) { task ->
+        project.tasks.register(uninstallAllTaskName) { task ->
             task.group = HELM_GROUP
             task.description = "Uninstalls all Helm releases."
             task.dependsOn(allReleasesTaskDependency(project, releases, HelmRelease::uninstallTaskName))

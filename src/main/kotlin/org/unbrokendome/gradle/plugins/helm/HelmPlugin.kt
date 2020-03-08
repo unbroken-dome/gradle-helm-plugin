@@ -72,7 +72,7 @@ class HelmPlugin
 
         project.tasks.addRule(AddRepositoryTaskRule(project.tasks, repositories))
 
-        val addRepositoriesTask = project.tasks.create(addRepositoriesTaskName) { task ->
+        val addRepositoriesTask = project.tasks.register(addRepositoriesTaskName) { task ->
             task.group = HELM_GROUP
             task.description = "Registers all configured Helm repositories."
             task.dependsOn(TaskDependency {
@@ -83,16 +83,16 @@ class HelmPlugin
         }
 
         val updateRepositoriesTask =
-            project.tasks.create(updateRepositoriesTaskName, HelmUpdateRepositories::class.java) { task ->
-            task.dependsOn(addRepositoriesTask)
-        }
+            project.tasks.register(updateRepositoriesTaskName, HelmUpdateRepositories::class.java) { task ->
+                task.dependsOn(addRepositoriesTask)
+            }
 
         // helm install/upgrade tasks that reference a symbolic repository name should depend on
         // helmUpdateRepositories
         project.tasks.withType(AbstractHelmInstallationCommandTask::class.java) { task ->
             task.dependsOn(TaskDependency {
                 if (task.chart.getOrElse("").contains('/')) {
-                    setOf(updateRepositoriesTask)
+                    setOf(updateRepositoriesTask.get())
                 } else emptySet()
             })
         }
