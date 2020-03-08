@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.toHelmString
 import java.time.Duration
@@ -26,7 +25,6 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
     @get:[Input Optional]
     val kubeConfig: RegularFileProperty =
         project.objects.fileProperty()
-            .convention(project.helm.kubeConfig)
 
 
     /**
@@ -36,8 +34,7 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val kubeContext: Property<String> =
-        project.objects.property<String>()
-            .convention(project.helm.kubeContext)
+        project.objects.property()
 
 
     /**
@@ -47,8 +44,7 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      */
     @get:Internal
     val remoteTimeout: Property<Duration> =
-        project.objects.property<Duration>()
-            .convention(project.helm.remoteTimeout)
+        project.objects.property()
 
 
     /**
