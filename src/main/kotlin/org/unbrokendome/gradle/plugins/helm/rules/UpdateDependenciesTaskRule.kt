@@ -3,7 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.rules
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 
 
@@ -12,7 +12,7 @@ private val namePattern =
 
 
 /**
- * The name of the [HelmBuildOrUpdateDependencies] task for this chart.
+ * The name of the [HelmUpdateDependencies] task for this chart.
  */
 val HelmChart.updateDependenciesTaskName
     get() = namePattern.mapName(name)
@@ -20,24 +20,28 @@ val HelmChart.updateDependenciesTaskName
 
 
 /**
- * A rule that creates a [HelmBuildOrUpdateDependencies] task for each chart.
+ * A rule that creates a [HelmUpdateDependencies] task for each chart.
  */
-internal class BuildDependenciesTaskRule(
+internal class UpdateDependenciesTaskRule(
     tasks: TaskContainer,
     charts: NamedDomainObjectCollection<HelmChart>
-) : AbstractHelmChartTaskRule<HelmBuildOrUpdateDependencies>(
-    HelmBuildOrUpdateDependencies::class.java, tasks, charts, namePattern
+) : AbstractHelmChartTaskRule<HelmUpdateDependencies>(
+    HelmUpdateDependencies::class.java, tasks, charts, namePattern
 ) {
 
-    override fun HelmBuildOrUpdateDependencies.configureFrom(chart: HelmChart) {
+    override fun HelmUpdateDependencies.configureFrom(chart: HelmChart) {
 
         description = "Builds or updates the dependencies for the ${chart.name} chart."
 
         chartDir.set(chart.outputDir)
 
+        // We depend on the update repositories task (which will cache the repo index for some time),
+        // so no need to refresh again
+        skipRefresh.set(true)
+
         dependsOn(
-            HelmPlugin.addRepositoriesTaskName,
-            chart.filterSourcesTaskName
+            HelmPlugin.updateRepositoriesTaskName,
+            chart.collectChartSourcesTaskName
         )
     }
 }

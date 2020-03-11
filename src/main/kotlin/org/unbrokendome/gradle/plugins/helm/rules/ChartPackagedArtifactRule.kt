@@ -1,11 +1,9 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
 import org.gradle.api.NamedDomainObjectCollection
-import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 
 
@@ -14,10 +12,20 @@ private val namePattern =
 
 
 /**
- * The name of the [Configuration] that contains the directory artifact for this chart.
+ * The name of the [Configuration] that contains the packaged artifact for this chart.
  */
 val HelmChart.packagedArtifactConfigurationName: String
     get() = namePattern.mapName(name)
+
+
+/**
+ * Gets the name of the [Configuration] that contains the packaged artifact for a chart with the given name.
+ *
+ * @param chartName the chart name
+ * @return the packaged chart artifact configuration name
+ */
+internal fun chartPackagedArtifactConfigurationName(chartName: String): String =
+    namePattern.mapName(chartName)
 
 
 /**
@@ -32,22 +40,17 @@ internal class ChartPackagedArtifactRule(
 ) : AbstractPatternRule<HelmChart, Configuration>(
     configurations, charts, namePattern
 ) {
-    constructor(project: Project, charts: NamedDomainObjectCollection<HelmChart>)
-            : this(project.configurations, project.tasks, charts)
 
-
-    override fun Configuration.configureFrom(source: HelmChart) {
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun Configuration.configureFrom(chart: HelmChart) {
 
         isCanBeResolved = false
         isCanBeConsumed = true
 
-        val packageTask =
-            tasks.named(source.packageTaskName, HelmPackage::class.java)
-
         outgoing { publications ->
-            publications.artifact(packageTask.flatMap { it.chartOutputPath }) { artifact ->
-                artifact.builtBy(packageTask)
-                artifact.name = source.chartName.get()
+            publications.artifact(chart.packageOutputFile) { artifact ->
+                artifact.builtBy(tasks.named(chart.packageTaskName))
+                artifact.name = chart.chartName.get()
                 artifact.extension = "tgz"
             }
         }

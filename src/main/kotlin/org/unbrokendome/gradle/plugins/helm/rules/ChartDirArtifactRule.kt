@@ -1,11 +1,9 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
 import org.gradle.api.NamedDomainObjectCollection
-import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 
 
@@ -30,9 +28,6 @@ internal class ChartDirArtifactRule(
 ) : AbstractPatternRule<HelmChart, Configuration>(
     configurations, charts, namePattern
 ) {
-    constructor(project: Project, charts: NamedDomainObjectCollection<HelmChart>)
-            : this(project.configurations, project.tasks, charts)
-
 
     companion object {
         fun getConfigurationName(chartName: String) =
@@ -40,18 +35,16 @@ internal class ChartDirArtifactRule(
     }
 
 
-    override fun Configuration.configureFrom(source: HelmChart) {
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun Configuration.configureFrom(chart: HelmChart) {
 
         isCanBeResolved = false
         isCanBeConsumed = true
 
-        val buildDependenciesTask =
-            tasks.named(source.updateDependenciesTaskName, HelmBuildOrUpdateDependencies::class.java)
-
         outgoing { publications ->
-            publications.artifact(buildDependenciesTask.flatMap { it.chartDir }) { artifact ->
-                artifact.builtBy(buildDependenciesTask)
-                artifact.name = source.chartName.get()
+            publications.artifact(chart.outputDir) { artifact ->
+                artifact.builtBy(tasks.named(chart.updateDependenciesTaskName))
+                artifact.name = chart.chartName.get()
             }
         }
     }

@@ -10,6 +10,10 @@ private val namePattern =
     RuleNamePattern.parse("helmPackage<Chart>Chart")
 
 
+internal fun chartPackageTaskName(chartName: String): String =
+    namePattern.mapName(chartName)
+
+
 /**
  * The name of the [HelmPackage] task for this chart.
  */
@@ -40,7 +44,7 @@ internal class PackageTaskRule(
         chartOutputPath
 
         dependsOn(
-            chart.filterSourcesTaskName,
+            chart.updateDependenciesTaskName,
             chart.lintTaskName
         )
     }

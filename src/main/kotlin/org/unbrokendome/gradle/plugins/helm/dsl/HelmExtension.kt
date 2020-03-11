@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
@@ -14,7 +15,6 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.coalesceProvider
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
@@ -50,7 +50,7 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
     val kubeConfig: RegularFileProperty
 
     /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is `5m0s`.
+     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks).
      *
      * Corresponds to the `--timeout` command line option in the Helm CLI.
      */
@@ -97,12 +97,23 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
 }
 
 
+internal interface HelmExtensionInternal : HelmExtension {
+
+    /**
+     * Base temp directory where certain intermediate artifacts will be placed.
+     *
+     * Defaults to `"${project.buildDir}/tmp/helm"`.
+     */
+    val tmpDir: DirectoryProperty
+}
+
+
 private open class DefaultHelmExtension
 @Inject constructor(
     project: Project,
     objects: ObjectFactory,
     layout: ProjectLayout
-) : HelmExtension {
+) : HelmExtension, HelmExtensionInternal {
 
     @Suppress("LeakingThis")
     private val execProviderSupport = HelmExecProviderSupport(project, this)
@@ -111,10 +122,8 @@ private open class DefaultHelmExtension
     final override val executable: Property<String> =
         objects.property<String>()
             .convention(
-                project.providerFromProjectProperty(
-                    "helm.executable",
-                    defaultValue = "helm", evaluateGString = true
-                )
+                project.providerFromProjectProperty("helm.executable", evaluateGString = true)
+                    .orElse("helm")
             )
 
 
@@ -150,37 +159,40 @@ private open class DefaultHelmExtension
     final override val outputDir: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.coalesceProvider(
-                    project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true),
-                    layout.buildDirectory.dir("helm/charts")
-                )
+                project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true)
+                    .orElse(layout.buildDirectory.dir("helm/charts"))
+            )
+
+
+    final override val tmpDir: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                project.dirProviderFromProjectProperty("helm.tmpDir")
+                    .orElse(layout.buildDirectory.dir("tmp/helm"))
             )
 
 
     final override val xdgDataHome: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true,
-                    defaultValueProvider = project.provider { "${project.rootDir}/.gradle/helm/data" }
-                )
+                project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true)
+                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/config"))
             )
 
 
     final override val xdgConfigHome: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true,
-                    defaultValueProvider = project.provider { "${project.rootDir}/.gradle/helm/config" }
-                )
+                project.dirProviderFromProjectProperty("helm.xdgConfigHome", evaluateGString = true)
+                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/config"))
             )
 
 
     final override val xdgCacheHome: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true,
-                    defaultValueProvider = project.provider { "${project.rootDir}/.gradle/helm/cache" }
-                )
+                project.dirProviderFromProjectProperty("helm.xdgCacheHome", evaluateGString = true)
+                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/cache"))
             )
 
 
@@ -202,6 +214,16 @@ private open class DefaultHelmExtension
     final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =
         execProviderSupport.execHelm(command, subcommand, action)
 }
+
+
+/**
+ * Returns the root directory of this project as a [Directory].
+ *
+ * @receiver the Gradle [Project]
+ * @see Project.getRootDir
+ */
+private val Project.rootDirAsDirectory: Directory
+    get() = project.rootProject.layout.projectDirectory
 
 
 /**

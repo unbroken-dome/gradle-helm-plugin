@@ -1,11 +1,10 @@
 package org.unbrokendome.gradle.plugins.helm.dsl.dependencies
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.plugins.ExtensionAware
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
+import org.unbrokendome.gradle.plugins.helm.rules.chartPackageTaskName
+import org.unbrokendome.gradle.plugins.helm.rules.chartPackagedArtifactConfigurationName
+import org.unbrokendome.gradle.plugins.helm.rules.dependenciesConfigurationName
 import javax.inject.Inject
 
 
@@ -17,13 +16,34 @@ interface ChartDependencyHandler {
     /**
      * Adds a dependency on another chart.
      *
-     * @param name the name of the chart in the dependent chart's requirements. This should either match
-     *        the `name` or `alias` field inside the dependent chart's _requirements.yaml_.
+     * @param name the name that the subchart will have inside the parent chart
      * @param chart the name of the chart inside the Gradle project. Defaults to `"main"` if not specified.
      * @param project the path to the project that contains the chart. If `null`, the dependency will be on
      *        a chart inside the same project as the dependent chart.
      */
     fun add(name: String, chart: String = "main", project: String? = null)
+
+
+    /**
+     * Adds a dependency on another chart in the same project.
+     *
+     * @param name the name that the subchart will have inside the parent chart
+     * @param chart the [HelmChart] object representing the dependency
+     */
+    @JvmDefault
+    fun add(name: String, chart: HelmChart) =
+        add(name, chart = chart.name)
+
+
+    /**
+     * Adds a dependency on another chart in the same project. The subchart will have
+     * its own [HelmChart.chartName] inside the parent chart.
+     *
+     * @param chart the [HelmChart] object representing the dependency
+     */
+    @JvmDefault
+    fun add(chart: HelmChart) =
+        add("", chart = chart.name)
 
 
     /**
@@ -38,7 +58,7 @@ interface ChartDependencyHandler {
      * ```
      *
      * The following keys are supported in the `notation` map parameter:
-     *   * `name`: the name of the chart in the dependent chart's requirements
+     *   * `name`: the name that the subchart will have in the resulting chart
      *   * `chart`: the name of the chart inside the Gradle project
      *   * `project`: the path to the project that contains the chart
      *
@@ -65,14 +85,32 @@ interface ChartDependencyHandler {
      * }
      * ```
      *
-     * @receiver the name of the chart in the dependent chart's requirements. This should either match
-     *           the `name` or `alias` field inside the dependent chart's _requirements.yaml_.
+     * @receiver the name that the subchart will have inside the parent chart
      * @param chart the name of the chart inside the Gradle project. Defaults to `"main"` if not specified.
      * @param project the path to the project that contains the chart. If `null`, the dependency will be on
      *        a chart inside the same project as the dependent chart.
      */
     operator fun String.invoke(chart: String = "main", project: String? = null) {
         add(this, chart = chart, project = project)
+    }
+
+
+    /**
+     * Adds a dependency on another chart.
+     *
+     * This variant is intended for Kotlin DSL support, allowing us to declare a chart dependency like this:
+     *
+     * ```
+     * dependencies {
+     *     "foo"(barChart)
+     * }
+     * ```
+     *
+     * @receiver the name that the subchart will have inside the parent chart
+     * @param chart the [HelmChart] object representing the dependency
+     */
+    operator fun String.invoke(chart: HelmChart) {
+        add(this, chart)
     }
 }
 
@@ -83,80 +121,43 @@ private open class DefaultChartDependencyHandler
     private val project: Project
 ) : ChartDependencyHandler {
 
-    private val chartDependenciesConfiguration: Configuration
-        get() {
-            val configurationName = chart.dependenciesConfigurationName
-            return project.configurations.run {
-                findByName(configurationName) ?: create(configurationName) { configuration ->
-                    configuration.isVisible = false
-
-                    // Add a custom extension on the configuration, which is a map of chart names to
-                    // objects of type ChartDependency, allowing us to resolve the correct chart artifacts
-                    // by chart name.
-                    // It would be nicer if we could just store the chart name with each Dependency, but
-                    // this is not possible because dependencies within the same project are not realized
-                    // as explicit Dependency objects but rather with Configuration.extendsFrom.
-                    (configuration as ExtensionAware).extensions.add(
-                        MutableMap::class.java,
-                        HELM_DEPENDENCIES_CONF_EXTENSION_NAME,
-                        mutableMapOf<String, ChartDependency>()
-                    )
-                }
-            }
-        }
-
-
     override fun add(name: String, chart: String, project: String?) {
 
         require(chart != this.chart.name || project != null) { "A chart cannot have a dependency on itself." }
 
-        val chartDependency: ChartDependency =
+        val dependencyNotation: Any =
             if (project != null) {
                 // dependency on a chart in another project
-                val dependency = this.project.dependencies.project(
-                    mapOf("path" to project, "configuration" to chartDirArtifactConfigurationName(chart))
+                this.project.dependencies.project(
+                    mapOf("path" to project, "configuration" to chartPackagedArtifactConfigurationName(chart))
                 )
-                ChartDependency.External(dependency)
 
             } else {
                 // dependency on a chart in the same project
-                val artifactConfiguration =
-                    this.project.configurations.getByName(chartDirArtifactConfigurationName(chart))
-                ChartDependency.Internal(artifactConfiguration)
+                this.project.files(
+                    this.project.tasks.named(chartPackageTaskName(chart))
+                )
             }
 
-        chartDependenciesConfiguration.let { configuration ->
-            configuration.helmDependencies[name] = chartDependency
-            this.project.dependencies.add(configuration.name, chartDependency.dependencyNotation)
-        }
+        this.project.dependencies.add(this.chart.dependenciesConfigurationName, dependencyNotation)
     }
 
 
     /**
      * Variant of [add] that uses the dynamic method name as dependency name in Groovy.
+     *
+     * @param name the name of the method called; interpreted as the name of the dependency
+     * @param arg any additional arguments
      */
     @Suppress("unused", "UNCHECKED_CAST")
-    fun methodMissing(name: String, arg: Any): Any? {
-        val args: Map<String, *> = ((arg as Array<Any?>).firstOrNull() as? Map<String, Any?>?)
-            ?: emptyMap<String, Any?>()
-        return add(args + mapOf("name" to name))
-    }
-
-
-    private fun chartDirArtifactConfigurationName(dependencyName: String) =
-        ChartDirArtifactRule.getConfigurationName(dependencyName)
+    fun methodMissing(name: String, arg: Any): Any? =
+        when (val firstArg = (arg as Array<Any?>).firstOrNull()) {
+            is HelmChart -> add(name, firstArg)
+            is Map<*, *> -> add(firstArg as Map<String, Any?> + mapOf("name" to name))
+            else -> add(mapOf("name" to name))
+        }
 }
 
 
 internal fun createChartDependencyHandler(chart: HelmChart, project: Project): ChartDependencyHandler =
     project.objects.newInstance(DefaultChartDependencyHandler::class.java, chart, project)
-
-
-/**
- * Name of the `helmDependencies` extension on [Configuration] objects.
- */
-internal const val HELM_DEPENDENCIES_CONF_EXTENSION_NAME = "helmDependencies"
-
-
-internal val Configuration.helmDependencies: MutableMap<String, ChartDependency>
-    get() = this.requiredExtension(HELM_DEPENDENCIES_CONF_EXTENSION_NAME)

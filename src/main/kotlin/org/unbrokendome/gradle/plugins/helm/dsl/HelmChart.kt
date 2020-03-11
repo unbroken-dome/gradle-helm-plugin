@@ -11,7 +11,12 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskDependency
+import org.unbrokendome.gradle.plugins.helm.HELM_MAIN_CHART_NAME
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
+import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
+import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
+import org.unbrokendome.gradle.plugins.helm.model.ChartModelDependencies
+import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
@@ -25,6 +30,9 @@ interface HelmChart : Named, Buildable {
 
     /**
      * The chart name.
+     *
+     * By default, the chart will have the same name as in the Gradle DSL (except for the "main" chart which
+     * will have the same name as the project by default).
      */
     val chartName: Property<String>
 
@@ -88,13 +96,37 @@ interface HelmChart : Named, Buildable {
 }
 
 
+internal interface HelmChartInternal : HelmChart {
+
+    /**
+     * The directory where the filtered sources of the chart will be placed.
+     */
+    val filteredSourcesDir: Provider<Directory>
+
+    /**
+     * The chart descriptor, as parsed from the Chart.yaml file.
+     */
+    val chartDescriptor: Provider<ChartDescriptor>
+
+    /**
+     * The dependencies, as declared in either the Chart.yaml file (for API version v2) or the
+     * requirements.yaml file (for API version v1).
+     *
+     * If the API version is v1 and no requirements.yaml file exists, the provider will produce
+     * an empty [ChartModelDependencies].
+     */
+    val modelDependencies: Provider<ChartModelDependencies>
+}
+
+
 private open class DefaultHelmChart
 @Inject constructor(
     private val name: String,
     defaultVersion: Provider<String>,
     baseOutputDir: Provider<Directory>,
+    filteredSourcesBaseDir: Provider<Directory>,
     objects: ObjectFactory
-) : HelmChart {
+) : HelmChart, HelmChartInternal {
 
     final override fun getName(): String =
         name
@@ -129,6 +161,24 @@ private open class DefaultHelmChart
                 emptySet()
             }
         }
+
+
+    final override val filteredSourcesDir: Provider<Directory> =
+        filteredSourcesBaseDir.flatMap { it.dir(chartName) }
+
+
+    final override val chartDescriptor: Provider<ChartDescriptor> =
+        ChartDescriptorYaml.loading(sourceDir.file("Chart.yaml"))
+
+
+    final override val modelDependencies: Provider<ChartModelDependencies> =
+        chartDescriptor.flatMap { descriptor ->
+            if (descriptor.apiVersion == "v1") {
+                ChartRequirementsYaml.loading(sourceDir.file("requirements.yaml"))
+            } else {
+                chartDescriptor
+            }
+        }
 }
 
 
@@ -138,7 +188,18 @@ private open class DefaultHelmChart
  * @receiver the Gradle [Project]
  * @return the container for `HelmChart`s
  */
-internal fun Project.helmChartContainer(baseOutputDir: Provider<Directory>): NamedDomainObjectContainer<HelmChart> =
+internal fun Project.helmChartContainer(
+    baseOutputDir: Provider<Directory>,
+    filteredSourcesBaseDir: Provider<Directory>
+): NamedDomainObjectContainer<HelmChart> =
     container(HelmChart::class.java) { name ->
-        objects.newInstance(DefaultHelmChart::class.java, name, this.versionProvider, baseOutputDir)
+        objects.newInstance<HelmChart>(
+            DefaultHelmChart::class.java, name,
+            this.versionProvider, baseOutputDir, filteredSourcesBaseDir
+        ).also { chart ->
+            // The "main" chart should be named like the project by default
+            if (name == HELM_MAIN_CHART_NAME) {
+                chart.chartName.convention(this@helmChartContainer.name)
+            }
+        }
     }

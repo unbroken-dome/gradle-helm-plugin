@@ -4,6 +4,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.unbrokendome.gradle.plugins.helm.HELM_MAIN_CHART_NAME
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.plugins.helm.util.versionProvider
 
 
 /**
@@ -27,7 +28,7 @@ internal class MainChartRule(
         if (chartName == HELM_MAIN_CHART_NAME && charts.isEmpty()) {
             charts.create(HELM_MAIN_CHART_NAME) { mainChart ->
                 mainChart.chartName.set(project.name)
-                mainChart.chartVersion.set(project.provider { project.version.toString() })
+                mainChart.chartVersion.set(project.versionProvider)
                 mainChart.sourceDir.set(
                     project.layout.projectDirectory.dir("src/main/helm")
                 )

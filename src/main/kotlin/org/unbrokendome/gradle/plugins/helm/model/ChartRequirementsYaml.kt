@@ -1,5 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.model
 
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.Reader
@@ -9,6 +11,14 @@ import java.io.Reader
  * Reads chart dependencies from a _requirements.yaml_ file.
  */
 internal object ChartRequirementsYaml {
+
+    fun loading(from: Provider<RegularFile>): Provider<ChartModelDependencies> =
+        from.map(this::load)
+
+
+    fun load(file: RegularFile): ChartModelDependencies =
+        load(file.asFile)
+
 
     /**
      * Reads a _requirements.yaml_ file into a [ChartModelDependencies] object.
