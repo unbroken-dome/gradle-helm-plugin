@@ -19,7 +19,6 @@ internal class MainChartRule(
     private val charts: NamedDomainObjectContainer<HelmChart>
 ) : AbstractRule() {
 
-
     override fun getDescription(): String =
         "main chart"
 

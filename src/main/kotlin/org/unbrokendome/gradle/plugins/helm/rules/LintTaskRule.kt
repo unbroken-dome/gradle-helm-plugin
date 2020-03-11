@@ -1,62 +1,49 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
+import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.lint
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
 
 
-/**
- * A rule that creates a [HelmLint] task for each chart.
- */
-internal class LintTaskRule(
-    private val tasks: TaskContainer,
-    private val charts: Iterable<HelmChart>
-) : AbstractRule() {
-
-    internal companion object {
-        fun getTaskName(chartName: String) =
-            "helmLint${chartName.capitalize()}Chart"
-    }
-
-    private val regex = Regex(getTaskName("(\\p{Upper}.*)"))
-
-
-    override fun getDescription(): String =
-        "Pattern: ${getTaskName("<Chart>")}"
-
-
-    override fun apply(taskName: String) {
-        if (regex.matches(taskName)) {
-            charts.find { it.lintTaskName == taskName }
-                ?.let { chart ->
-
-                    val filterSourcesTask = tasks.getByName(chart.filterSourcesTaskName) as HelmFilterSources
-
-                    tasks.create(taskName, HelmLint::class.java) { task ->
-                        task.description = "Lints the ${chart.name} chart."
-
-                        task.chartDir.set(filterSourcesTask.targetDir)
-
-                        chart.lint.let { chartLint ->
-                            task.onlyIf { chartLint.enabled.get() }
-                            task.strict.set(chartLint.strict)
-                            task.values.putAll(chartLint.values)
-                            task.fileValues.putAll(chartLint.fileValues)
-                            task.valueFiles.from(chartLint.valueFiles)
-                        }
-
-                        task.dependsOn(chart.updateDependenciesTaskName)
-                    }
-                }
-        }
-    }
-}
+private val namePattern =
+    RuleNamePattern.parse("helmLint<Chart>Chart")
 
 
 /**
  * The name of the [HelmLint] task for this chart.
  */
 val HelmChart.lintTaskName
-    get() = LintTaskRule.getTaskName(name)
+    get() = namePattern.mapName(name)
+
+
+/**
+ * A rule that creates a [HelmLint] task for each chart.
+ */
+internal class LintTaskRule(
+    tasks: TaskContainer,
+    charts: NamedDomainObjectCollection<HelmChart>
+) : AbstractHelmChartTaskRule<HelmLint>(
+    HelmLint::class.java, tasks, charts, namePattern
+) {
+
+    override fun HelmLint.configureFrom(chart: HelmChart) {
+
+        description = "Lints the ${chart.name} chart."
+
+        chartDir.set(chart.outputDir)
+
+        chart.lint.let { chartLint ->
+            onlyIf { chartLint.enabled.get() }
+            strict.set(chartLint.strict)
+            values.putAll(chartLint.values)
+            fileValues.putAll(chartLint.fileValues)
+            valueFiles.from(chartLint.valueFiles)
+        }
+
+        dependsOn(
+            chart.updateDependenciesTaskName
+        )
+    }
+}

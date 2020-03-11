@@ -1,69 +1,18 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.rules
 
 import org.gradle.api.NamedDomainObjectCollection
-import org.gradle.api.Project
+import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.tasks.HelmPublishChart
-import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
+import org.unbrokendome.gradle.plugins.helm.rules.AbstractTaskRule2
+import org.unbrokendome.gradle.plugins.helm.rules.RuleNamePattern2
 import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
 
 
-/**
- * Rule that creates a task for publishing a given chart to a given repository.
- */
-internal class HelmPublishChartToRepositoryTaskRule(
-    private val project: Project,
-    private val charts: NamedDomainObjectCollection<HelmChart>,
-    private val repositories: NamedDomainObjectCollection<HelmPublishingRepository>
-) : AbstractRule() {
-
-    internal companion object {
-        fun getTaskName(chartName: String, repositoryName: String) =
-            "helmPublish${chartName.capitalize()}ChartTo${repositoryName.capitalize()}Repo"
-    }
-
-    private val regex = Regex(getTaskName("(\\p{Upper}.*)", "(\\p{Upper}.*)"))
-
-
-    override fun getDescription(): String =
-        "Pattern: ${getTaskName("<Chart>", "<Repo>")}"
-
-
-    override fun apply(taskName: String) {
-
-        regex.matchEntire(taskName)?.let { matchResult ->
-            val chartName = matchResult.groupValues[1].decapitalize()
-            val chart = charts.findByName(chartName) ?: charts.findByName(chartName.capitalize())
-
-            val repositoryName = matchResult.groupValues[2].decapitalize()
-            val repository =
-                repositories.findByName(repositoryName) ?: repositories.findByName(repositoryName.capitalize())
-
-            if (chart != null && repository != null) {
-
-                project.tasks.create(taskName, HelmPublishChart::class.java) { task ->
-                    task.description = "Publishes the ${chart.name} chart to the ${repository.name} repository."
-
-                    task.onlyIf { chart.publishConvention.publish.get() }
-
-                    task.chartName.set(chart.chartName)
-                    task.chartVersion.set(chart.chartVersion)
-                    task.chartFile.set(
-                        project.layout.file(
-                            project.provider {
-                                project.configurations.getByName(chart.packagedArtifactConfigurationName)
-                                    .artifacts.single().file
-                            })
-                    )
-                    task.targetRepository = repository
-                    task.dependsOn(chart)
-                }
-            }
-        }
-    }
-}
+private val namePattern =
+    RuleNamePattern2.parse("helmPublish<Chart>ChartTo<Repo>Repo")
 
 
 /**
@@ -73,4 +22,37 @@ internal class HelmPublishChartToRepositoryTaskRule(
  * @param repositoryName the name of the repository
  */
 internal fun HelmChart.publishToRepositoryTaskName(repositoryName: String) =
-    HelmPublishChartToRepositoryTaskRule.getTaskName(name, repositoryName)
+    namePattern.mapName(name, repositoryName)
+
+
+/**
+ * Rule that creates a task for publishing a given chart to a given repository.
+ */
+internal class HelmPublishChartToRepositoryTaskRule(
+    tasks: TaskContainer,
+    charts: NamedDomainObjectCollection<HelmChart>,
+    repositories: NamedDomainObjectCollection<HelmPublishingRepository>
+) : AbstractTaskRule2<HelmChart, HelmPublishingRepository, HelmPublishChart>(
+    HelmPublishChart::class.java, tasks, charts, repositories, namePattern
+) {
+
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun HelmPublishChart.configureFrom(chart: HelmChart, repository: HelmPublishingRepository) {
+
+        description = "Publishes the ${chart.name} chart to the ${repository.name} repository."
+
+        onlyIf { chart.publishConvention.publish.get() }
+
+        chartName.set(chart.chartName)
+        chartVersion.set(chart.chartVersion)
+        chartFile.set(
+            project.layout.file(
+                project.provider {
+                    project.configurations.getByName(chart.packagedArtifactConfigurationName)
+                        .artifacts.single().file
+                })
+        )
+        targetRepository = repository
+        dependsOn(chart)
+    }
+}

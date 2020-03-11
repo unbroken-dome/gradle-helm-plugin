@@ -4,9 +4,12 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -20,6 +23,18 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * file and extract the missing information from there.
  */
 open class HelmPackage : AbstractHelmCommandTask() {
+
+    internal companion object {
+
+        /**
+         * Returns the name of the packaged chart file, according to the pattern
+         * `<name>-<version>.tgz`.
+         */
+        fun packagedChartFileName(chartName: Provider<String>, chartVersion: Provider<String>): Provider<String> =
+            chartName.flatMap { name ->
+                chartVersion.map { version -> "${name}-${version}.tgz" }
+            }
+    }
 
     /**
      * Set the appVersion on the chart to this version.
@@ -86,14 +101,12 @@ open class HelmPackage : AbstractHelmCommandTask() {
     /**
      * Location to write the chart archive.
      *
-     * Default destination is `helm/charts/` under the project's build directory. This can also be configured
-     * globally using the [HelmExtension.outputDir] property of the
-     * `helm` DSL block.
+     * Default destination is `helm/charts/` under the project's build directory.
      */
     @get:Internal("Represented as part of chartOutputPath")
     val destinationDir: DirectoryProperty =
         project.objects.directoryProperty()
-            .convention(project.helm.outputDir)
+            .convention(project.layout.buildDirectory.dir("helm/charts"))
 
 
     /**
@@ -101,9 +114,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of chartOutputPath")
     val chartFileName: Provider<String> =
-        project.provider {
-            "${chartName.get()}-${chartVersion.get()}.tgz"
-        }
+        packagedChartFileName(chartName, chartVersion)
 
 
     /**

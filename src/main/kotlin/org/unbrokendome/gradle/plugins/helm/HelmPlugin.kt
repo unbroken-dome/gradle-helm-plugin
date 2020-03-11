@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm
 
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
@@ -29,7 +30,7 @@ import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.BuildDependenciesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartPackagedArtifactRule
-import org.unbrokendome.gradle.plugins.helm.rules.FilterSourcesTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.FilterChartSourcesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.MainChartRule
 import org.unbrokendome.gradle.plugins.helm.rules.PackageTaskRule
@@ -115,7 +116,7 @@ class HelmPlugin
         charts.addRule(MainChartRule(project, charts))
 
         project.tasks.run {
-            addRule(FilterSourcesTaskRule(this, charts))
+            addRule(FilterChartSourcesTaskRule(this, charts))
             addRule(BuildDependenciesTaskRule(this, charts))
             addRule(LintTaskRule(this, charts))
             addRule(PackageTaskRule(this, charts))
@@ -167,12 +168,14 @@ class HelmPlugin
     /**
      * Creates and installs the `helm.charts` sub-extension.
      */
-    private fun createChartsExtension(project: Project) =
-        project.helmChartContainer()
+    private fun createChartsExtension(project: Project): NamedDomainObjectContainer<HelmChart> {
+        val helm = project.helm
+        return project.helmChartContainer(baseOutputDir = helm.outputDir)
             .apply {
-                (project.helm as ExtensionAware)
+                (helm as ExtensionAware)
                     .extensions.add(HELM_CHARTS_EXTENSION_NAME, this)
             }
+    }
 
 
     /**

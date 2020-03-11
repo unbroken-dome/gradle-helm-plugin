@@ -47,8 +47,8 @@ class HelmPublishPlugin
 
             project.tasks.run {
                 val repositories = publishingExtension.repositories
-                addRule(HelmPublishChartToRepositoryTaskRule(project, charts, repositories))
-                addRule(HelmPublishChartTaskRule(project, charts, repositories))
+                addRule(HelmPublishChartToRepositoryTaskRule(this, charts, repositories))
+                addRule(HelmPublishChartTaskRule(this, charts, repositories))
             }
 
             createPublishAllTask(project, charts)
