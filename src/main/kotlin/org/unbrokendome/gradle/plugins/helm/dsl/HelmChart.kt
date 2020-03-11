@@ -1,9 +1,11 @@
 package org.unbrokendome.gradle.plugins.helm.dsl
 
+import org.gradle.api.Action
 import org.gradle.api.Buildable
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
@@ -93,6 +95,22 @@ interface HelmChart : Named, Buildable {
     @JvmDefault
     val packageOutputFile: Provider<RegularFile>
         get() = baseOutputDir.flatMap { it.file(packageFileName) }
+
+
+    /**
+     * A [CopySpec] that allows copying additional files into the chart.
+     */
+    val extraFiles: CopySpec
+
+
+    /**
+     * Configures a [CopySpec] that allows copying additional files into the chart.
+     *
+     * @param action an [Action] to configure on the [extraFiles] `CopySpec`
+     */
+    fun extraFiles(action: Action<CopySpec>) {
+        action.execute(extraFiles)
+    }
 }
 
 
@@ -122,7 +140,7 @@ internal interface HelmChartInternal : HelmChart {
 private open class DefaultHelmChart
 @Inject constructor(
     private val name: String,
-    defaultVersion: Provider<String>,
+    project: Project,
     baseOutputDir: Provider<Directory>,
     filteredSourcesBaseDir: Provider<Directory>,
     objects: ObjectFactory
@@ -139,7 +157,7 @@ private open class DefaultHelmChart
 
     final override val chartVersion: Property<String> =
         objects.property<String>()
-            .convention(defaultVersion)
+            .convention(project.versionProvider)
 
 
     final override val sourceDir: DirectoryProperty =
@@ -179,6 +197,9 @@ private open class DefaultHelmChart
                 chartDescriptor
             }
         }
+
+
+    override val extraFiles: CopySpec = project.copySpec()
 }
 
 
@@ -195,7 +216,7 @@ internal fun Project.helmChartContainer(
     container(HelmChart::class.java) { name ->
         objects.newInstance<HelmChart>(
             DefaultHelmChart::class.java, name,
-            this.versionProvider, baseOutputDir, filteredSourcesBaseDir
+            this, baseOutputDir, filteredSourcesBaseDir
         ).also { chart ->
             // The "main" chart should be named like the project by default
             if (name == HELM_MAIN_CHART_NAME) {

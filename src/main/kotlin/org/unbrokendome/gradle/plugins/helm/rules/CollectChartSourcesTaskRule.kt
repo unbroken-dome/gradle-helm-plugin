@@ -54,9 +54,10 @@ internal class CollectChartSourcesTaskRule(
         }
 
         from(chartsProvider) { spec ->
-            includeEmptyDirs = false
             spec.into("charts")
         }
+
+        with(chart.extraFiles)
 
         dependsOn(
             chart.filterSourcesTaskName,
