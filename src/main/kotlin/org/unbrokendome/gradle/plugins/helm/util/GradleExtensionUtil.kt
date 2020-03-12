@@ -7,18 +7,21 @@ import org.gradle.api.plugins.ExtensionAware
 /**
  * Gets the extension of the given name if it exists.
  *
+ * Will return `null` if the receiver is not [ExtensionAware].
+ *
+ * @receiver the object containing extensions
  * @param name the extension name
  * @return the extension, or `null` if it does not exist
- * @throws ClassCastException if the receiver object is not [ExtensionAware]
  */
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> Any.extension(name: String): T? =
-    (this as ExtensionAware).extensions.findByName(name) as T?
+    (this as? ExtensionAware)?.extensions?.findByName(name) as T?
 
 
 /**
  * Gets the extension of the given name, throwing an exception if it does not exist.
  *
+ * @receiver the object containing extensions
  * @param name the extension name
  * @throws ClassCastException if the receiver object is not [ExtensionAware]
  * @throws org.gradle.api.UnknownDomainObjectException if the extension does not exist
@@ -31,6 +34,7 @@ internal fun <T : Any> Any.requiredExtension(name: String): T =
 /**
  * Gets the extension of the given type, throwing an exception if it does not exist.
  *
+ * @receiver the object containing extensions
  * @param <T> the extension type
  * @throws ClassCastException if the receiver object is not [ExtensionAware]
  * @throws org.gradle.api.UnknownDomainObjectException if the extension does not exist
@@ -42,6 +46,7 @@ internal inline fun <reified T : Any> Any.requiredExtension(): T =
 /**
  * Gets the convention of the given type, throwing an exception if it does not exist.
  *
+ * @receiver the object containing conventions
  * @param <T> the convention type
  * @throws ClassCastException if the receiver object does not support conventions
  * @throws org.gradle.api.UnknownDomainObjectException if the convention does not exist

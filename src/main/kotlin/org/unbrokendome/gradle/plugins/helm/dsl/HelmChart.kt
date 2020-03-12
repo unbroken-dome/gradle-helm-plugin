@@ -122,6 +122,11 @@ internal interface HelmChartInternal : HelmChart {
     val filteredSourcesDir: Provider<Directory>
 
     /**
+     * The directory where the resolved dependencies (subcharts) of the chart will be placed.
+     */
+    val dependenciesDir: Provider<Directory>
+
+    /**
      * The chart descriptor, as parsed from the Chart.yaml file.
      */
     val chartDescriptor: Provider<ChartDescriptor>
@@ -143,6 +148,7 @@ private open class DefaultHelmChart
     project: Project,
     baseOutputDir: Provider<Directory>,
     filteredSourcesBaseDir: Provider<Directory>,
+    dependenciesBaseDir: Provider<Directory>,
     objects: ObjectFactory
 ) : HelmChart, HelmChartInternal {
 
@@ -185,6 +191,10 @@ private open class DefaultHelmChart
         filteredSourcesBaseDir.flatMap { it.dir(chartName) }
 
 
+    override val dependenciesDir: Provider<Directory> =
+        dependenciesBaseDir.flatMap { it.dir(chartName) }
+
+
     final override val chartDescriptor: Provider<ChartDescriptor> =
         ChartDescriptorYaml.loading(sourceDir.file("Chart.yaml"))
 
@@ -211,12 +221,13 @@ private open class DefaultHelmChart
  */
 internal fun Project.helmChartContainer(
     baseOutputDir: Provider<Directory>,
-    filteredSourcesBaseDir: Provider<Directory>
+    filteredSourcesBaseDir: Provider<Directory>,
+    dependenciesBaseDir: Provider<Directory>
 ): NamedDomainObjectContainer<HelmChart> =
     container(HelmChart::class.java) { name ->
         objects.newInstance<HelmChart>(
             DefaultHelmChart::class.java, name,
-            this, baseOutputDir, filteredSourcesBaseDir
+            this, baseOutputDir, filteredSourcesBaseDir, dependenciesBaseDir
         ).also { chart ->
             // The "main" chart should be named like the project by default
             if (name == HELM_MAIN_CHART_NAME) {

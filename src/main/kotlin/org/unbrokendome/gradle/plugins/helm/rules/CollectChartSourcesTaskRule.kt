@@ -37,23 +37,12 @@ internal class CollectChartSourcesTaskRule(
 
         group = HELM_GROUP
         description = "Collects all sources for the ${chart.name} chart."
+        includeEmptyDirs = false
 
         into(chart.outputDir.asFile())
         from((chart as HelmChartInternal).filteredSourcesDir.asFile())
 
-        val chartDependencyConfiguration = project.configurations.getByName(chart.dependenciesConfigurationName)
-        includeEmptyDirs = false
-
-        // Construct a FileCollection provider that extracts all the packaged charts from dependencies
-        val chartsProvider = project.provider {
-            chartDependencyConfiguration.resolve().asSequence()
-                .map { project.tarTree(it) }
-                // Make sure we have at least an empty FileCollection, otherwise reduce() will throw
-                .ifEmpty { sequenceOf(project.files()) }
-                .reduce { it1, it2 -> it1.plus(it2) }
-        }
-
-        from(chartsProvider) { spec ->
+        from(chart.dependenciesDir) { spec ->
             spec.into("charts")
         }
 
@@ -61,7 +50,7 @@ internal class CollectChartSourcesTaskRule(
 
         dependsOn(
             chart.filterSourcesTaskName,
-            chartDependencyConfiguration
+            chart.collectDependenciesTaskName
         )
 
         // Preserve any .lock files placed by helm dep build or helm dep up

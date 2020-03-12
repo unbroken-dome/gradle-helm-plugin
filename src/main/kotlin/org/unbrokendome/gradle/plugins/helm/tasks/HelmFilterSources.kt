@@ -17,11 +17,9 @@ import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
 import org.unbrokendome.gradle.plugins.helm.dsl.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.util.AbstractYamlTransformingReader
-import org.unbrokendome.gradle.plugins.helm.util.YamlPath
+import org.unbrokendome.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
-import java.io.Reader
 import java.util.Objects
 
 
@@ -132,12 +130,9 @@ open class HelmFilterSources : DefaultTask() {
     private fun CopySpec.applyChartInfoOverrides() {
         if (overrideChartInfo.get()) {
             filesMatching("Chart.yaml") { details ->
-                details.filter(
-                    mapOf("overrides" to mapOf(
-                        "name" to chartName.get(),
-                        "version" to chartVersion.get()
-                    )),
-                    YamlOverrideFilterReader::class.java
+                details.filterYaml(
+                    "name" to chartName.get(),
+                    "version" to chartVersion.get()
                 )
             }
         }
@@ -168,27 +163,5 @@ open class HelmFilterSources : DefaultTask() {
                 }
             }
         }
-    }
-
-
-    /**
-     * A [java.io.FilterReader] that modifies a given YAML file by overriding specific values.
-     *
-     * Overridden values must be provided by setting the `overrides` property.
-     *
-     * Any values that are already present in the source and have corresponding entries in [overrides] will be
-     * overridden in-place with the new values. Entries in [overrides] that do not appear in the original source
-     * will be appended at the end.
-     *
-     * Note: Properties of this class must be `lateinit var` because they are injected by Gradle's
-     * [org.gradle.api.file.ContentFilterable.filter] method.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    internal class YamlOverrideFilterReader(input: Reader) : AbstractYamlTransformingReader(input) {
-
-        var overrides: Map<String, Any> = emptyMap()
-
-        override fun transformScalar(path: YamlPath, value: String): String? =
-            overrides[path.toString()]?.toString()
     }
 }

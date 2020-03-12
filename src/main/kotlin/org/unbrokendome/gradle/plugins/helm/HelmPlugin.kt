@@ -31,6 +31,7 @@ import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDependenciesConfigurationRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartPackagedArtifactRule
+import org.unbrokendome.gradle.plugins.helm.rules.CollectChartDependenciesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.CollectChartSourcesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.FilterChartSourcesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
@@ -120,8 +121,8 @@ class HelmPlugin
         charts.addRule(MainChartRule(this, charts))
 
         listOf(
-            ::FilterChartSourcesTaskRule, ::CollectChartSourcesTaskRule, ::UpdateDependenciesTaskRule,
-            ::LintTaskRule, ::PackageTaskRule
+            ::FilterChartSourcesTaskRule, ::CollectChartDependenciesTaskRule, ::CollectChartSourcesTaskRule,
+            ::UpdateDependenciesTaskRule, ::LintTaskRule, ::PackageTaskRule
         ).forEach { ruleCreator ->
             tasks.addRule(ruleCreator(tasks, charts))
         }
@@ -176,7 +177,8 @@ class HelmPlugin
 
         return helmChartContainer(
                 baseOutputDir = helm.outputDir,
-                filteredSourcesBaseDir = helm.tmpDir.dir("filtered")
+                filteredSourcesBaseDir = helm.tmpDir.dir("filtered"),
+                dependenciesBaseDir = helm.tmpDir.dir("dependencies")
             )
             .apply {
                 (helm as ExtensionAware)
