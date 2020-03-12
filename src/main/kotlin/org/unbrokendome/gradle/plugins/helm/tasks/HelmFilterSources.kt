@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.putFrom
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
@@ -19,7 +20,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.util.AbstractYamlTransformingReader
 import org.unbrokendome.gradle.plugins.helm.util.YamlPath
 import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.putFrom
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
 import java.io.Reader
 import java.util.Objects

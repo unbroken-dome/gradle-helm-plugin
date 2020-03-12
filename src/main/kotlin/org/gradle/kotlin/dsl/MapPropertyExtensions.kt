@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.util
+package org.gradle.kotlin.dsl
 
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
@@ -13,5 +13,5 @@ import org.gradle.api.provider.Provider
  * @param key the key
  * @param providerOfValue the provider of the value
  */
-internal fun <K : Any, V : Any> MapProperty<K, V>.putFrom(key: K, providerOfValue: Provider<out V>) =
+fun <K : Any, V : Any> MapProperty<K, V>.putFrom(key: K, providerOfValue: Provider<out V>) =
     put(key, providerOfValue)
