@@ -1,10 +1,15 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.Task
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.withLockFile
 import java.time.Duration
 
 
@@ -14,6 +19,21 @@ import java.time.Duration
  * Corresponds to the `helm repo update` CLI command.
  */
 open class HelmUpdateRepositories : AbstractHelmCommandTask() {
+
+    /**
+     * The names of configured repositories.
+     */
+    @get:Internal
+    val repositoryNames: ListProperty<String> =
+        project.objects.listProperty()
+
+
+    /**
+     * Lock file to synchronize multiple [HelmUpdateRepositories] tasks that access the same cache directory.
+     */
+    private val taskSyncLockFile: Provider<RegularFile> =
+        repositoryCacheDir.file("gradle-helm-update.lock")
+
 
     /**
      * Defines how long the repository cache is considered up-to-date after it was last written.
@@ -30,19 +50,45 @@ open class HelmUpdateRepositories : AbstractHelmCommandTask() {
 
 
     init {
-        inputs.file(repositoryConfigFile)
-            .withPropertyName("repositoryConfigFile")
-            .optional().skipWhenEmpty()
-        outputs.dir(repositoryCacheDir)
-            .withPropertyName("repositoryCacheDir")
-            .optional()
+        // skip the task if we don't have any repositories configured in the project
+        onlyIf { !repositoryNames.orNull.isNullOrEmpty() }
 
+        // declare the repositories.yaml file as a skip-when-empty input, so we get a
+        // "no source" result if it doesn't exist (better than "up to date")
+        inputs.files(repositoryConfigFile)
+            .withPropertyName("repositoryConfigFile")
+            .skipWhenEmpty()
 
         outputs.upToDateWhen { task -> checkUpToDate(task) }
     }
 
 
+    @TaskAction
+    fun updateRepositories() {
+
+        val lockFile = this.taskSyncLockFile.get().asFile
+        withLockFile(lockFile) {
+
+            // Do the up-to-date check again, it might be that another task operating on the
+            // same cache directory updated it in the meantime
+            if (checkUpToDate(this)) {
+                didWork = false
+
+            } else {
+                execHelm("repo", "update")
+            }
+        }
+    }
+
+
     private fun checkUpToDate(task: Task): Boolean {
+
+        val repositoryConfigFile = project.file(this.repositoryConfigFile)
+        if (!repositoryConfigFile.exists()) {
+            // this should usually not happen, but better to check to avoid an exception later
+            logger.debug("{} is up-to-date because the repository config file does not exist.", task)
+            return true
+        }
 
         val repositoryCacheDir = project.file(this.repositoryCacheDir)
         if (!repositoryCacheDir.isDirectory) {
@@ -55,22 +101,39 @@ open class HelmUpdateRepositories : AbstractHelmCommandTask() {
             return false
         }
 
-        val minLastModTime = System.currentTimeMillis() - repositoryCacheTtl.get().toMillis()
-        val outdatedCacheFiles = repositoryCacheDir.listFiles { file -> file.lastModified() < minLastModTime }.orEmpty()
+        val filesToCheck = this.repositoryNames.get().asSequence()
+            .flatMap { sequenceOf("${it}-charts.txt", "${it}-index.yaml") }
+            .map { repositoryCacheDir.resolve(it) }
+            .toList()
 
-        if (outdatedCacheFiles.any()) {
-            logger.debug("{} is not up-to-date because the following repository cache files are outdated: {}",
-            task, outdatedCacheFiles.contentToString()
-            )
+        val (existingFiles, nonExistingFiles) = filesToCheck.partition { it.exists() }
+        if (nonExistingFiles.any()) {
+            if (logger.isDebugEnabled) {
+                logger.debug(
+                    "{} is not up-to-date because the following repository cache files are not present: {}",
+                    task, nonExistingFiles.map { it.name }
+                )
+            }
+            return false
+        }
+
+        // Find any cache files that are either older than the config file,
+        // or have been around for longer than the cache TTL
+        val minLastModTime = maxOf(
+            System.currentTimeMillis() - repositoryCacheTtl.get().toMillis(),
+            repositoryConfigFile.lastModified()
+        )
+        val outdatedFiles = existingFiles.filter { it.lastModified() < minLastModTime }
+        if (outdatedFiles.any()) {
+            if (logger.isDebugEnabled) {
+                logger.debug(
+                    "{} is not up-to-date because the following repository cache files are outdated: {}",
+                    task, outdatedFiles.map { it.name }
+                )
+            }
             return false
         }
 
         return true
-    }
-
-
-    @TaskAction
-    fun updateRepositories() {
-        execHelm("repo", "update")
     }
 }

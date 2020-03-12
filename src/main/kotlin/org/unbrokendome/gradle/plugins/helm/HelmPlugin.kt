@@ -89,6 +89,7 @@ class HelmPlugin
         val updateRepositoriesTask =
             project.tasks.register(updateRepositoriesTaskName, HelmUpdateRepositories::class.java) { task ->
                 task.dependsOn(addRepositoriesTask)
+                task.repositoryNames.set(project.provider { repositories.names })
             }
 
         // helm install/upgrade tasks that reference a symbolic repository name should depend on

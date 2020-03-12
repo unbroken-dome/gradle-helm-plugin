@@ -176,7 +176,7 @@ private open class DefaultHelmExtension
         objects.directoryProperty()
             .convention(
                 project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true)
-                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/config"))
+                    .orElse(project.layout.buildDirectory.dir("helm/data"))
             )
 
 
@@ -184,7 +184,7 @@ private open class DefaultHelmExtension
         objects.directoryProperty()
             .convention(
                 project.dirProviderFromProjectProperty("helm.xdgConfigHome", evaluateGString = true)
-                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/config"))
+                    .orElse(project.layout.buildDirectory.dir("helm/config"))
             )
 
 
