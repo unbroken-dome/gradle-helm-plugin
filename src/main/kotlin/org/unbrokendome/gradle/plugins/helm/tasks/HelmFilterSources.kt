@@ -15,12 +15,9 @@ import org.gradle.kotlin.dsl.putFrom
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
-import org.unbrokendome.gradle.plugins.helm.dsl.filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
-import java.util.Objects
 
 
 private val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
@@ -98,12 +95,22 @@ open class HelmFilterSources : DefaultTask() {
      * Settings that control filtering of the chart sources.
      */
     @get:Nested
-    val filtering: Filtering = project.objects.createFiltering(parent = project.helm.filtering)
+    val filtering: Filtering = project.createFiltering()
         .apply {
             values.putFrom("chartName", chartName)
             values.putFrom("chartVersion", chartVersion)
             values.putFrom("projectVersion", project.versionProvider)
         }
+
+
+    init {
+        val fileValues = filtering.fileValues
+        inputs.files(
+            fileValues.keySet().map { keys ->
+                keys.map { fileValues.getting(it) }
+            }
+        )
+    }
 
 
     /**
@@ -145,22 +152,14 @@ open class HelmFilterSources : DefaultTask() {
     private fun CopySpec.applyFiltering() {
         if (filtering.enabled.get()) {
 
-            // the regex to match placeholders inside the files
-            val regex = Regex(
-                Regex.escape(filtering.placeholderPrefix.get()) +
-                        "(.*?)" +
-                        Regex.escape(filtering.placeholderSuffix.get())
-            )
-
             val values = filtering.values.get()
+            val valuesFromFiles = filtering.fileValues.get()
+                .mapValues { (_, value) ->
+                    project.files(value).singleFile.readText()
+                }
 
             filesMatching(FilteredFilePatterns) { details ->
-                details.filter { line ->
-                    line.replace(regex) { matchResult ->
-                        val key = matchResult.groupValues[1]
-                        Objects.toString(values[key])
-                    }
-                }
+                details.expand(valuesFromFiles + values)
             }
         }
     }

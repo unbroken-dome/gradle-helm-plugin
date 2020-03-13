@@ -24,6 +24,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.lint
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.contains
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsItem
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.dirValue
@@ -31,6 +32,7 @@ import org.unbrokendome.gradle.plugins.helm.testutil.assertions.doesNotContainIt
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.taskDependencies
+import org.unbrokendome.gradle.plugins.helm.testutil.directory
 
 
 class HelmPluginChartsTest : AbstractGradleProjectTest() {
@@ -83,14 +85,14 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Chart's filtering should inherit from global filtering`() {
         addChart()
         with(project.helm.filtering) {
-            placeholderPrefix.set("_O_o_")
+            this.values.put("foo", "bar")
         }
 
         assertThat(this::helmCharts)
             .containsItem("myChart")
             .hasExtension<Filtering>("filtering")
-            .prop(Filtering::placeholderPrefix).isPresent()
-            .isEqualTo("_O_o_")
+            .prop(Filtering::values)
+            .contains("foo", "bar")
     }
 
 
@@ -171,6 +173,12 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
         project.version = "2.5.9"
 
         evaluateProject()
+
+        directory(project.projectDir) {
+            directory("src/main/helm") {
+
+            }
+        }
 
         assertThat(this::helmCharts)
             .containsItem("main")

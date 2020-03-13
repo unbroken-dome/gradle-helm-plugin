@@ -42,7 +42,6 @@ import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
 import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.toUri
@@ -62,7 +61,7 @@ class HelmPlugin
         project.plugins.apply(HelmCommandsPlugin::class.java)
 
         configureRepositories(project)
-        project.createFilteringExtension()
+        project.configureFiltering()
         project.configureCharts()
     }
 
@@ -127,7 +126,7 @@ class HelmPlugin
             tasks.addRule(ruleCreator(tasks, charts))
         }
 
-        tasks.create("helmPackage") { task ->
+        tasks.register("helmPackage") { task ->
             task.group = HELM_GROUP
             task.description = "Packages all Helm charts."
             task.dependsOn(TaskDependency {
@@ -190,22 +189,11 @@ class HelmPlugin
     /**
      * Creates and installs the `helm.filtering` sub-extension.
      */
-    private fun Project.createFilteringExtension() =
-        objects.createFiltering()
-            .apply {
-                enabled.set(
-                    booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true)
-                )
-                placeholderPrefix.set(
-                    providerFromProjectProperty("helm.filtering.placeholderPrefix", defaultValue = "\${")
-                )
-                placeholderSuffix.set(
-                    providerFromProjectProperty("helm.filtering.placeholderSuffix", defaultValue = "}")
-                )
-
-                (helm as ExtensionAware)
-                    .extensions.add(Filtering::class.java, HELM_FILTERING_EXTENSION_NAME, this)
-            }
+    private fun Project.configureFiltering() {
+        val filtering = createFiltering()
+        (helm as ExtensionAware).extensions
+            .add(Filtering::class.java, HELM_FILTERING_EXTENSION_NAME, filtering)
+    }
 
 
     /**
@@ -215,7 +203,7 @@ class HelmPlugin
      * @param project the current Gradle [Project]
      */
     private fun HelmChart.createExtensions(project: Project) {
-        createFilteringExtension(project.objects, project.helm)
+        createFilteringExtension(project, project.helm)
         createLintingExtension(project.objects, project.helm)
         createDependenciesExtension(project)
     }
@@ -225,15 +213,15 @@ class HelmPlugin
      * Creates and installs the `filtering` extension on a [HelmChart].
      *
      * @receiver the [HelmChart] on which to install the extension
-     * @param objectFactory the current project's [ObjectFactory]
+     * @param project the current Gradle [Project]
      * @param helmExtension the global [HelmExtension] (used to inherit values)
      */
-    private fun HelmChart.createFilteringExtension(objectFactory: ObjectFactory, helmExtension: HelmExtension) {
+    private fun HelmChart.createFilteringExtension(project: Project, helmExtension: HelmExtension) {
         (this as ExtensionAware).extensions
             .add(
                 Filtering::class.java,
-                "filtering",
-                objectFactory.createFiltering(parent = helmExtension.filtering)
+                HELM_FILTERING_EXTENSION_NAME,
+                project.createFiltering(parent = helmExtension.filtering)
             )
     }
 
@@ -249,7 +237,7 @@ class HelmPlugin
         (this as ExtensionAware).extensions
             .add(
                 Linting::class.java,
-                "lint",
+                HELM_LINT_EXTENSION_NAME,
                 objectFactory.createLinting(parent = helmExtension.lint)
             )
     }
@@ -265,7 +253,7 @@ class HelmPlugin
         (this as ExtensionAware).extensions
             .add(
                 ChartDependencyHandler::class.java,
-                "dependencies",
+                HELM_DEPENDENCIES_EXTENSION_NAME,
                 createChartDependencyHandler(this, project)
             )
     }
