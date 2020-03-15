@@ -15,7 +15,9 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
-import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -25,13 +27,12 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * Runs a series of tests to verify that a chart is well-formed.
  * Corresponds to the `helm lint` CLI command.
  */
-open class HelmLint : AbstractHelmCommandTask() {
+open class HelmLint : AbstractHelmCommandTask(), HelmValueOptions {
 
     /**
      * The directory that contains the sources for the Helm chart.
      */
     @get:[InputDirectory SkipWhenEmpty]
-    @Suppress("LeakingThis")
     val chartDir: DirectoryProperty =
         project.objects.directoryProperty()
 
@@ -51,7 +52,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      * `--set` option (for all other types).
      */
     @get:Input
-    val values: MapProperty<String, Any> =
+    final override val values: MapProperty<String, Any> =
         project.objects.mapProperty()
 
 
@@ -67,7 +68,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
      */
     @get:Input
-    val fileValues: MapProperty<String, Any> =
+    final override val fileValues: MapProperty<String, Any> =
         project.objects.mapProperty()
 
 
@@ -79,7 +80,7 @@ open class HelmLint : AbstractHelmCommandTask() {
      * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     @get:InputFiles
-    val valueFiles: ConfigurableFileCollection =
+    final override val valueFiles: ConfigurableFileCollection =
         project.objects.fileCollection()
 
 
@@ -108,7 +109,6 @@ open class HelmLint : AbstractHelmCommandTask() {
 
         execHelm("lint") {
             flag("--strict", strict)
-            valuesOptions(values, fileValues, valueFiles)
             args(chartDir)
         }
 
@@ -116,4 +116,8 @@ open class HelmLint : AbstractHelmCommandTask() {
             GFileUtils.touch(it.asFile)
         }
     }
+
+
+    override val execProviderSupport: HelmExecProviderSupport
+        get() = super.execProviderSupport.addOptionsApplier(HelmValueOptionsApplier)
 }

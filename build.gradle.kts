@@ -24,6 +24,7 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
     implementation("org.yaml:snakeyaml:1.25")
+    implementation("org.json:json:20190722")
     implementation("org.apache.httpcomponents:httpclient:4.5.6")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")

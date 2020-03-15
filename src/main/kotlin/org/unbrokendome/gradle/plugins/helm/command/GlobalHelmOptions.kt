@@ -4,12 +4,13 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
+import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 
 
 /**
  * Holds options that apply to all Helm commands.
  */
-interface GlobalHelmOptions {
+interface GlobalHelmOptions : HelmOptions {
 
     /**
      * The name or path of the Helm executable. The `PATH` variable is taken into account, so this
@@ -73,4 +74,28 @@ interface GlobalHelmOptions {
      * Path to the file containing repository names and URLs.
      */
     val repositoryConfigFile: RegularFileProperty
+}
+
+
+
+internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
+
+    override fun apply(spec: HelmExecSpec, options: HelmOptions) {
+        if (options is GlobalHelmOptions) {
+            with(spec) {
+                withExecSpec {
+                    executable = options.executable.getOrElse("helm")
+
+                    options.extraArgs.ifPresent { extraArgs ->
+                        args(extraArgs)
+                    }
+                }
+                flag("--debug", options.debug)
+
+                environment("XDG_DATA_HOME", options.xdgDataHome)
+                environment("XDG_CONFIG_HOME", options.xdgConfigHome)
+                environment("XDG_CACHE_HOME", options.xdgCacheHome)
+            }
+        }
+    }
 }

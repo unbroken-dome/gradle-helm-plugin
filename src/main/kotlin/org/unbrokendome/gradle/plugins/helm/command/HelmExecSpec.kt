@@ -1,7 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.Action
-import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.process.ExecSpec
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
@@ -126,29 +125,17 @@ interface HelmExecSpec {
 
 
 /**
- * Default implementation of [HelmExecSpec].
- *
- * Uses Gradle's [Project.exec] to invoke the Helm CLI.
+ * Default implementation of [HelmExecSpec], based on a Gradle [ExecSpec].
  */
 internal class DefaultHelmExecSpec(
     private val execSpec: ExecSpec,
-    globalOptions: GlobalHelmOptions,
     command: String,
     subcommand: String?
 ) : HelmExecSpec {
 
-
     init {
-        execSpec.executable = globalOptions.executable.getOrElse("helm")
-
         execSpec.args(command)
         subcommand?.let { execSpec.args(it) }
-
-        flag("--debug", globalOptions.debug)
-
-        environment("XDG_DATA_HOME", globalOptions.xdgDataHome)
-        environment("XDG_CONFIG_HOME", globalOptions.xdgConfigHome)
-        environment("XDG_CACHE_HOME", globalOptions.xdgCacheHome)
     }
 
 

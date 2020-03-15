@@ -6,23 +6,16 @@ import org.gradle.api.Action
 /**
  * Returns a new action that executes this action and then another action.
  *
- * @receiver the first action to execute
- * @param other the other action to execute
- * @return the combined action
+ * @receiver the first action to execute, `null` is interpreted as an empty action
+ * @param other the other action to execute, `null` is interpreted as an empty action
+ * @return the combined action, or `null` if both input actions are `null`
  */
-internal fun <T> Action<T>.andThen(other: Action<T>): Action<T> =
-    Action {
-        this.execute(it)
-        other.execute(it)
+internal fun <T> Action<T>?.andThen(other: Action<T>?): Action<T>? =
+    when {
+        this == null -> other
+        other == null -> this
+        else -> Action {
+            this.execute(it)
+            other.execute(it)
+        }
     }
-
-
-/**
- * Returns a new action that executes this action and then another action.
- *
- * @receiver the first action to execute
- * @param other the other action to execute
- * @return the combined action
- */
-internal fun <T> Action<T>.andThen(other: T.() -> Unit): Action<T> =
-    andThen(Action(other))

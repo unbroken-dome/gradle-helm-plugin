@@ -19,9 +19,6 @@ class HelmTest : AbstractHelmServerCommandTask() {
         project.objects.property()
 
 
-
-
-
     @TaskAction
     fun test() {
         execHelm("test") {

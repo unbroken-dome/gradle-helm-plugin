@@ -5,16 +5,17 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.toHelmString
 import java.time.Duration
 
 
 /**
  * Base class for tasks representing Helm CLI commands that communicate with the remote Kubernetes cluster.
  */
-abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
+abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), HelmServerOptions {
 
     /**
      * Path to the Kubernetes configuration file.
@@ -23,7 +24,7 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      * Helm invocation.
      */
     @get:[Input Optional]
-    val kubeConfig: RegularFileProperty =
+    final override val kubeConfig: RegularFileProperty =
         project.objects.fileProperty()
 
 
@@ -33,7 +34,7 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      * Corresponds to the `--kube-context` command line option in the Helm CLI.
      */
     @get:[Input Optional]
-    val kubeContext: Property<String> =
+    final override val kubeContext: Property<String> =
         project.objects.property()
 
 
@@ -43,7 +44,7 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      * Corresponds to the `--timeout` command line option in the Helm CLI.
      */
     @get:Internal
-    val remoteTimeout: Property<Duration> =
+    final override val remoteTimeout: Property<Duration> =
         project.objects.property()
 
 
@@ -53,14 +54,10 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask() {
      * Corresponds to the `--namespace` CLI parameter.
      */
     @get:Internal
-    val namespace: Property<String> =
+    final override val namespace: Property<String> =
         project.objects.property()
 
 
-    override fun modifyHelmExecSpec(exec: HelmExecSpec) = exec.run {
-        option("--kube-context", kubeContext)
-        option("--namespace", namespace)
-        option("--timeout", remoteTimeout.map { it.toHelmString() })
-        environment("KUBECONFIG", kubeConfig)
-    }
+    override val execProviderSupport: HelmExecProviderSupport
+        get() = super.execProviderSupport.withOptionsApplier(HelmServerOptionsApplier)
 }

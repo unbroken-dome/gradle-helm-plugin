@@ -1,9 +1,7 @@
-package org.unbrokendome.gradle.plugins.helm.command.tasks
+package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.Directory
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -12,23 +10,15 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import java.io.File
 import java.net.URI
 
 
-abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTask(), HelmInstallationOptions {
+internal interface HelmInstallationOptions : HelmServerOptions {
 
     /**
      * Release name.
      */
-    @get:Input
-    final override val releaseName: Property<String> =
-        project.objects.property()
+    val releaseName: Property<String>
 
 
     /**
@@ -40,34 +30,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * - absolute URL: e.g. `https://example.com/charts/nginx-1.2.3.tgz`
      * - simple chart reference, e.g. `mariadb` (you must also set the [repository] property in this case)
      */
-    @get:Input
-    final override val chart: Property<String> =
-        project.objects.property()
-
-
-    /**
-     * Sets the chart to be installed. The value can be any of the forms accepted by the Helm CLI.
-     *
-     * This is a convenience method that can be used instead of setting the [chart] property directly.
-     *
-     * The following argument types are accepted:
-     *
-     * - A chart reference (`String`): e.g. `stable/mariadb`.
-     * - A path to a packaged chart (`String`, [File], [RegularFile])
-     * - A path to an unpacked chart directory (`String`, [File], [Directory])
-     * - An absolute URL (`String`, [URI]): e.g. `https://example.com/charts/nginx-1.2.3.tgz`
-     * - A simple chart reference (`String`), e.g. `mariadb`.
-     *   Note that you must also set the [repository] property in this case.
-     * - a [Provider] of any of the above.
-     *
-     */
-    fun from(chart: Any) {
-        if (chart is Provider<*>) {
-            this.chart.set(chart.map { it.toString() })
-        } else {
-            this.chart.set(chart.toString())
-        }
-    }
+    val chart: Property<String>
 
 
     /**
@@ -76,8 +39,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--atomic` Helm CLI parameter.
      */
     @get:Internal
-    final override val atomic: Property<Boolean> =
-        project.objects.property()
+    val atomic: Property<Boolean>
 
 
     /**
@@ -86,8 +48,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--ca-file` CLI parameter.
      */
     @get:Internal
-    final override val caFile: RegularFileProperty =
-        project.objects.fileProperty()
+    val caFile: RegularFileProperty
 
 
     /**
@@ -96,8 +57,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--cert-file` CLI parameter.
      */
     @get:Internal
-    final override val certFile: RegularFileProperty =
-        project.objects.fileProperty()
+    val certFile: RegularFileProperty
 
 
     /**
@@ -107,9 +67,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--devel` CLI parameter.
      */
     @get:Input
-    final override val devel: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(false)
+    val devel: Property<Boolean>
 
 
     /**
@@ -118,8 +76,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--dry-run` CLI parameter.
      */
     @get:Internal
-    final override val dryRun: Property<Boolean> =
-        project.objects.property()
+    val dryRun: Property<Boolean>
 
 
     /**
@@ -128,8 +85,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--key-file` CLI parameter.
      */
     @get:Internal
-    final override val keyFile: RegularFileProperty =
-        project.objects.fileProperty()
+    val keyFile: RegularFileProperty
 
 
     /**
@@ -138,8 +94,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--no-hooks` CLI parameter.
      */
     @get:Internal
-    final override val noHooks: Property<Boolean> =
-        project.objects.property()
+    val noHooks: Property<Boolean>
 
 
     /**
@@ -148,8 +103,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--password` CLI parameter.
      */
     @get:Internal
-    final override val password: Property<String> =
-        project.objects.property()
+    val password: Property<String>
 
 
     /**
@@ -160,8 +114,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Use this when the [chart] property contains only a simple chart reference, without a symbolic repository name.
      */
     @get:[Input Optional]
-    final override val repository: Property<URI> =
-        project.objects.property()
+    val repository: Property<URI>
 
 
     /**
@@ -170,8 +123,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--username` CLI parameter.
      */
     @get:Internal
-    final override val username: Property<String> =
-        project.objects.property()
+    val username: Property<String>
 
 
     /**
@@ -181,8 +133,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * `--set` option (for all other types).
      */
     @get:Input
-    final override val values: MapProperty<String, Any> =
-        project.objects.mapProperty()
+    val values: MapProperty<String, Any>
 
 
     /**
@@ -197,8 +148,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
      */
     @get:Input
-    final override val fileValues: MapProperty<String, Any> =
-        project.objects.mapProperty()
+    val fileValues: MapProperty<String, Any>
 
 
     /**
@@ -209,8 +159,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     @get:InputFiles
-    final override val valueFiles: ConfigurableFileCollection =
-        project.objects.fileCollection()
+    val valueFiles: ConfigurableFileCollection
 
 
     /**
@@ -219,8 +168,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--verify` CLI parameter.
      */
     @get:Internal
-    final override val verify: Property<Boolean> =
-        project.objects.property()
+    val verify: Property<Boolean>
 
 
     /**
@@ -229,8 +177,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * Corresponds to the `--version` Helm CLI parameter.
      */
     @get:Internal
-    final override val version: Property<String> =
-        project.objects.property()
+    val version: Property<String>
 
 
     /**
@@ -238,19 +185,36 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * state before marking the release as successful. It will wait for as along as [remoteTimeout].
      */
     @get:Internal
-    final override val wait: Property<Boolean> =
-        project.objects.property()
+    val wait: Property<Boolean>
+}
 
 
-    init {
-        inputs.files(
-            fileValues.keySet().map { keys ->
-                keys.map { fileValues.getting(it) }
+internal object HelmInstallationOptionsApplier : HelmOptionsApplier {
+
+    override fun apply(spec: HelmExecSpec, options: HelmOptions) {
+        if (options is HelmInstallationOptions) {
+            with(spec) {
+
+                args(options.releaseName)
+                args(options.chart)
+
+                flag("--atomic", options.atomic)
+                option("--ca-file", options.caFile)
+                option("--cert-file", options.certFile)
+                flag("--devel", options.devel)
+                flag("--dry-run", options.dryRun)
+                option("--key-file", options.keyFile)
+                flag("--no-hooks", options.noHooks)
+                option("--password", options.password)
+                option("--repo", options.repository)
+                option("--username", options.username)
+                flag("--verify", options.verify)
+                option("--version", options.version)
+                flag("--wait", options.wait)
             }
-        )
+        }
     }
 
-
-    override val execProviderSupport: HelmExecProviderSupport
-        get() = super.execProviderSupport.withOptionsApplier(HelmInstallationOptionsApplier)
+    override val implies: List<HelmOptionsApplier>
+        get() = listOf(HelmValueOptionsApplier)
 }

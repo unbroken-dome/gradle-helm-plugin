@@ -11,8 +11,10 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
+import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecResult
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
@@ -110,14 +112,10 @@ internal interface HelmExtensionInternal : HelmExtension {
 
 private open class DefaultHelmExtension
 @Inject constructor(
-    project: Project,
+    private val project: Project,
     objects: ObjectFactory,
     layout: ProjectLayout
 ) : HelmExtension, HelmExtensionInternal {
-
-    @Suppress("LeakingThis")
-    private val execProviderSupport = HelmExecProviderSupport(project, this)
-
 
     final override val executable: Property<String> =
         objects.property<String>()
@@ -213,6 +211,16 @@ private open class DefaultHelmExtension
 
     final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =
         execProviderSupport.execHelm(command, subcommand, action)
+
+
+    final override fun execHelmCaptureOutput(
+        command: String, subcommand: String?, action: Action<HelmExecSpec>?
+    ): HelmExecResult =
+        execProviderSupport.execHelmCaptureOutput(command, subcommand, action)
+
+
+    private val execProviderSupport: HelmExecProviderSupport
+        get() = HelmExecProviderSupport(project, this, GlobalHelmOptionsApplier)
 }
 
 
