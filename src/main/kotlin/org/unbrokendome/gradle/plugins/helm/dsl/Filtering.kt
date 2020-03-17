@@ -7,7 +7,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import javax.inject.Inject
@@ -57,27 +56,23 @@ internal interface FilteringInternal : Filtering, Hierarchical<Filtering>
  */
 private open class DefaultFiltering
 @Inject constructor(
-    project: Project
+    objects: ObjectFactory
 ) : FilteringInternal {
 
     final override val enabled: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(
-                project.booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true)
-                    .orElse(true)
-            )
+        objects.property()
 
 
     final override val values: MapProperty<String, Any> =
-        project.objects.mapProperty<String, Any>().empty()
+        objects.mapProperty<String, Any>().empty()
 
 
     final override val fileValues: MapProperty<String, Any> =
-        project.objects.mapProperty<String, Any>().empty()
+        objects.mapProperty<String, Any>().empty()
 
 
     final override fun setParent(parent: Filtering) {
-        enabled.set(parent.enabled)
+        enabled.convention(parent.enabled)
         values.putAll(parent.values)
         fileValues.putAll(parent.fileValues)
     }
@@ -91,8 +86,8 @@ private open class DefaultFiltering
  * @param parent the optional parent [Filtering] object
  * @return the created [Filtering] object
  */
-internal fun Project.createFiltering(parent: Filtering? = null): Filtering =
-    objects.newInstance(DefaultFiltering::class.java, this)
+internal fun ObjectFactory.createFiltering(parent: Filtering? = null): Filtering =
+    newInstance(DefaultFiltering::class.java)
         .apply {
             parent?.let(this::setParent)
         }

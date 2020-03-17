@@ -42,6 +42,7 @@ import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
 import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.toUri
@@ -190,7 +191,13 @@ class HelmPlugin
      * Creates and installs the `helm.filtering` sub-extension.
      */
     private fun Project.configureFiltering() {
-        val filtering = createFiltering()
+        val filtering = objects.createFiltering()
+            .apply {
+                enabled.convention(
+                    booleanProviderFromProjectProperty("helm.filtering.enabled")
+                        .orElse(true)
+                )
+            }
         (helm as ExtensionAware).extensions
             .add(Filtering::class.java, HELM_FILTERING_EXTENSION_NAME, filtering)
     }
@@ -221,7 +228,7 @@ class HelmPlugin
             .add(
                 Filtering::class.java,
                 HELM_FILTERING_EXTENSION_NAME,
-                project.createFiltering(parent = helmExtension.filtering)
+                project.objects.createFiltering(parent = helmExtension.filtering)
             )
     }
 

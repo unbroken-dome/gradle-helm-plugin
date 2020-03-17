@@ -14,6 +14,7 @@ import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseTask
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.installTaskName
 import org.unbrokendome.gradle.plugins.helm.release.rules.uninstallTaskName
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 
 
 class HelmReleasesPlugin : Plugin<Project> {
@@ -27,48 +28,61 @@ class HelmReleasesPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
 
-        project.plugins.apply(HelmPlugin::class.java)
+        project.run {
 
-        val releases = createReleasesExtension(project)
+            project.plugins.apply(HelmPlugin::class.java)
 
-        project.tasks.run {
-            addRule(HelmInstallReleaseTaskRule(this, releases))
-            addRule(HelmUninstallReleaseTaskRule(this, releases))
+            val releases = createReleasesExtension()
+
+            tasks.run {
+                addRule(HelmInstallReleaseTaskRule(this, releases))
+                addRule(HelmUninstallReleaseTaskRule(this, releases))
+            }
+
+            createInstallAllReleasesTask(releases)
+            createUninstallAllReleasesTask(releases)
         }
-
-        createInstallAllReleasesTask(project, releases)
-        createUninstallAllReleasesTask(project, releases)
     }
 
 
-    private fun createReleasesExtension(project: Project) =
+    private fun Project.createReleasesExtension() =
         project.helmReleaseContainer()
-            .apply {
+            .also { releases ->
                 (project.helm as ExtensionAware)
-                    .extensions.add(HELM_RELEASES_EXTENSION_NAME, this)
+                    .extensions.add(HELM_RELEASES_EXTENSION_NAME, releases)
+
+                releases.all { release ->
+                    release.dryRun.convention(
+                        booleanProviderFromProjectProperty("helm.dryRun")
+                    )
+
+                    release.atomic.convention(
+                        project.booleanProviderFromProjectProperty("helm.atomic")
+                    )
+                }
             }
 
 
-    private fun createInstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
-        project.tasks.register(installAllTaskName) { task ->
+    private fun Project.createInstallAllReleasesTask(releases: Iterable<HelmRelease>) {
+        tasks.register(installAllTaskName) { task ->
             task.group = HELM_GROUP
             task.description = "Installs all Helm releases."
-            task.dependsOn(allReleasesTaskDependency(project, releases, HelmRelease::installTaskName))
+            task.dependsOn(allReleasesTaskDependency(releases, HelmRelease::installTaskName))
         }
     }
 
 
-    private fun createUninstallAllReleasesTask(project: Project, releases: Iterable<HelmRelease>) {
-        project.tasks.register(uninstallAllTaskName) { task ->
+    private fun Project.createUninstallAllReleasesTask(releases: Iterable<HelmRelease>) {
+        tasks.register(uninstallAllTaskName) { task ->
             task.group = HELM_GROUP
             task.description = "Uninstalls all Helm releases."
-            task.dependsOn(allReleasesTaskDependency(project, releases, HelmRelease::uninstallTaskName))
+            task.dependsOn(allReleasesTaskDependency(releases, HelmRelease::uninstallTaskName))
         }
     }
 
 
-    private fun allReleasesTaskDependency(
-        project: Project, releases: Iterable<HelmRelease>,
+    private fun Project.allReleasesTaskDependency(
+        releases: Iterable<HelmRelease>,
         taskNameFn: (HelmRelease) -> String
     ) =
         TaskDependency {

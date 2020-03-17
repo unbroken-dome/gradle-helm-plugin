@@ -7,13 +7,13 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -240,6 +240,7 @@ interface HelmRelease : Named {
 
 private open class DefaultHelmRelease
 @Inject constructor(
+    objects: ObjectFactory,
     private val name: String,
     private val project: Project
 ) : HelmRelease {
@@ -249,12 +250,12 @@ private open class DefaultHelmRelease
 
 
     final override val releaseName: Property<String> =
-        project.objects.property<String>()
+        objects.property<String>()
             .convention(name)
 
 
     final override val chart: Property<ChartReference> =
-        project.objects.property()
+        objects.property()
 
 
     final override fun chart(project: String?, chart: String): ChartReference =
@@ -282,55 +283,53 @@ private open class DefaultHelmRelease
 
 
     final override val repository: Property<URI> =
-        project.objects.property()
+        objects.property()
 
 
     final override val namespace: Property<String> =
-        project.objects.property()
+        objects.property()
 
 
     final override val version: Property<String> =
-        project.objects.property()
+        objects.property()
 
 
     final override val dryRun: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
+        objects.property()
 
 
     final override val atomic: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
+        objects.property()
 
 
     final override val wait: Property<Boolean> =
-        project.objects.property()
+        objects.property()
 
 
     final override val replace: Property<Boolean> =
-        project.objects.property<Boolean>()
+        objects.property<Boolean>()
             .convention(false)
 
 
     final override val keepHistoryOnUninstall: Property<Boolean> =
-        project.objects.property<Boolean>()
+        objects.property<Boolean>()
             .convention(false)
 
 
     final override val values: MapProperty<String, Any> =
-        project.objects.mapProperty()
+        objects.mapProperty()
 
 
     final override val fileValues: MapProperty<String, Any> =
-        project.objects.mapProperty()
+        objects.mapProperty()
 
 
     final override val valueFiles: ConfigurableFileCollection =
-        project.objects.fileCollection()
+        objects.fileCollection()
 
 
     final override val dependsOn: SetProperty<String> =
-        project.objects.setProperty()
+        objects.setProperty()
 
 
     final override fun from(notation: Any) {

@@ -95,7 +95,7 @@ open class HelmFilterSources : DefaultTask() {
      * Settings that control filtering of the chart sources.
      */
     @get:Nested
-    val filtering: Filtering = project.createFiltering()
+    val filtering: Filtering = project.objects.createFiltering()
         .apply {
             values.putFrom("chartName", chartName)
             values.putFrom("chartVersion", chartVersion)
