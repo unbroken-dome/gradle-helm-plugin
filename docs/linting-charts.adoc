@@ -1,7 +1,7 @@
 = Linting Charts
 
 The default workflow for building and packaging a Helm chart includes a lint step, which is
-performs by the `HelmLint` task and maps to a `helm lint` CLI call.
+performed by the `HelmLint` task and maps to a `helm lint` CLI call.
 
 Both the global `helm` DSL block and each `chart` block provide a nested `lint` block, where you
 can fine-tune linting on a global or chart level. Each chart will inherit the global configuration
@@ -41,8 +41,8 @@ helm {
         strict.set(true)
     }
 
-    (charts) {
-        "main" {
+    charts {
+        create("main") {
             // This configures linting only for the main chart
             lint {
                 // disable strict linting only for this chart
@@ -56,16 +56,20 @@ helm {
 
 == Passing Values to the Linter
 
-You can pass values to the linter using the `values` and `valueFiles`.
+You can pass values to the linter using the `values`, `fileValues` and `valueFiles`.
 
-This may be necessary if you use the `required` function in your Helm templates (see
-https://github.com/helm/helm/issues/2347[Helm issue #2347]). Also, it can be useful if
+* `values` contains values to be passed directly (CLI option: `--set` or `--set-string`)
+* `fileValues` contains values to be read from files (CLI option: `--set-file`)
+* `valueFiles` contains a list of files that contain values in YAML format (CLI option: `--values`)
+
+Passing values to `helm lint` may be necessary to avoid warnings if you use the `required` function in your Helm
+templates (see https://github.com/helm/helm/issues/2347[Helm issue #2347]). Also, it can be useful if
 you have conditional templates which would not be rendered when using the default values
 from values.yaml.
 
 [TIP]
 `helm lint` does not actually perform a syntactic analysis of your charts; instead it renders
-the template internally (just as `helm install` would do) and checks the resulting YAML for
+the template internally (just as `helm template` would do) and checks the resulting YAML for
 correctness.
 
 Values and value files defined in the global `lint` block are automatically inherited by

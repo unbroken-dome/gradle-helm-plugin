@@ -176,7 +176,7 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
 
         directory(project.projectDir) {
             directory("src/main/helm") {
-
+                file("Chart.yaml", contents = "apiVersion: v2")
             }
         }
 

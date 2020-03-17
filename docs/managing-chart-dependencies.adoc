@@ -1,16 +1,14 @@
 = Managing Chart Dependencies
 
-The `helm` plugin can manage your
-https://docs.helm.sh/developing_charts/#chart-dependencies[chart's dependencies], modifying the
-`requirements.yaml` file accordingly.
+The `helm` plugin can manage dependencies between charts in the same Gradle build.
 
 This is especially useful if you have multiple charts in the same project (or in a multi-project build)
 that depend on one another, because it will also add Gradle task dependencies to make sure that the charts
 are packaged in the correct order.
 
-Note that you will still need a `requirements.yaml` file with `dependencies` entries; the plugin will not
-create it automatically. For each dependency declared in the Gradle script, it will find the matching
-dependency in `requirements.yaml` and modify its `repository` property.
+Chart dependencies are resolved by packaging the dependency chart and then extracting it into the `charts`
+sub-directory of the dependent chart. This does not involve any of the standard Helm dependency mechanisms
+(`helm dependency build` / `helm dependency update`) and will run before `helm dependency update`.
 
 
 == Declaring a Dependency
@@ -26,16 +24,14 @@ helm.charts {
 
     foo {
         chartVersion = '1.2.3'
-        sourceDir = file('src/helm/foo')
+        sourceDir = file 'src/helm/foo'
     }
 
     bar {
         chartVersion = '3.2.1'
-        sourceDir = file('src/helm/bar')
+        sourceDir = file 'src/helm/bar'
 
-        dependencies {
-            foo chart: 'foo'
-        }
+        dependencies.add 'foo'
     }
 }
 ----
@@ -54,50 +50,83 @@ helm.charts {
         chartVersion.set("3.2.1")
         sourceDir.set(file("src/helm/bar"))
 
-        dependencies {
-            "foo"(chart = "foo")
-        }
+        dependencies.add("foo")
     }
 }
 ----
 
-The "method" name inside `dependencies` is the name that the dependency will have in the `requirements.yaml`,
-whereas the `chart` parameter specifies the name of the chart in the Gradle DSL.
-
-TIP: The `dependencies` entry in the YAML file will be matched either by its `name` or an `alias`.
-
-You can also use an alternative syntax using `dependencies.add` if you prefer so:
+Instead of using the name, it is also possible to refer directly to the `HelmChart` DSL object in the dependency:
 
 [source,groovy,role="primary"]
 .Groovy
 ----
-dependencies.add(name: 'foo', chart: 'foo')
+helm.charts {
+
+    foo {
+        chartVersion = '1.2.3'
+        sourceDir = file 'src/helm/foo'
+    }
+
+    bar {
+        chartVersion = '3.2.1'
+        sourceDir = file 'src/helm/bar'
+
+        dependencies.add foo
+    }
+}
 ----
 
 [source,kotlin,role="secondary"]
 .Kotlin
 ----
-dependencies.add(name = "foo", chart = "foo")
+(helm.charts) {
+
+    val foo by creating {
+        chartVersion.set("1.2.3")
+        sourceDir.set(file("src/helm/foo"))
+    }
+
+    val bar by creating {
+        chartVersion.set("3.2.1")
+        sourceDir.set(file("src/helm/bar"))
+
+        dependencies.add(foo)
+    }
+}
 ----
 
+== Configuring the Dependency in Chart.yaml
 
-The resulting `requirements.yaml` file for the `bar` chart will look as follows:
+Since the dependency resolution done by this plugin is simply a package-and-extract operation, it is _not_ necessary
+to mention the dependency in your `Chart.yaml` file (or `requirements.yaml` for API version `v1`). However, for some
+advanced configuration of the dependency (e.g. when using an `alias` or `import-values`), you can still declare it.
+In that case, you should omit the `repository` so that `helm dependency update` will not attempt to resolve it from
+a chart repository:
 
 [source,yaml]
-.requirements.yaml
+.bar/Chart.yaml
 ----
+apiVersion: v2
+name: bar
+version: 3.2.1
+
 dependencies:
   - name: foo
-    repository: file://../foo
+    alias: fooAlias
+    import-values:
+      - fooData
 ----
 
-The URL in `repository` points to the local output directory of the `foo` chart,
-relative to the output directory of the `bar` chart.
+When running `helm dependency update` (via the `helmUpdateBarDependencies` task), it will output something like:
+
+----
+Dependency foo did not declare a repository. Assuming it exists in the charts directory
+----
 
 
 == Chart Dependencies in Multi-Project Builds
 
-If you have a Gradle multi-project builds, chart dependencies can also refer to charts built by
+If you have a Gradle multi-project build, chart dependencies can also refer to charts built by
 other projects.
 
 Use the `project` parameter when adding a dependency, in addition to the `chart` parameter:
@@ -107,7 +136,7 @@ Use the `project` parameter when adding a dependency, in addition to the `chart`
 ----
 dependencies {
     // Assuming that the foo chart is defined in the foo project
-    foo project: ':foo', chart: 'foo'
+    add project: ':foo', chart: 'foo'
 }
 ----
 
@@ -116,7 +145,7 @@ dependencies {
 ----
 dependencies {
     // Assuming that the foo chart is defined in the foo project
-    "foo"(project = ":foo", chart = "foo")
+    add(project = ":foo", chart = "foo")
 }
 ----
 
@@ -129,7 +158,7 @@ chart, the `chart` parameter can be omitted:
 ----
 dependencies {
     // Referencing the main chart in the foo project
-    foo project: ':foo'
+    add project: ':foo'
 }
 ----
 
@@ -138,6 +167,65 @@ dependencies {
 ----
 dependencies {
     // Referencing the main chart in the foo project
-    "foo"(project = ":foo")
+    add(project = ":foo")
+}
+----
+
+
+== Mixing Gradle and Helm Dependency Resolution
+
+A chart may have external dependencies (to be resolved by `helm dependency update`) in addition to the dependencies
+managed by the Gradle plugin.
+
+At the point when `helm dependency update` is run, the resolved charts from Gradle will already be present in the
+`charts/` sub-directory, and `helm dependency update` should be smart enough to ignore them.
+
+
+== Resolving External Chart Dependencies
+
+The dependency resolution mechanism described here is primarily intended for resolving dependencies on charts in the
+same Gradle project, or in another Gradle project that is part of the same multi-project build. For dependencies on
+external charts, it is best to publish those to a link:https://helm.sh/docs/topics/chart_repository/[chart repository]
+(for example, using the <<Publishing Charts,`helm-publish` plugin>>)
+and then use Helm's standard dependency mechanism to resolve them.
+
+However, in some cases you might prefer to use Gradle to resolve those dependencies. For example, if you already have
+a Maven repository for your internal artifacts, and only a few common charts to be used as dependencies, it might be
+more convenient to publish those charts to your Maven repository instead.
+
+The Helm plugin internally creates a dependency configuration called `helm<Chart>Dependencies`, for example
+`helmFooDependencies` for a chart named `foo`. You can use Gradle's standard `dependencies` block to add external
+module dependencies to this configuration. It is required that these resolve to a single tar.gz compressed file,
+like the one that is produced by `helm package`.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.charts {
+    foo {
+        sourceDir = file 'src/helm/foo'
+    }
+}
+
+// Note: this is the Gradle project dependencies block, not the chart's
+dependencies {
+    // Assuming that a packaged Helm chart is available at these GAV coordinates
+    helmFooDependencies 'com.example.bar:bar-helm-chart:3.2.1@tgz'
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.charts {
+    create("foo") {
+        sourceDir.set(file("src/helm/foo"))
+    }
+}
+
+// Note: this is the Gradle project dependencies block, not the chart's
+dependencies {
+    // Assuming that a packaged Helm chart is available at these GAV coordinates
+    "helmFooDependencies"("com.example.bar:bar-helm-chart:3.2.1@tgz")
 }
 ----

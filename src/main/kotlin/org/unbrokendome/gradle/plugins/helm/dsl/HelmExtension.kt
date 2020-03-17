@@ -16,6 +16,7 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecResult
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
@@ -30,40 +31,11 @@ import javax.inject.Inject
 /**
  * The main Helm DSL extension, accessible using the `helm { ... }` block in build scripts.
  */
-interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
+interface HelmExtension : HelmExecProvider, GlobalHelmOptions, HelmServerOptions {
 
     override val executable: Property<String>
 
     override val debug: Property<Boolean>
-
-    /**
-     * Name of the kubeconfig context to use.
-     *
-     * Corresponds to the `--kube-context` command line option in the Helm CLI.
-     */
-    val kubeContext: Property<String>
-
-    /**
-     * Path to the Kubernetes configuration file.
-     *
-     * If this property is set, its value will be used to set the `KUBECONFIG` environment variable for each
-     * Helm invocation.
-     */
-    val kubeConfig: RegularFileProperty
-
-    /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks).
-     *
-     * Corresponds to the `--timeout` command line option in the Helm CLI.
-     */
-    val remoteTimeout: Property<Duration>
-
-    /**
-     * The namespace scope for remote Kubernetes operations.
-     *
-     * Corresponds to the `--namespace` option in the Helm CLI.
-     */
-    val namespace: Property<String>
 
     /**
      * Base output directory for Helm charts.
@@ -140,7 +112,7 @@ private open class DefaultHelmExtension
     final override val tmpDir: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.tmpDir")
+                project.dirProviderFromProjectProperty("helm.tmpDir", evaluateGString = true)
                     .orElse(layout.buildDirectory.dir("tmp/helm"))
             )
 
@@ -185,7 +157,7 @@ private open class DefaultHelmExtension
 
 
 /**
- * Returns the root directory of this project as a [Directory].
+ * Returns the root directory of this project as a [Directory].
  *
  * @receiver the Gradle [Project]
  * @see Project.getRootDir

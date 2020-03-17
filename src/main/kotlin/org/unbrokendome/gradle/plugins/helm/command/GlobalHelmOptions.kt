@@ -33,7 +33,7 @@ interface GlobalHelmOptions : HelmOptions {
      * Base directory for storing data.
      *
      * Corresponds to the `XDG_DATA_HOME` environment variable.
-     * If not set, defaults to `.gradle/helm/data` inside the project directory.
+     * If not set, defaults to `helm/data` inside the project build directory.
      *
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
@@ -43,17 +43,17 @@ interface GlobalHelmOptions : HelmOptions {
      * Base directory for storing configuration.
      *
      * Corresponds to the `XDG_CONFIG_HOME` environment variable.
-     * If not set, defaults to `.gradle/helm/config` inside the project directory.
+     * If not set, defaults to `helm/config` inside the project build directory.
      *
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
     val xdgConfigHome: DirectoryProperty
 
     /**
-     * Base directory for storing data.
+     * Base directory for storing cached data.
      *
      * Corresponds to the `XDG_CACHE_HOME` environment variable.
-     * If not set, defaults to `.gradle/helm/cache` inside the project directory.
+     * If not set, defaults to `.gradle/helm/cache` inside the _root_ project directory.
      *
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */

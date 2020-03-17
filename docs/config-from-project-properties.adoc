@@ -7,11 +7,11 @@ instead of specifying them in the DSL. This has the advantage that you can pass 
 In addition, such properties are automatically inherited by subprojects.
 
 Some of these properties allow evaluation as a Groovy `GString`, so that you can do things like
-`-Phelm.home=$buildDir/helm/home` (but the dollar signs may need to be escaped so the shell does not
-treat them as environment variables).
+`-Phelm.executable=$rootDir/helm/bin/helm3` (but the dollar signs may need to be escaped so the shell does not
+treat them as environment variables). GStrings will be evaluated in the context of each project.
 
 In general, the name of the project property corresponds to the path of the property in the DSL,
-e.g. `helm.home`.
+e.g. `helm.executable`.
 
 NOTE: Properties set explicitly in your Gradle script have precedence over properties from the command line
 or `gradle.properties` file, so it may be better to put them in `gradle.properties` in the first place, to
@@ -21,22 +21,15 @@ allow for easier overriding.
 
 [cols="3,4,1"]
 |===
-| Property | Description | GString
+| Property | Description | GString
 
 | `helm.executable`
-| Path to the Helm CLI executable. Defaults to `helm`.
+| Path to the Helm CLI executable. The `PATH` variable is taken into account, so this
+  can just be `"helm"` if the Helm client is installed in a suitable location. Defaults to `helm`.
 | icon:check[]
 
 | `helm.debug`
 | Enable verbose output from the Helm CLI.
-|
-
-| `helm.home`
-| Location of the Helm home directory.
-| icon:check[]
-
-| `helm.host`
-| Address of Tiller, in the format `host:port`.
 |
 
 | `helm.kubeContext`
@@ -47,49 +40,42 @@ allow for easier overriding.
 | Path to the Kubernetes configuration file.
 | icon:check[]
 
-| `helm.timeoutSeconds`
-| Timeout used for various Helm CLI commands.
+| `helm.remoteTimeout`
+| Time to wait for an individual Kubernetes operation (like Jobs or hooks).
++
+May be specified in Helm format (e.g. `3m30s`), in ISO format (e.g. `PT3M30S`) or as a plain number indicating the
+number of seconds (e.g. `210`).
+|
+
+| `helm.namespace`
+| The target namespace for Kubernetes operations.
 |
 
 | `helm.outputDir`
 | The base output directory for charts; defaults to `$buildDir/helm/charts`.
 | icon:check[]
-|===
 
-== Tiller
+| `helm.tmpDir`
+| Base temporary directory for various intermediate artifacts. Defaults to `$buildDir/tmp/helm`.
+| icon:check[]
 
-[cols="2*"]
-|===
-| Property | Description
+| `helm.xdgDataHome`
+| Base directory for storing data. Corresponds to the `XDG_DATA_HOME` environment variable.
+  Defaults to `$buildDir/helm/data`.
+| icon:check[]
 
-| `helm.tiller.install`
-| If `true`, install Tiller on the cluster.
+| `helm.xdgConfigHome`
+| Base directory for storing configuration. Corresponds to the `XDG_CONFIG_HOME` environment variable.
+  Defaults to `$buildDir/helm/config`.
+| icon:check[]
 
-| `helm.tiller.namespace`
-| Namespace of Tiller.
-
-| `helm.tiller.forceUpgrade`
-| Force upgrade of Tiller to the current Helm version.
-
-| `helm.tiller.historyMax`
-| Limit the maximum number of revisions saved per release.
-
-| `helm.tiller.replicas`
-| Amount of Tiller instances to run on the cluster.
-
-| `helm.tiller.serviceAccount`
-| Name of the service account to use for Tiller.
-
-| `helm.tiller.image`
-| Override the Tiller image.
-
-| `helm.tiller.upgrade`
-| Upgrade if Tiller is already installed.
-
-| `helm.tiller.wait`
-| Block until Tiller is running and ready to receive requests (defaults to `true`)
+| `helm.xdgCacheHome`
+| Base directory for storing data. Corresponds to the `XDG_CACHE_HOME` environment variable.
+  Defaults to `$rootDir/.gradle/helm/cache`.
+| icon:check[]
 
 |===
+
 
 == Repositories
 
@@ -98,7 +84,7 @@ You can configure repositories entirely from Gradle properties -- just the prese
 
 [cols="2*"]
 |===
-| Property | Description
+| Property | Description
 
 | `helm.repository.<name>.url`
 | The URL of the repository.
@@ -116,27 +102,22 @@ You can configure repositories entirely from Gradle properties -- just the prese
 | Private key file for certificate authentication.
 |===
 
+
 == Filtering
 
 [cols="2*"]
 |===
-| Property | Description
+| Property | Description
 
 | `helm.filtering.enabled`
 | Globally enable or disable filtering. Defaults to `true`.
-
-| `helm.filtering.placeholderPrefix`
-| Prefix that demarcates a placeholder in filtered YAML files. Defaults to `${`.
-
-| `helm.filtering.placeholderSuffix`
-| Suffix that demarcates a placeholder in filtered YAML files. Defaults to `}`.
 |===
 
 == Linting
 
 [cols="2*"]
 |===
-| Property | Description
+| Property | Description
 
 | `helm.lint.enabled`
 | Globally enable or disable linting. Defaults to `true`.
@@ -150,12 +131,11 @@ You can configure repositories entirely from Gradle properties -- just the prese
 
 [cols="2*"]
 |===
-| Property | Description
+| Property | Description
 
 | `helm.dryRun`
 | Only perform a dry run when installing or deleting releases.
-|===
 
 | `helm.atomic`
-| Perform releases atomically
+| Perform releases atomically.
 |===
