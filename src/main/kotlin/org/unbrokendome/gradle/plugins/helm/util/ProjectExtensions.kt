@@ -11,7 +11,7 @@ val Project.versionProvider: Provider<String>
     get() = provider { version.toString() }
 
 
-fun <T : Any> Project.coalesceProvider(vararg providers: Provider<out T>): Provider<T> = provider {
+internal fun <T : Any> Project.coalesceProvider(vararg providers: Provider<out T>): Provider<T> = provider {
     providers.asSequence()
         .mapNotNull { it.orNull }
         .firstOrNull()

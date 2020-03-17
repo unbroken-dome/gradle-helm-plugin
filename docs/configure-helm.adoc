@@ -3,8 +3,7 @@
 The global flags for Helm can be configured directly in the `helm` DSL block.
 
 Most of these correspond to options that are passed to every Helm CLI command as a parameter
-or an environment variable, or parameters that are passed to the initial `helm init` call that
-sets up the local Helm environment.
+or an environment variable.
 
 [TIP]
 ====
@@ -14,13 +13,86 @@ See <<Configuration from Project Properties>>.
 ====
 
 
-The following `helm.home` sets the Helm home directory to a path inside the Gradle build directory.
+== Global Helm Options
+
+The following properties can be set on the `helm` extension in the Gradle build script.
+
+|===
+| Property | Description | `helm` CLI option
+
+`executable`
+Path to the `helm` executable. The `PATH` environment variable is taken into account, so this can just be `helm`
+ (which is the default) if the Helm client is installed in a suitable location.
+
+`extraArgs`
+Additional arguments to pass to _every_ invocation of `helm`. This can be used for command-line options that have
+ no counterpart in the plugin.
+
+`kubeConfig`
+Path to the Kubernetes configuration file.
+Environment variable `KUBECONFIG`
+
+`kubeContext`
+Name of the kubeconfig context to use.
+`--kube-context`
+
+`namespace`
+Kubernetes namespace scope.
+`--namespace`
+
+`remoteTimeout`
+Time to wait for any individual Kubernetes operation (like Jobs for hooks).
+`--timeout` (on certain commands like `install`, `upgrade` or `uninstall`)
+|===
+
+
+== Helm Directories
+
+Starting with Helm 3, Helm does not have a "helm home" directory anymore, and dropped the need for a call to
+`helm init` before working with Helm. Instead, local Helm directories are governed by 3 environment variables,
+which can be configured in the Gradle `helm` extension. By default, these directories are set to paths inside
+the Gradle project, so that any `helm` invocation from the Gradle build is independent from the Helm configuration
+present on the local machine.
+
+It is also possible to set these properties via `gradle.properties` or pass them using the `-P` flag on the
+Gradle command line (see <<Configuration from Project Properties>>).
+
+See link:https://helm.sh/docs/helm/helm/[the Helm docs] for details about how XDG base directories are used
+by the Helm CLI.
+
+|===
+| `helm` extension property | Description | Environment variable | Default Value
+
+`xdgDataHome`
+Base directory for storing data. (Note: this does not currently seem to be used by any `helm` command.)
+`XDG_DATA_HOME`
+`build/helm/data` under the project dir
+
+`xdgConfigHome`
+Base directory for storing configuration.
+`XDG_CONFIG_HOME`
+`build/helm/config` under the project dir
+
+`xdgCacheHome`
+Base directory for storing cached data.
+`XDG_CACHE_HOME`
+`.gradle/helm/cache` under the _root_ project dir
+|===
+
+[NOTE]
+====
+The cache home, as indicated by `xdgCacheHome`, defaults to a directory under the _root_ project, meaning that
+in a multi-module build, all Helm projects will share the same cache by default. This speeds up builds, but may lead
+to problems in certain situations, for example if two projects register a different chart repository under the same
+name.
++
+If necessary, you can always set the cache home to a project-local directory, for example:
 
 [source,groovy,role="primary"]
 .Groovy
 ----
 helm {
-    home = file("$buildDir/helm/home")
+    xdgCacheHome = file("${project.buildDir}/helm/cache")
 }
 ----
 
@@ -28,65 +100,7 @@ helm {
 .Kotlin
 ----
 helm {
-    home.set(file("$buildDir/helm/home"))
+    xdgCacheHome.set(file("${project.buildDir}/helm/cache"))
 }
 ----
-
-
-[TIP]
 ====
-Setting the Helm home directory to a path like this is actually a good practice, as it makes your
-build less dependent on the local machine, and does not pollute the local Helm configuration.
-====
-
-The plugin splits what is usually done by `helm init` into two steps:
-
-Task `helmInitClient`::
-This will call `helm init --client-only`, skipping a remote Tiller installation. Since this sets up the
-Helm client, most other Helm tasks will have a dependency on this.
-
-Task `helmInitServer`::
-This will call `helm init` which also installs Tiller in the remote cluster. Only tasks that actually
-communicate with Tiller (like
-link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-install/[`HelmInstall`]
-or
-link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/-helm-delete/[`HelmDelete`]
-depend on this.
-
-
-== Configuring Tiller
-
-Inside the `helm.tiller` block you can configure certain settings for the remote Tiller installation.
-Most of these correspond to parameters of the `helm init` CLI command.
-
-[source,groovy,role="primary"]
-.Groovy
-----
-helm {
-    tiller {
-        // Install/expect Tiller in a different namespace than kube-system
-        namespace = "custom-namespace"
-
-        // Set a service account for Tiller
-        serviceAccount = "tiller-service-account"
-    }
-}
-----
-
-[source,kotlin,role="secondary"]
-.Kotlin
-----
-helm {
-    tiller {
-        // Install/expect Tiller in a different namespace than kube-system
-        namespace.set("custom-namespace")
-
-        // Set a service account for Tiller
-        serviceAccount.set("tiller-service-account")
-    }
-}
-----
-
-Please refer to the
-link:dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.dsl/-tiller/[API Reference] for a
-full list of configuration options.

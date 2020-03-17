@@ -13,7 +13,7 @@ import org.gradle.api.provider.SetProperty
  * @param T the type of the property
  * @return the property
  */
-inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
+internal inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
     property(T::class.javaObjectType)
 
 
@@ -22,7 +22,7 @@ inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
  *
  * @param T the type of element
  */
-inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
+internal inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
     listProperty(T::class.java)
 
 
@@ -31,7 +31,7 @@ inline fun <reified T : Any> ObjectFactory.listProperty(): ListProperty<T> =
  *
  * @param T the type of element
  */
-inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
+internal inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
     setProperty(T::class.java)
 
 
@@ -41,5 +41,5 @@ inline fun <reified T : Any> ObjectFactory.setProperty(): SetProperty<T> =
  * @param K the type of key
  * @param V the type of value
  */
-inline fun <reified K : Any, reified V : Any> ObjectFactory.mapProperty(): MapProperty<K, V> =
+internal inline fun <reified K : Any, reified V : Any> ObjectFactory.mapProperty(): MapProperty<K, V> =
     mapProperty(K::class.java, V::class.java)

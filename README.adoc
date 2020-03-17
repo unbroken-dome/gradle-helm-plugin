@@ -17,13 +17,14 @@ This is a suite of Gradle plugins for building, publishing and managing https://
 * Build, package and publish Helm charts using a declarative Gradle DSL
 * Resolve placeholders like `${chartVersion}` from chart source files before packaging
 * Resolve dependencies between charts using Gradle artifact dependencies
+* Install, upgrade and uninstall releases to/from a Kubernetes cluster
 
 
 == Requirements
 
 * Gradle 5.1 or higher
 * JDK 1.8 or higher (for running Gradle)
-* Helm command-line client
+* Helm command-line client 3.+
 
 
 == Quick Start
@@ -49,7 +50,6 @@ Put your Helm chart sources into `src/main/helm`:
                 📂 templates
                     📄 ...
                 📄 Chart.yaml
-                📄 requirements.yaml
                 📄 values.yaml
 ----
 

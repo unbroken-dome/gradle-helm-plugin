@@ -1,76 +1,46 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
-import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileCollection
-import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
- * Updates the chart dependencies from the _requirements.yaml_ file, and creates a _requirements.lock_ file that
- * fixes the versions of chart dependencies. Corresponds to the `helm dependency update` CLI command.
+ * Updates the chart dependencies from the `Chart.yaml` file, and creates a `Chart.lock` file that
+ * fixes the versions of chart dependencies.
  *
- * This task will be skipped with `NO_SOURCE` if the chart does not a _requirements.yaml_ file.
+ * Corresponds to the `helm dependency update` CLI command.
  */
-open class HelmUpdateDependencies : AbstractHelmCommandTask() {
-
-    /**
-     * The chart directory.
-     */
-    @get:Internal("Represented as part of other properties")
-    val chartDir: DirectoryProperty =
-        project.objects.directoryProperty()
-
-
-    /**
-     * A [FileCollection] containing the _requirements.yaml_ file if present. This is a read-only property.
-     *
-     * This is modeled as a [FileCollection] so the task will not fail if the file does not exist. The collection
-     * will never contain more than one file.
-     */
-    @get:[InputFiles SkipWhenEmpty]
-    @Suppress("unused")
-    val requirementsYamlFile: FileCollection =
-        chartDir.asFileTree.matching {
-            it.include("requirements.yaml")
-        }
-
-
-    /**
-     * Path to the _requirements.lock_ file. This is a read-only property.
-     */
-    @get:OutputFile
-    @Suppress("unused")
-    val requirementsLockFile: Provider<RegularFile> =
-        chartDir.file("requirements.lock")
-
-
-    /**
-     * The _charts_ sub-directory; this is where sub-charts will be placed by the command (read-only).
-     */
-    @get:OutputDirectory
-    @Suppress("unused")
-    val subchartsDir: Provider<Directory> =
-        chartDir.dir("charts")
-
+open class HelmUpdateDependencies : AbstractHelmDependenciesTask() {
 
     /**
      * If set to `true`, do not refresh the local repository cache.
+     *
+     * Corresponds to the `--skip-refresh` CLI option.
      */
     @Internal
     val skipRefresh: Property<Boolean> =
         project.objects.property()
 
 
+    init {
+        inputs.file(dependencyDescriptorFile).optional()
+        outputs.file(lockFile)
+
+        onlyIf {
+            // skip if the chart has no declared external dependencies
+            modelDependencies.get().dependencies
+                .any { it.repository != null }
+        }
+    }
+
+
     @TaskAction
     fun updateDependencies() {
         execHelm("dependency", "update") {
-            flag("--skip-refresh", skipRefresh)
             args(chartDir)
+            flag("--skip-refresh", skipRefresh)
         }
     }
 }

@@ -3,17 +3,13 @@
 The plugin includes a _filtering_ step that will resolve placeholders in certain chart files before the chart
 is packaged.
 
-This is most useful to insert the name and version into the chart, because they will often correspond to the
-Gradle project's name and version:
+Filtering applies only to `*.yaml` files directly in the chart directory. Chart templates will _not_ be filtered
+this way; instead apply filtering to the `values.yaml` file and then use Helm's templating constructs for building
+the Chart templates.
 
-.Chart.yaml
-[source,yaml]
-----
-apiVersion: v1
-name: ${chartName}
-version: ${chartVersion}
-appVersion: ${projectVersion}
-----
+Filtered files are processed using a Groovy
+link:https://docs.groovy-lang.org/latest/html/api/groovy/text/SimpleTemplateEngine.html[SimpleTemplateEngine]. Filter
+expressions are Groovy expressions enclosed in `${` and `}`, for example `${chartName}`.
 
 The following placeholders are automatically available based on the corresponding properties of the chart in
 the DSL. You can also define additional placeholders and their values using the `filtering.values` property (see below).
@@ -26,15 +22,60 @@ the DSL. You can also define additional placeholders and their values using the 
 | `projectVersion` | The `version` of the Gradle `Project` (at the time the filtering task is executed)
 |===
 
-NOTE: Only the files _Chart.yaml_, _requirements.yaml_ and _values.yaml_ are filtered this way. The actual templates
-in the chart are not filtered; you should use Helm's templating constructs instead.
+TIP: The `name` and `version` in the Chart.yaml are automatically replaced based on the chart information from the
+Gradle script. You do not need to add filter expressions for these.
+
+== Enable or Disable Filtering
+
+The filtering is enabled by default. You can set the `filtering.enabled` property to `false` if you would not like
+the chart to be filtered. This can be done either on the project level or the chart level:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    // Disable filtering by default
+    filtering.enabled = false
+
+    charts {
+        chart1 {
+            // filtering will be enabled for this chart
+            filtering.enabled = true
+        }
+        chart2 {
+            // filtering will be disabled for this chart (inheriting settings from project level)
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    // Disable filtering by default
+    filtering.enabled.set(false)
+
+    charts {
+        create("chart1") {
+            // filtering will be enabled for this chart
+            filtering.enabled.set(true)
+        }
+        create("chart2") {
+            // filtering will be disabled for this chart (inheriting settings from project level)
+        }
+    }
+}
+----
 
 
-== Configure the Filtering Step
 
-You can fine-tune the filtering process by modifying the `filtering` block, which is available both directly inside
-the `helm` block, as well as each chart. The chart-level filtering inherits from the global filtering but will
-override properties if they are defined in both places:
+== Supply Additional Values
+
+Use the `filtering.values` property to define additional values to be available in filtering expressions.
+Again, values may be specified in the project-level `filtering` block, as well as on a `filtering` block for an
+individual chart. Project-level and chart-level values are merged, with the chart-level values having precedence
+if a value is defined in both places.
 
 [source,groovy,role="primary"]
 .Groovy
@@ -76,20 +117,106 @@ helm {
 }
 ----
 
-You can also pass a `Provider` or `Property` as the value; in this case it will be resolved lazily when the filtering
+TIP: You can also pass a `Provider` or `Property` as the value; in this case it will be resolved lazily when the filtering
 task runs.
 
-The following properties are available in the `filtering` block:
 
-|===
-| Property | Type | Default Value | Description
+=== Example: Pass the JIB Docker Image Name and Version
 
-| enabled | `boolean` | `true` | Enables or disables the entire filtering step.
-| placeholderPrefix | `String` | `${` | The string that marks the end of a resolvable placeholder inside the filtered YAML files.
-| placeholderSuffix | `String` | `}` | The string that marks the end of a resolvable placeholder inside the filtered YAML files.
-| values | `Map` | | The values to be resolved in placeholders.
-|===
+Many Helm charts use the following conventional structure in their `values.yaml` to specify the Docker image to be
+used in Kubernetes deployments:
 
-INFO: `values` is a `MapProperty` which merges the values from different levels of `filtering` blocks. That means
-you can add some values in the global `helm.filtering` block, add some more inside the individual chart's `filtering`
-block, and they will all be available for the placeholder resolution.
+[source,yaml]
+.values.yaml
+----
+image:
+  repository: "gcr.io/awesome-project/awesome-image"
+  tag: "1.2.3"
+----
+
+If the Docker image is built with JIB in the same project, we can avoid the repetition (which is bound to cause silly
+copy & paste errors eventually) and pass the values from Gradle instead:
+
+[source,groovy,role="primary"]
+.build.gradle
+----
+helm {
+    filtering {
+        values.put 'imageRepository', jib.to.image
+        values.put 'imageTag', jib.to.tags.first()
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.build.gradle.kts
+----
+helm {
+    filtering {
+        values.put("imageRepository", jib.to.image)
+        values.put("imageTag", jib.to.tags.first())
+    }
+}
+----
+
+And then refer to these values in the `values.yaml` file:
+
+[source,yaml]
+.values.yaml
+----
+image:
+  repository: ${imageRepository}
+  tag: ${imageTag}
+----
+
+
+=== Values from Files
+
+Values can also be read from the contents of files; use the `filtering.fileValues` property for this. The following
+example would generate a RSA private key using `openssl` and then pass it to the filtering:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+def rsaKeyFile = objects.file()
+    .fileValue(file("$buildDir/rsa.key"))
+
+task generateRsaKey(type: Exec) {
+    // Declare the file as a task output so that task dependencies are set up by Gradle
+    outputs.file rsaKeyFile
+    executable = 'openssl'
+    arg 'genrsa', '-out', rsaKeyFile.get()
+}
+
+helm.filtering {
+    fileValues.put 'rsaKey', rsaKeyFile
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+val rsaKeyFile = objects.file()
+    .fileValue(file("$buildDir/rsa.key"))
+
+tasks.create("generateRsaKey", Exec::class) {
+    // Declare the file as a task output so that task dependencies are set up by Gradle
+    outputs.file(rsaKeyFile)
+    executable = "openssl"
+    arg("genrsa", "-out", rsaKeyFile.get())
+}
+
+helm.filtering {
+    fileValues.put("rsaKey", rsaKeyFile)
+}
+----
+
+Afterwards, we can use this value in our `values.yaml` file (note that the value contains newlines, so we need
+to do some processing for correct YAML indentation):
+
+[source,yaml]
+.values.yaml
+----
+rsaKey: |-
+${ rsaKey.readLines().each { "  $it" } }
+----

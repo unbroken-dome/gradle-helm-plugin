@@ -2,18 +2,14 @@ package org.unbrokendome.gradle.plugins.helm
 
 import assertk.assertThat
 import assertk.assertions.isSuccess
-import assertk.assertions.prop
 import org.gradle.api.NamedDomainObjectContainer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInit
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isTrue
 
 
 class HelmPluginTest : AbstractGradleProjectTest() {
@@ -58,13 +54,5 @@ class HelmPluginTest : AbstractGradleProjectTest() {
         assertThat(this::project)
             .hasExtension<HelmExtension>("helm")
             .hasExtension<NamedDomainObjectContainer<HelmChart>>("charts")
-    }
-
-
-    @Test
-    fun `Plugin should create a helmInitClient task`() {
-        assertThat(this::project)
-            .containsTask<HelmInit>("helmInitClient")
-            .prop(HelmInit::clientOnly).isTrue()
     }
 }

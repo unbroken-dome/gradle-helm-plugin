@@ -1,22 +1,22 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
+import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.util.andThen
+import org.unbrokendome.gradle.plugins.helm.command.execHelm
 import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 
@@ -24,11 +24,7 @@ import org.unbrokendome.gradle.plugins.helm.util.property
 /**
  * Base class for tasks that invoke a Helm CLI command.
  */
-abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmExecProvider {
-
-    @Suppress("LeakingThis")
-    private val execProviderSupport = HelmExecProviderSupport(project, this)
-
+abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions {
 
     init {
         group = HELM_GROUP
@@ -36,53 +32,62 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions, HelmE
 
 
     @get:Input
-    override val executable: Property<String> =
+    final override val executable: Property<String> =
         project.objects.property<String>()
-            .convention(project.helm.executable)
-
-
-    @get:Internal
-    override val home: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(project.helm.home)
-
-
-    /**
-     * Register the [home] property as an input directory for this task.
-     */
-    protected fun registerHelmHomeAsInputDir() {
-        inputs.dir(home).withPropertyName("home").withPathSensitivity(PathSensitivity.ABSOLUTE)
-    }
+            .convention("helm")
 
 
     @get:Console
-    override val debug: Property<Boolean> =
+    final override val debug: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(false)
 
 
     @get:Input
-    override val extraArgs: ListProperty<String> =
-        project.objects.listProperty<String>()
-            .apply { addAll(project.helm.extraArgs) }
+    final override val extraArgs: ListProperty<String> =
+        project.objects.listProperty()
 
 
-    /**
-     * Modifies the [HelmExecSpec] before a Helm command is executed.
-     *
-     * The default implementation does nothing. Subclasses can override this if they need to modify each
-     * invocation of a Helm CLI command.
-     *
-     * @receiver the [HelmExecSpec] to be executed
-     */
-    protected open fun HelmExecSpec.modifyHelmExecSpec() {}
+    @get:Internal
+    final override val xdgDataHome: DirectoryProperty =
+        project.objects.directoryProperty()
+            .convention(project.layout.projectDirectory.dir("${project.rootDir}/.gradle/helm/data"))
 
 
-    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
-        execProviderSupport.execHelm(command, subcommand,
-            action.andThen { modifyHelmExecSpec() })
+    @get:Internal
+    final override val xdgConfigHome: DirectoryProperty =
+        project.objects.directoryProperty()
+            .convention(project.layout.projectDirectory.dir("${project.rootDir}/.gradle/helm/config"))
 
 
-    protected fun execHelm(command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit): ExecResult =
-        execHelm(command, subcommand, Action(action))
+    @get:Internal
+    final override val xdgCacheHome: DirectoryProperty =
+        project.objects.directoryProperty()
+            .convention(project.layout.projectDirectory.dir("${project.rootDir}/.gradle/helm/cache"))
+
+
+    @get:Internal
+    protected val registryConfigFile: Provider<RegularFile>
+        get() = xdgConfigHome.file("helm/registry.json")
+
+
+    @get:Internal
+    protected val repositoryCacheDir: Provider<Directory>
+        get() = xdgCacheHome.dir("helm/repository")
+
+
+    @get:Internal
+    protected val repositoryConfigFile: Provider<RegularFile>
+        get() = xdgConfigHome.file("helm/repositories.yaml")
+
+
+    protected fun execHelm(
+        command: String, subcommand: String? = null, action: (HelmExecSpec.() -> Unit)? = null
+    ): ExecResult =
+        execProviderSupport.execHelm(command, subcommand, action)
+
+
+    @get:Internal
+    internal open val execProviderSupport: HelmExecProviderSupport
+        get() = HelmExecProviderSupport(project, this, GlobalHelmOptionsApplier)
 }

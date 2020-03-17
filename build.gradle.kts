@@ -23,10 +23,12 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
-    implementation("org.yaml:snakeyaml:1.18")
+    implementation("org.yaml:snakeyaml:1.25")
+    implementation("org.json:json:20190722")
     implementation("org.apache.httpcomponents:httpclient:4.5.6")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")

@@ -7,20 +7,24 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
+import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.setProperty
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
 
 
 /**
- * Represents a release to be installed into or deleted from a Kubernetes cluster.
+ * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
  */
 interface HelmRelease : Named {
 
@@ -135,10 +139,12 @@ interface HelmRelease : Named {
      */
     val dryRun: Property<Boolean>
 
+
     /**
      * If `true`, will execute the release atomically.
      */
     val atomic: Property<Boolean>
+
 
     /**
      * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
@@ -157,22 +163,43 @@ interface HelmRelease : Named {
 
 
     /**
-     * If `true`, the associated `helmDelete` task will purge the release, completely removing the release from the
-     * store and making its name free for later use.
+     * If `true`, the associated `helmUninstall` task will retain the release history
+     * (using the `--keep-history` flag).
      *
      * Defaults to `false`.
      */
-    val purge: Property<Boolean>
+    val keepHistoryOnUninstall: Property<Boolean>
 
 
     /**
      * Values to be used for the release.
+     *
+     * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
+     * `--set` option (for all other types).
      */
     val values: MapProperty<String, Any>
 
 
     /**
+     * Values read from the contents of files, to be used for the release.
+     *
+     * Corresponds to the `--set-file` CLI option.
+     *
+     * The values of the map can be of any type that is accepted by [Project.file]. Additionally, when adding a
+     * [Provider] that represents an output file of another task, the corresponding install/upgrade task will
+     * automatically have a task dependency on the producing task.
+     *
+     * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
+     */
+    val fileValues: MapProperty<String, Any>
+
+
+    /**
      * A collection of YAML files containing values for this release.
+     *
+     * Corresponds to the `--values` CLI option.
+     *
+     * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     val valueFiles: ConfigurableFileCollection
 
@@ -181,7 +208,7 @@ interface HelmRelease : Named {
      * Names of other releases that this release depends on.
      *
      * A dependency between two releases will create task dependencies such that the dependency will be installed
-     * before, and deleted after, the dependent release.
+     * before, and uninstalled after, the dependent release.
      *
      * Currently such dependencies can be expressed only within the same project.
      */
@@ -192,7 +219,7 @@ interface HelmRelease : Named {
      * Express a dependency on another release.
      *
      * A dependency between two releases will create task dependencies such that the dependency will be installed
-     * before, and deleted after, the dependent release.
+     * before, and uninstalled after, the dependent release.
      *
      * Currently such dependencies can be expressed only within the same project.
      */
@@ -213,6 +240,7 @@ interface HelmRelease : Named {
 
 private open class DefaultHelmRelease
 @Inject constructor(
+    objects: ObjectFactory,
     private val name: String,
     private val project: Project
 ) : HelmRelease {
@@ -222,12 +250,12 @@ private open class DefaultHelmRelease
 
 
     final override val releaseName: Property<String> =
-        project.objects.property<String>()
+        objects.property<String>()
             .convention(name)
 
 
     final override val chart: Property<ChartReference> =
-        project.objects.property()
+        objects.property()
 
 
     final override fun chart(project: String?, chart: String): ChartReference =
@@ -255,49 +283,53 @@ private open class DefaultHelmRelease
 
 
     final override val repository: Property<URI> =
-        project.objects.property()
+        objects.property()
 
 
     final override val namespace: Property<String> =
-        project.objects.property()
+        objects.property()
 
 
     final override val version: Property<String> =
-        project.objects.property()
+        objects.property()
 
 
     final override val dryRun: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(project.booleanProviderFromProjectProperty("helm.dryRun"))
+        objects.property()
+
 
     final override val atomic: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(project.booleanProviderFromProjectProperty("helm.atomic"))
+        objects.property()
+
 
     final override val wait: Property<Boolean> =
-        project.objects.property()
+        objects.property()
 
 
     final override val replace: Property<Boolean> =
-        project.objects.property<Boolean>()
+        objects.property<Boolean>()
             .convention(false)
 
 
-    final override val purge: Property<Boolean> =
-        project.objects.property<Boolean>()
+    final override val keepHistoryOnUninstall: Property<Boolean> =
+        objects.property<Boolean>()
             .convention(false)
 
 
     final override val values: MapProperty<String, Any> =
-        project.objects.mapProperty()
+        objects.mapProperty()
+
+
+    final override val fileValues: MapProperty<String, Any> =
+        objects.mapProperty()
 
 
     final override val valueFiles: ConfigurableFileCollection =
-        project.layout.configurableFiles()
+        objects.fileCollection()
 
 
     final override val dependsOn: SetProperty<String> =
-        project.objects.setProperty()
+        objects.setProperty()
 
 
     final override fun from(notation: Any) {

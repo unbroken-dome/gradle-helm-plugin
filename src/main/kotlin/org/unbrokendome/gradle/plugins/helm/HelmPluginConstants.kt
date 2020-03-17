@@ -16,12 +16,6 @@ const val HELM_EXTENSION_NAME = "helm"
 
 
 /**
- * The name of the `tiller` DSL sub-extension.
- */
-const val HELM_TILLLER_EXTENSION_NAME = "tiller"
-
-
-/**
  * The name of the `lint` DSL sub-extension.
  */
 const val HELM_LINT_EXTENSION_NAME = "lint"

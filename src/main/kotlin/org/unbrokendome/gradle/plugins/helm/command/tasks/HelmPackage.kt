@@ -4,9 +4,12 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -21,8 +24,22 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  */
 open class HelmPackage : AbstractHelmCommandTask() {
 
+    internal companion object {
+
+        /**
+         * Returns the name of the packaged chart file, according to the pattern
+         * `<name>-<version>.tgz`.
+         */
+        fun packagedChartFileName(chartName: Provider<String>, chartVersion: Provider<String>): Provider<String> =
+            chartName.flatMap { name ->
+                chartVersion.map { version -> "${name}-${version}.tgz" }
+            }
+    }
+
     /**
      * Set the appVersion on the chart to this version.
+     *
+     * Corresponds to the `--app-version` CLI option.
      */
     @get:[Input Optional]
     val appVersion: Property<String> =
@@ -30,7 +47,9 @@ open class HelmPackage : AbstractHelmCommandTask() {
 
 
     /**
-     * Update dependencies from "requirements.yaml" to dir "charts/" before packaging.
+     * Update dependencies from "Chart.yaml" to dir "charts/" before packaging.
+     *
+     * Corresponds to the `--dependency-update` CLI option.
      */
     @get:Input
     val updateDependencies: Property<Boolean> =
@@ -41,7 +60,6 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * The directory that contains the sources for the Helm chart.
      */
     @get:InputDirectory
-    @Suppress("LeakingThis")
     val sourceDir: DirectoryProperty =
         project.objects.directoryProperty()
 
@@ -83,14 +101,12 @@ open class HelmPackage : AbstractHelmCommandTask() {
     /**
      * Location to write the chart archive.
      *
-     * Default destination is `helm/charts/` under the project's build directory. This can also be configured
-     * globally using the [HelmExtension.outputDir] property of the
-     * `helm` DSL block.
+     * Default destination is `helm/charts/` under the project's build directory.
      */
     @get:Internal("Represented as part of chartOutputPath")
     val destinationDir: DirectoryProperty =
         project.objects.directoryProperty()
-            .convention(project.helm.outputDir)
+            .convention(project.layout.buildDirectory.dir("helm/charts"))
 
 
     /**
@@ -98,9 +114,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      */
     @get:Internal("Represented as part of chartOutputPath")
     val chartFileName: Provider<String> =
-        project.provider {
-            "${chartName.get()}-${chartVersion.get()}.tgz"
-        }
+        packagedChartFileName(chartName, chartVersion)
 
 
     /**
@@ -111,22 +125,6 @@ open class HelmPackage : AbstractHelmCommandTask() {
         destinationDir.file(chartFileName)
 
 
-    /**
-     * Indicates whether the chart should also be saved to the local repository after packaging.
-     *
-     * Corresponds to the `--save` command line parameter. Defaults to `false`.
-     */
-    @get:Input
-    val saveToLocalRepo: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(false)
-
-
-    init {
-        registerHelmHomeAsInputDir()
-    }
-
-
     @TaskAction
     fun helmPackage() {
 
@@ -134,11 +132,10 @@ open class HelmPackage : AbstractHelmCommandTask() {
         this.destinationDir.get().asFile.mkdirs()
 
         execHelm("package") {
-            option("--version", chartVersion)
             option("--app-version", appVersion)
             flag("--dependency-update", updateDependencies)
             option("--destination", destinationDir)
-            flag("--save", saveToLocalRepo, true)
+            option("--version", chartVersion)
             args(sourceDir)
         }
     }

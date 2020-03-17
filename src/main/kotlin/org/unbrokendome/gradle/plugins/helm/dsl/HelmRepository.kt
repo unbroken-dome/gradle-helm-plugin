@@ -4,7 +4,6 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainerSupport
@@ -25,6 +24,20 @@ interface HelmRepository : Named, CredentialsContainer {
      */
     val url: Property<URI>
 
+
+    /**
+     * Sets the URL of the repository to the given value.
+     *
+     * This is a shortcut for calling
+     * ```
+     * url.set( project.uri(path) )
+     * ```
+     *
+     * @param path the URL or path, evaluated as per [Project.uri]
+     */
+    fun url(path: Any)
+
+
     /**
      * An optional path to a CA bundle used to verify certificates of HTTPS-enabled servers.
      */
@@ -34,19 +47,19 @@ interface HelmRepository : Named, CredentialsContainer {
 
 private open class DefaultHelmRepository
 private constructor(
+    private val project: Project,
     private val name: String,
-    objects: ObjectFactory,
     credentialsContainer: CredentialsContainer
 ) : HelmRepository, CredentialsContainer by credentialsContainer {
 
 
-    private constructor(name: String, objects: ObjectFactory, credentialsFactory: CredentialsFactory)
-            : this(name, objects, CredentialsContainerSupport(objects, credentialsFactory))
+    private constructor(project: Project, name: String, credentialsFactory: CredentialsFactory)
+            : this(project, name, CredentialsContainerSupport(project.objects, credentialsFactory))
 
 
     @Inject
-    constructor(name: String, objects: ObjectFactory)
-            : this(name, objects, DefaultCredentialsFactory(objects))
+    constructor(project: Project, name: String)
+            : this(project, name, DefaultCredentialsFactory(project.objects))
 
 
     final override fun getName(): String =
@@ -54,11 +67,16 @@ private constructor(
 
 
     final override val url: Property<URI> =
-        objects.property()
+        project.objects.property()
+
+
+    override fun url(path: Any) {
+        this.url.set(project.uri(path))
+    }
 
 
     final override val caFile: RegularFileProperty =
-        objects.fileProperty()
+        project.objects.fileProperty()
 }
 
 
@@ -70,5 +88,5 @@ private constructor(
  */
 internal fun Project.helmRepositoryContainer(): NamedDomainObjectContainer<HelmRepository> =
     container(HelmRepository::class.java) { name ->
-        objects.newInstance(DefaultHelmRepository::class.java, name)
+        objects.newInstance(DefaultHelmRepository::class.java, project, name)
     }

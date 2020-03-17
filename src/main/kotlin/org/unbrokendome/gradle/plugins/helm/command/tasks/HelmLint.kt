@@ -1,13 +1,23 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
+import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
-import org.unbrokendome.gradle.plugins.helm.command.valuesOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -17,13 +27,12 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * Runs a series of tests to verify that a chart is well-formed.
  * Corresponds to the `helm lint` CLI command.
  */
-open class HelmLint : AbstractHelmCommandTask() {
+open class HelmLint : AbstractHelmCommandTask(), HelmValueOptions {
 
     /**
      * The directory that contains the sources for the Helm chart.
      */
     @get:[InputDirectory SkipWhenEmpty]
-    @Suppress("LeakingThis")
     val chartDir: DirectoryProperty =
         project.objects.directoryProperty()
 
@@ -38,18 +47,41 @@ open class HelmLint : AbstractHelmCommandTask() {
 
     /**
      * Values to be used by the linter.
+     *
+     * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
+     * `--set` option (for all other types).
      */
     @get:Input
-    val values: MapProperty<String, Any> =
+    final override val values: MapProperty<String, Any> =
+        project.objects.mapProperty()
+
+
+    /**
+     * Values read from the contents of files, to be used by the linter.
+     *
+     * Corresponds to the `--set-file` CLI option.
+     *
+     * The values of the map can be of any type that is accepted by [Project.file]. Additionally, when adding a
+     * [Provider] that represents an output file of another task, the corresponding install/upgrade task will
+     * automatically have a task dependency on the producing task.
+     *
+     * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
+     */
+    @get:Input
+    final override val fileValues: MapProperty<String, Any> =
         project.objects.mapProperty()
 
 
     /**
      * A collection of YAML files containing values to be used by the linter.
+     *
+     * Corresponds to the `--values` CLI option.
+     *
+     * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     @get:InputFiles
-    val valueFiles: ConfigurableFileCollection =
-        project.layout.configurableFiles()
+    final override val valueFiles: ConfigurableFileCollection =
+        project.objects.fileCollection()
 
 
     /**
@@ -64,7 +96,11 @@ open class HelmLint : AbstractHelmCommandTask() {
 
 
     init {
-        registerHelmHomeAsInputDir()
+        inputs.files(
+            fileValues.keySet().map { keys ->
+                keys.map { fileValues.getting(it) }
+            }
+        )
     }
 
 
@@ -73,7 +109,6 @@ open class HelmLint : AbstractHelmCommandTask() {
 
         execHelm("lint") {
             flag("--strict", strict)
-            valuesOptions(values, valueFiles)
             args(chartDir)
         }
 
@@ -81,4 +116,8 @@ open class HelmLint : AbstractHelmCommandTask() {
             GFileUtils.touch(it.asFile)
         }
     }
+
+
+    override val execProviderSupport: HelmExecProviderSupport
+        get() = super.execProviderSupport.addOptionsApplier(HelmValueOptionsApplier)
 }

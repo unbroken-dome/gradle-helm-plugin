@@ -1,54 +1,47 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
+import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
+
+
+private val namePattern =
+    RuleNamePattern.parse("helmUpdate<Chart>ChartDependencies")
 
 
 /**
- * A rule that creates a [HelmBuildOrUpdateDependencies] task for each chart.
- */
-internal class BuildDependenciesTaskRule(
-    private val tasks: TaskContainer,
-    private val charts: Iterable<HelmChart>
-) : AbstractRule() {
-
-    internal companion object {
-        fun getTaskName(chartName: String) =
-            "helmUpdate${chartName.capitalize()}ChartDependencies"
-    }
-
-
-    private val regex = Regex(getTaskName("(\\p{Upper}.*)"))
-
-
-    override fun getDescription(): String =
-        "Pattern: " + getTaskName("<Chart>")
-
-
-    override fun apply(taskName: String) {
-        if (regex.matches(taskName)) {
-            charts.find { it.updateDependenciesTaskName == taskName }
-                ?.let { chart ->
-
-                    val filterSourcesTask = tasks.getByName(chart.filterSourcesTaskName) as HelmFilterSources
-
-                    tasks.create(taskName, HelmBuildOrUpdateDependencies::class.java) { task ->
-                        task.description = "Builds or updates the dependencies for the ${chart.name} chart."
-                        task.chartDir.set(filterSourcesTask.targetDir)
-                        task.dependsOn(HelmPlugin.addRepositoriesTaskName)
-                        task.dependsOn(filterSourcesTask)
-                    }
-                }
-        }
-    }
-}
-
-
-/**
- * The name of the [HelmBuildOrUpdateDependencies] task for this chart.
+ * The name of the [HelmUpdateDependencies] task for this chart.
  */
 val HelmChart.updateDependenciesTaskName
-    get() = BuildDependenciesTaskRule.getTaskName(name)
+    get() = namePattern.mapName(name)
+
+
+
+/**
+ * A rule that creates a [HelmUpdateDependencies] task for each chart.
+ */
+internal class UpdateDependenciesTaskRule(
+    tasks: TaskContainer,
+    charts: NamedDomainObjectCollection<HelmChart>
+) : AbstractHelmChartTaskRule<HelmUpdateDependencies>(
+    HelmUpdateDependencies::class.java, tasks, charts, namePattern
+) {
+
+    override fun HelmUpdateDependencies.configureFrom(chart: HelmChart) {
+
+        description = "Builds or updates the dependencies for the ${chart.name} chart."
+
+        chartDir.set(chart.outputDir)
+
+        // We depend on the update repositories task (which will cache the repo index for some time),
+        // so no need to refresh again
+        skipRefresh.set(true)
+
+        dependsOn(
+            HelmPlugin.updateRepositoriesTaskName,
+            chart.collectChartSourcesTaskName
+        )
+    }
+}

@@ -1,6 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.testutil.assertions
 
 import assertk.Assert
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
@@ -37,3 +38,7 @@ fun Assert<Provider<RegularFile>>.fileValue() =
 fun Assert<Provider<Directory>>.dirValue() =
     isPresent()
         .prop("directory") { it.asFile }
+
+
+fun <K : Any, V : Any> Assert<Provider<Map<K, V>>>.contains(key: K, value: V) =
+    isPresent().contains(key, value)

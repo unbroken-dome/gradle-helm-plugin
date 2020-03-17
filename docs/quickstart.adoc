@@ -29,7 +29,6 @@ Put your Helm chart sources into `src/main/helm`:
                 📂 templates
                     📄 ...
                 📄 Chart.yaml
-                📄 requirements.yaml
                 📄 values.yaml
 ----
 

@@ -2,62 +2,40 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
+import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
+import org.unbrokendome.gradle.plugins.helm.command.HelmExecResult
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.util.*
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.listProperty
+import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
+import java.time.Duration
 import javax.inject.Inject
 
 
 /**
  * The main Helm DSL extension, accessible using the `helm { ... }` block in build scripts.
  */
-interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
+interface HelmExtension : HelmExecProvider, GlobalHelmOptions, HelmServerOptions {
 
     override val executable: Property<String>
 
     override val debug: Property<Boolean>
-
-    override val home: DirectoryProperty
-
-    /**
-     * Address of Tiller, in the format `host:port`.
-     *
-     * If this property is set, its value will be used to set the `HELM_HOST` environment variable for each
-     * Helm invocation.
-     */
-    val host: Property<String>
-
-    /**
-     * Name of the kubeconfig context to use.
-     *
-     * Corresponds to the `--kube-context` command line option in the Helm CLI.
-     */
-    val kubeContext: Property<String>
-
-    /**
-     * Path to the Kubernetes configuration file.
-     *
-     * If this property is set, its value will be used to set the `KUBECONFIG` environment variable for each
-     * Helm invocation.
-     */
-    val kubeConfig: RegularFileProperty
-
-    /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
-     *
-     * Corresponds to the `--timeout` command line option in the Helm CLI.
-     */
-    val timeoutSeconds: Provider<Int>
 
     /**
      * Base output directory for Helm charts.
@@ -68,48 +46,35 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
 }
 
 
+internal interface HelmExtensionInternal : HelmExtension {
+
+    /**
+     * Base temp directory where certain intermediate artifacts will be placed.
+     *
+     * Defaults to `"${project.buildDir}/tmp/helm"`.
+     */
+    val tmpDir: DirectoryProperty
+}
+
+
 private open class DefaultHelmExtension
 @Inject constructor(
-    project: Project,
+    private val project: Project,
     objects: ObjectFactory,
     layout: ProjectLayout
-) : HelmExtension {
-
-    @Suppress("LeakingThis")
-    private val execProviderSupport = HelmExecProviderSupport(project, this)
-
+) : HelmExtension, HelmExtensionInternal {
 
     final override val executable: Property<String> =
         objects.property<String>()
             .convention(
-                project.providerFromProjectProperty(
-                    "helm.executable",
-                    defaultValue = "helm", evaluateGString = true
-                )
+                project.providerFromProjectProperty("helm.executable", evaluateGString = true)
+                    .orElse("helm")
             )
 
 
     final override val debug: Property<Boolean> =
         objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.debug"))
-
-
-    private val defaultHelmHomePath: Provider<String> =
-        project.provider { System.getProperty("user.home") + "/.helm" }
-
-
-    final override val home: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.home", defaultValueProvider = defaultHelmHomePath, evaluateGString = true
-                )
-            )
-
-
-    final override val host: Property<String> =
-        objects.property<String>()
-            .convention(project.providerFromProjectProperty("helm.host"))
 
 
     final override val kubeContext: Property<String> =
@@ -122,9 +87,14 @@ private open class DefaultHelmExtension
             .convention(project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
 
 
-    final override val timeoutSeconds: Property<Int> =
-        objects.property<Int>()
-            .convention(project.intProviderFromProjectProperty("helm.timeoutSeconds"))
+    final override val remoteTimeout: Property<Duration> =
+        objects.property<Duration>()
+            .convention(project.durationProviderFromProjectProperty("helm.remoteTimeout"))
+
+
+    final override val namespace: Property<String> =
+        objects.property<String>()
+            .convention(project.providerFromProjectProperty("helm.namespace"))
 
 
     final override val extraArgs: ListProperty<String> =
@@ -134,16 +104,66 @@ private open class DefaultHelmExtension
     final override val outputDir: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.coalesceProvider(
-                    project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true),
-                    layout.buildDirectory.dir("helm/charts")
-                )
+                project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true)
+                    .orElse(layout.buildDirectory.dir("helm/charts"))
             )
 
 
-    final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>): ExecResult =
+    final override val tmpDir: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                project.dirProviderFromProjectProperty("helm.tmpDir", evaluateGString = true)
+                    .orElse(layout.buildDirectory.dir("tmp/helm"))
+            )
+
+
+    final override val xdgDataHome: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true)
+                    .orElse(project.layout.buildDirectory.dir("helm/data"))
+            )
+
+
+    final override val xdgConfigHome: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                project.dirProviderFromProjectProperty("helm.xdgConfigHome", evaluateGString = true)
+                    .orElse(project.layout.buildDirectory.dir("helm/config"))
+            )
+
+
+    final override val xdgCacheHome: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                project.dirProviderFromProjectProperty("helm.xdgCacheHome", evaluateGString = true)
+                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/cache"))
+            )
+
+
+    final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =
         execProviderSupport.execHelm(command, subcommand, action)
+
+
+    final override fun execHelmCaptureOutput(
+        command: String, subcommand: String?, action: Action<HelmExecSpec>?
+    ): HelmExecResult =
+        execProviderSupport.execHelmCaptureOutput(command, subcommand, action)
+
+
+    private val execProviderSupport: HelmExecProviderSupport
+        get() = HelmExecProviderSupport(project, this, GlobalHelmOptionsApplier)
 }
+
+
+/**
+ * Returns the root directory of this project as a [Directory].
+ *
+ * @receiver the Gradle [Project]
+ * @see Project.getRootDir
+ */
+private val Project.rootDirAsDirectory: Directory
+    get() = project.rootProject.layout.projectDirectory
 
 
 /**

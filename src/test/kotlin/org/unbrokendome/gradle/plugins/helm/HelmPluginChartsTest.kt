@@ -2,17 +2,37 @@ package org.unbrokendome.gradle.plugins.helm
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsOnly
+import assertk.assertions.each
+import assertk.assertions.extracting
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.prop
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Task
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmBuildOrUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
-import org.unbrokendome.gradle.plugins.helm.dsl.*
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
+import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.plugins.helm.dsl.Linting
+import org.unbrokendome.gradle.plugins.helm.dsl.charts
+import org.unbrokendome.gradle.plugins.helm.dsl.filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.lint
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.*
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.contains
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsItem
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.dirValue
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.doesNotContainItem
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.taskDependencies
+import org.unbrokendome.gradle.plugins.helm.testutil.directory
 
 
 class HelmPluginChartsTest : AbstractGradleProjectTest() {
@@ -65,14 +85,14 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
     fun `Chart's filtering should inherit from global filtering`() {
         addChart()
         with(project.helm.filtering) {
-            placeholderPrefix.set("_O_o_")
+            this.values.put("foo", "bar")
         }
 
         assertThat(this::helmCharts)
             .containsItem("myChart")
             .hasExtension<Filtering>("filtering")
-            .prop(Filtering::placeholderPrefix).isPresent()
-            .isEqualTo("_O_o_")
+            .prop(Filtering::values)
+            .contains("foo", "bar")
     }
 
 
@@ -92,13 +112,13 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
 
 
     @Test
-    fun `Plugin should create a HelmBuildOrUpdateDependencies task for each chart`() {
+    fun `Plugin should create a HelmUpdateDependencies task for each chart`() {
         addChart()
 
         assertThat(this::project)
-            .containsTask<HelmBuildOrUpdateDependencies>("helmUpdateMyChartChartDependencies")
+            .containsTask<HelmUpdateDependencies>("helmUpdateMyChartChartDependencies")
             .all {
-                prop(HelmBuildOrUpdateDependencies::chartDir).dirValue()
+                prop(HelmUpdateDependencies::chartDir).dirValue()
                     .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
             }
     }
@@ -153,6 +173,12 @@ class HelmPluginChartsTest : AbstractGradleProjectTest() {
         project.version = "2.5.9"
 
         evaluateProject()
+
+        directory(project.projectDir) {
+            directory("src/main/helm") {
+                file("Chart.yaml", contents = "apiVersion: v2")
+            }
+        }
 
         assertThat(this::helmCharts)
             .containsItem("main")

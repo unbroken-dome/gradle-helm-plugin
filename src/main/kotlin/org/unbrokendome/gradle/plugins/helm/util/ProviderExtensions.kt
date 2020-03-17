@@ -2,7 +2,9 @@ package org.unbrokendome.gradle.plugins.helm.util
 
 import groovy.lang.Closure
 import groovy.util.Eval
+import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
+import java.io.File
 import java.net.URI
 
 
@@ -44,3 +46,12 @@ internal fun Provider<String>.asGString(evalRoot: Any): Provider<String> =
  */
 internal fun Provider<String>.toUri(): Provider<URI> =
     map(URI::create)
+
+
+/**
+ * Returns a new [Provider] that returns the path of the [FileSystemLocation] as a [File] object.
+ *
+ * @receiver the [Provider] of the [FileSystemLocation] (either a `Provider<RegularFile>` or `Provider<Directory`)
+ */
+internal fun <T : FileSystemLocation> Provider<T>.asFile(): Provider<File> =
+    map { it.asFile }

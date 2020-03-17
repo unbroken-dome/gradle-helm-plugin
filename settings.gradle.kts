@@ -1,7 +1,8 @@
-val kotlinVersion: String by settings
 pluginManagement {
+    val kotlinVersion: String by settings
     resolutionStrategy.eachPlugin {
-        if (requested.id.namespace == "org.jetbrains.kotlin") {
+        if (requested.id.namespace == "org.jetbrains.kotlin" ||
+                requested.id.namespace.orEmpty().startsWith("org.jetbrains.kotlin.")) {
             useVersion(kotlinVersion)
         }
     }

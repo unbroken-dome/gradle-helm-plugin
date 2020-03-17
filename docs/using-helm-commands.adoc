@@ -24,14 +24,7 @@ plugins {
     id 'org.unbroken-dome.helm-commands' version '<VERSION>'
 }
 
-helm {
-    home = file("${project.buildDir}/helm/home")
-}
-
-task helmInit(type: HelmInit)
-
 task installMariaDb(type: HelmInstall) {
-    dependsOn helmInit
     chart = 'stable/mariadb'
     version = '4.3.1'
     releaseName = 'mariadb'

@@ -1,13 +1,33 @@
 = Managing Releases
 
-With the `helm-release` plugin, you can manage Helm releases on a remote Kubernetes cluster.
+With the `helm-releases` plugin, you can manage Helm releases on a remote Kubernetes cluster.
 
 It allows you to define your releases in the Gradle DSL, in a declarative fashion. In this way, it can
 be used as an alternative to tools like https://github.com/roboll/helmfile[Helmfile] or
 https://github.com/Praqma/Helmsman[Helmsman], with the advantage of leveraging the full power of Gradle
 instead of defining a custom file format.
 
-Define your releases using the `helm.repositories` block in your Gradle script:
+
+Apply the `helm-releases` plugin to your project:
+
+[source,groovy,role="primary",subs="+attributes"]
+.Groovy
+----
+plugins {
+    id 'org.unbroken-dome.helm-releases' version '{project-version}'
+}
+----
+
+[source,kotlin,role="secondary",subs="+attributes"]
+.Kotlin
+----
+plugins {
+    id("org.unbroken-dome.helm-releases") version "{project-version}"
+}
+----
+
+
+Define your releases using the `helm.releases` block in your Gradle script:
 
 [source,groovy,role="primary"]
 .Groovy
@@ -48,7 +68,7 @@ helm {
 ----
 
 There are quite a few properties you can set for a release; most of them correspond to a command line
-option in `helm install`, `helm upgrade` or `helm delete`.
+option in `helm install`, `helm upgrade` or `helm uninstall`.
 
 The `from` method is quite powerful, as it accepts various sources for the chart from which the release
 will be created. Besides a `String` (for specifying the chart directly), it can also be a `File`,
@@ -84,15 +104,13 @@ helm {
 .Kotlin
 ----
 helm {
-    charts {
-        create("foo") {
-            // configure the foo chart ...
-        }
+    val foo by charts.creating {
+        // configure the foo chart ...
     }
 
     releases {
-        foo {
-            from charts["foo"]
+        create("foo") {
+            from(foo)
         }
     }
 }
@@ -135,8 +153,8 @@ Task `helmInstall<X>`::
 Installs the release named X. This task will also do upgrades; depending on the `replace` property
 it will either call `helm upgrade --install` (by default) or `helm install --replace`.
 
-Task `helmDelete<X>`::
-Deletes the release named X (by calling `helm delete`).
+Task `helmUninstall<X>`::
+Uninstalls the release named X (by calling `helm uninstall`).
 
 
 In addition, there will be the following tasks to manage _all_ releases in the project at once:
@@ -144,8 +162,8 @@ In addition, there will be the following tasks to manage _all_ releases in the p
 Task `helmInstall`::
 Install or upgrade all releases.
 
-Task `helmDelete`::
-Delete all releases.
+Task `helmUninstall`::
+Uninstall all releases configured in the build script.
 
 TIP: If you use a chart built by the helm plugin for a release, the corresponding `helmInstall`
 task will have a task dependency on the `helmPackage` task so that the chart is guaranteed to be
@@ -155,14 +173,14 @@ up to date before it is installed.
 == Release Dependencies
 
 You can express dependencies between releases, to influence the order of installations/deletions
-when using the `helmInstall` or `helmDelete` task. A release will always be installed after all
-its dependencies, and deleted before its dependencies are deleted.
+when using the `helmInstall` or `helmUninstall` task. A release will always be installed after all
+its dependencies, and uninstalled before its dependencies are uninstalled.
 
 Currently it is not possible to define dependencies on releases in another Gradle project.
 
 TIP: While a release dependency influences the order of `install` invocations, it does not guarantee
 that the release will be up and running on the cluster when the installation of the dependent release
-begins.. By default, `helm install` does not wait until the deployment is complete -- if this is what
+begins. By default, `helm install` does not wait until the deployment is complete -- if this is what
 you need, you can set `wait` to `true` in the release, so that the install/upgrade command is invoked
 with the `--wait` flag.
 
@@ -197,3 +215,15 @@ helm.releases {
     }
 }
 ----
+
+
+== Install/Upgrade logic
+
+The installation task that the plugin creates for each release, named `helmInstall<Name>Release`, will perform an
+install or upgrade based on the following logic:
+
+* if the release has the `replace` property set to `true`, it will always call `helm install --replace`
+* Otherwise, it calls `helm ls` as an intermediate step to determine the current status of the release.
+** if the release exists but previously failed, it will call `helm install --replace`. This works around the
+  `UPGRADE FAILED: "<name>" has no deployed releases` issue if a previous call to `helm install` was not successful.
+** Otherwise, it will call `helm upgrade --install` (also if the release does not exist).

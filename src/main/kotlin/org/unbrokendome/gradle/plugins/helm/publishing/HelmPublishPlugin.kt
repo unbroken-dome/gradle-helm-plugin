@@ -13,7 +13,11 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.charts
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.*
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmChartPublishConvention
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmChartPublishConvention
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmPublishingExtension
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.repositories
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartToRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.publishTaskName
@@ -43,8 +47,8 @@ class HelmPublishPlugin
 
             project.tasks.run {
                 val repositories = publishingExtension.repositories
-                addRule(HelmPublishChartToRepositoryTaskRule(project, charts, repositories))
-                addRule(HelmPublishChartTaskRule(project, charts, repositories))
+                addRule(HelmPublishChartToRepositoryTaskRule(this, charts, repositories))
+                addRule(HelmPublishChartTaskRule(this, charts, repositories))
             }
 
             createPublishAllTask(project, charts)
@@ -81,7 +85,7 @@ class HelmPublishPlugin
      * Create a task that publishes all charts in the project to all publishing repositories.
      */
     private fun createPublishAllTask(project: Project, charts: NamedDomainObjectContainer<HelmChart>) {
-        project.tasks.create("helmPublish") { task ->
+        project.tasks.register("helmPublish") { task ->
             task.group = HELM_GROUP
             task.description = "Publishes all Helm charts."
 

@@ -82,7 +82,7 @@ plugins {
 
 == `helm-releases`
 
-Use this plugin to manage Helm releases (install/update/delete) on a remote Kubernetes cluster.
+Use this plugin to manage Helm releases (install/upgrade/uninstall) on a remote Kubernetes cluster.
 
 It enables the `helm.releases` DSL block, where you can declare your releases using Gradle DSL, referencing either
  Helm charts built using the other projects, or existing charts from a Helm repository.

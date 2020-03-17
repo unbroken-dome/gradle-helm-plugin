@@ -1,12 +1,31 @@
 package org.unbrokendome.gradle.plugins.helm.rules
 
-import org.gradle.api.Project
+import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.dsl.ArtifactHandler
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+
+
+private val namePattern =
+    RuleNamePattern.parse("helm<Chart>Packaged")
+
+
+/**
+ * The name of the [Configuration] that contains the packaged artifact for this chart.
+ */
+val HelmChart.packagedArtifactConfigurationName: String
+    get() = namePattern.mapName(name)
+
+
+/**
+ * Gets the name of the [Configuration] that contains the packaged artifact for a chart with the given name.
+ *
+ * @param chartName the chart name
+ * @return the packaged chart artifact configuration name
+ */
+internal fun chartPackagedArtifactConfigurationName(chartName: String): String =
+    namePattern.mapName(chartName)
 
 
 /**
@@ -15,50 +34,25 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
  * The artifact will contain a single file, which is the tar.gz package file of the chart.
  */
 internal class ChartPackagedArtifactRule(
-    private val configurations: ConfigurationContainer,
+    configurations: ConfigurationContainer,
     private val tasks: TaskContainer,
-    private val artifacts: ArtifactHandler,
-    private val charts: Iterable<HelmChart>
-) : AbstractRule() {
+    charts: NamedDomainObjectCollection<HelmChart>
+) : AbstractPatternRule<HelmChart, Configuration>(
+    configurations, charts, namePattern
+) {
 
-    constructor(project: Project, charts: Iterable<HelmChart>)
-            : this(project.configurations, project.tasks, project.artifacts, charts)
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun Configuration.configureFrom(chart: HelmChart) {
 
+        isCanBeResolved = false
+        isCanBeConsumed = true
 
-    internal companion object {
-        fun getConfigurationName(chartName: String) =
-            "helm${chartName.capitalize()}Packaged"
-    }
-
-
-    private val regex = Regex(getConfigurationName("(\\p{Upper}.*)"))
-
-
-    override fun getDescription(): String =
-        "Pattern: " + getConfigurationName("<Chart>")
-
-
-    override fun apply(configurationName: String) {
-        if (regex.matches(configurationName)) {
-            charts.find { it.packagedArtifactConfigurationName == configurationName }
-                ?.let { chart ->
-                    configurations.create(configurationName)
-
-                    val packageTask = tasks.getByName(chart.packageTaskName) as HelmPackage
-
-                    artifacts.add(configurationName, packageTask.chartOutputPath) {
-                        it.builtBy(packageTask)
-                        it.name = chart.chartName.get()
-                        it.extension = "tgz"
-                    }
-                }
+        outgoing { publications ->
+            publications.artifact(chart.packageOutputFile) { artifact ->
+                artifact.builtBy(tasks.named(chart.packageTaskName))
+                artifact.name = chart.chartName.get()
+                artifact.extension = "tgz"
+            }
         }
     }
 }
-
-
-/**
- * The name of the [Configuration] that contains the package artifact for this chart.
- */
-val HelmChart.packagedArtifactConfigurationName: String
-    get() = ChartPackagedArtifactRule.getConfigurationName(name)

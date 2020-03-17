@@ -2,7 +2,10 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.unbrokendome.gradle.plugins.helm.*
+import org.unbrokendome.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.HELM_REPOSITORIES_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
 
 
@@ -11,13 +14,6 @@ import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
  */
 internal val Project.helm: HelmExtension
     get() = extensions.getByType(HelmExtension::class.java)
-
-
-/**
- * Gets the [Tiller] sub-extension.
- */
-internal val HelmExtension.tiller: Tiller
-    get() = requiredExtension(HELM_TILLLER_EXTENSION_NAME)
 
 
 /**
@@ -30,7 +26,7 @@ internal val HelmExtension.lint: Linting
 /**
  * Gets the `repositories` sub-extension.
  */
-internal val HelmExtension.repositories: NamedDomainObjectContainer<HelmRepository>
+internal val HelmExtension.repositories: HelmRepositoryHandler
     get() = requiredExtension(HELM_REPOSITORIES_EXTENSION_NAME)
 
 

@@ -17,13 +17,14 @@ class DirectoryBuilder(private val path: Path) {
         check(Files.isDirectory(path)) { "Directory \"$path\" exists and is not a directory" }
     }
 
-    fun directory(name: String, spec: DirectoryBuilder.() -> Unit) {
+    fun directory(name: String, spec: (DirectoryBuilder.() -> Unit)? = null) {
         val subPath = this.path.resolve(name)
         if (!Files.exists(subPath)) {
             Files.createDirectories(subPath)
         }
         check(Files.isDirectory(subPath)) { "Directory \"$subPath\" exists and is not a directory" }
-        DirectoryBuilder(subPath).let(spec)
+        val builder = DirectoryBuilder(subPath)
+        spec?.invoke(builder)
     }
 
     fun file(name: String, contents: String, append: Boolean = false, charset: Charset = Charsets.UTF_8) {

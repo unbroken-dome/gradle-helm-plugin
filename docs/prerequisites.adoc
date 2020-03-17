@@ -9,11 +9,16 @@ in Gradle 5.1, earlier versions of Gradle are unfortunately not supported.
 
 * JDK 8 or higher (for running Gradle)
 
-* Helm CLI
+* Helm CLI (3.+)
 +
 This plugin delegates all `helm` commands to a locally installed Helm CLI. See
 https://docs.helm.sh/using_helm/#installing-helm[Installing Helm] in the Helm documentation for installation
 instructions on various systems.
++
+Starting with version 0.5.0, the plugin requires Helm 3. However, the chart API version `v1` is still
+supported by Helm 3, and also by the plugin. (The main difference between `v1` and `v2` is that `v1` declares
+chart dependencies in a file called `requirements.yaml`, whereas in `v2` the dependencies are declared
+directly in the `Chart.yaml` file.)
 +
 INFO: Delegating to the Helm CLI decouples the plugin release cycle from the Helm release cycle, but it also
 means that some features offered by the plugin may not be available in the CLI and vice versa.

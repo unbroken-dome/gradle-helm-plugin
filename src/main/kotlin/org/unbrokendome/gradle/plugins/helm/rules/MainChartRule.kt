@@ -19,19 +19,20 @@ internal class MainChartRule(
     private val charts: NamedDomainObjectContainer<HelmChart>
 ) : AbstractRule() {
 
-
     override fun getDescription(): String =
         "main chart"
 
 
     override fun apply(chartName: String) {
         if (chartName == HELM_MAIN_CHART_NAME && charts.isEmpty()) {
-            charts.create(HELM_MAIN_CHART_NAME) { mainChart ->
-                mainChart.chartName.set(project.name)
-                mainChart.chartVersion.set(project.provider { project.version.toString() })
-                mainChart.sourceDir.set(
-                    project.layout.projectDirectory.dir("src/main/helm")
-                )
+
+            if (project.file("src/main/helm/Chart.yaml").isFile) {
+                charts.create(HELM_MAIN_CHART_NAME) { mainChart ->
+                    mainChart.chartName.convention(project.name)
+                    mainChart.sourceDir.convention(
+                        project.layout.projectDirectory.dir("src/main/helm")
+                    )
+                }
             }
         }
     }
