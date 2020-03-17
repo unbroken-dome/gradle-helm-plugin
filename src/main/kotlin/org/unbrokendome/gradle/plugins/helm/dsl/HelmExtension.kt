@@ -71,31 +71,6 @@ interface HelmExtension : HelmExecProvider, GlobalHelmOptions {
      * Defaults to `"${project.buildDir}/helm/charts"`.
      */
     val outputDir: DirectoryProperty
-
-    /**
-     * Path to the registry config file.
-     *
-     * Corresponds to the `--registry-config` CLI parameter.
-     * Defaults to the file `helm/registry.json` below the
-     * [xdgConfigHome] directory.
-     */
-    override val registryConfigFile: RegularFileProperty
-
-    /**
-     * Path to the directory containing cached repository indexes.
-     *
-     * Corresponds to the `--repository-cache` CLI parameter. Defaults to the directory `helm/repository` below the
-     * [xdgCacheHome] directory.
-     */
-    override val repositoryCacheDir: DirectoryProperty
-
-    /**
-     * Path to the file containing repository names and URLs.
-     *
-     * Corresponds to the `--repository-config` CLI parameter. Defaults to the file `helm/repositories.yaml` below
-     * the [xdgConfigHome] directory.
-     */
-    override val repositoryConfigFile: RegularFileProperty
 }
 
 
@@ -192,21 +167,6 @@ private open class DefaultHelmExtension
                 project.dirProviderFromProjectProperty("helm.xdgCacheHome", evaluateGString = true)
                     .orElse(project.rootDirAsDirectory.dir(".gradle/helm/cache"))
             )
-
-
-    final override val registryConfigFile: RegularFileProperty =
-        objects.fileProperty()
-            .convention(xdgConfigHome.file("helm/registry.json"))
-
-
-    final override val repositoryCacheDir: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(xdgCacheHome.dir("helm/repository"))
-
-
-    final override val repositoryConfigFile: RegularFileProperty =
-        objects.fileProperty()
-            .convention(xdgConfigHome.file("helm/repositories.yaml"))
 
 
     final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =

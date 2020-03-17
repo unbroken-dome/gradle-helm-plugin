@@ -32,7 +32,7 @@ open class HelmUpdateRepositories : AbstractHelmCommandTask() {
      * Lock file to synchronize multiple [HelmUpdateRepositories] tasks that access the same cache directory.
      */
     private val taskSyncLockFile: Provider<RegularFile> =
-        repositoryCacheDir.file("gradle-helm-update.lock")
+        repositoryCacheDir.map { it.file("gradle-helm-update.lock") }
 
 
     /**

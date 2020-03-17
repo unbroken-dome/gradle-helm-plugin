@@ -1,10 +1,12 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -65,21 +67,18 @@ abstract class AbstractHelmCommandTask : DefaultTask(), GlobalHelmOptions {
 
 
     @get:Internal
-    final override val registryConfigFile: RegularFileProperty =
-        project.objects.fileProperty()
-            .convention(xdgConfigHome.file("helm/registry.json"))
+    protected val registryConfigFile: Provider<RegularFile>
+        get() = xdgConfigHome.file("helm/registry.json")
 
 
     @get:Internal
-    final override val repositoryCacheDir: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(xdgCacheHome.dir("helm/repository"))
+    protected val repositoryCacheDir: Provider<Directory>
+        get() = xdgCacheHome.dir("helm/repository")
 
 
     @get:Internal
-    final override val repositoryConfigFile: RegularFileProperty =
-        project.objects.fileProperty()
-            .convention(xdgConfigHome.file("helm/repositories.yaml"))
+    protected val repositoryConfigFile: Provider<RegularFile>
+        get() = xdgConfigHome.file("helm/repositories.yaml")
 
 
     protected fun execHelm(

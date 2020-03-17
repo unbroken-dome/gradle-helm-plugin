@@ -1,7 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
@@ -59,21 +58,6 @@ interface GlobalHelmOptions : HelmOptions {
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
     val xdgCacheHome: DirectoryProperty
-
-    /**
-     * Path to the registry config file.
-     */
-    val registryConfigFile: RegularFileProperty
-
-    /**
-     * Path to the directory containing cached repository indexes.
-     */
-    val repositoryCacheDir: DirectoryProperty
-
-    /**
-     * Path to the file containing repository names and URLs.
-     */
-    val repositoryConfigFile: RegularFileProperty
 }
 
 

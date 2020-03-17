@@ -46,9 +46,6 @@ class HelmCommandsPlugin
                 xdgDataHome.set(helmExtension.xdgDataHome)
                 xdgConfigHome.set(helmExtension.xdgConfigHome)
                 xdgCacheHome.set(helmExtension.xdgCacheHome)
-                registryConfigFile.set(helmExtension.registryConfigFile)
-                repositoryCacheDir.set(helmExtension.repositoryCacheDir)
-                repositoryConfigFile.set(helmExtension.repositoryConfigFile)
             }
         }
 
