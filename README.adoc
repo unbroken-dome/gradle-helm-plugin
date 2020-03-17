@@ -10,6 +10,8 @@ endif::[]
 
 This is a suite of Gradle plugins for building, publishing and managing https://www.helm.sh/[Helm] charts.
 
+NOTE: Starting with version 1.0.0, the plugins require Helm 3.+.
+
 
 == Features
 
@@ -35,7 +37,7 @@ Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
 [source,groovy]
 ----
 plugins {
-  id 'org.unbroken-dome.helm' version '0.4.4'
+  id 'org.unbroken-dome.helm' version '1.0.0'
 }
 ----
 
