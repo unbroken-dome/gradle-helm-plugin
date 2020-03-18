@@ -217,6 +217,6 @@ to do some processing for correct YAML indentation):
 [source,yaml]
 .values.yaml
 ----
-rsaKey: |-
-${ rsaKey.readLines().each { "  $it" } }
+rsaKey: |
+  ${ rsaKey.collectReplacements { it == '\n' ? '\n    ' : null } }
 ----
