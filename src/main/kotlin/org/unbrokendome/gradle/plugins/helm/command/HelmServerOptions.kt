@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.toHelmString
 import java.time.Duration
 
@@ -44,8 +45,14 @@ interface HelmServerOptions : GlobalHelmOptions {
 
 internal object HelmServerOptionsApplier : HelmOptionsApplier {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+
     override fun apply(spec: HelmExecSpec, options: HelmOptions) {
         if (options is HelmServerOptions) {
+
+            logger.debug("Applying HelmServerOptions {}", options)
+
             with(spec) {
                 option("--kube-context", options.kubeContext)
                 option("--namespace", options.namespace)

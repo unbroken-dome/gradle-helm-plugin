@@ -106,6 +106,7 @@ internal class HelmExecProviderSupport(
             fun applyAll(optionsApplier: HelmOptionsApplier) {
                 if (optionsAppliersCalled.add(optionsApplier)) {
                     optionsApplier.implies.forEach { applyAll(it) }
+                    logger.debug("Calling OptionsApplier: {} with options: {}", optionsApplier, options)
                     optionsApplier.apply(helmExecSpec, options)
                 }
             }

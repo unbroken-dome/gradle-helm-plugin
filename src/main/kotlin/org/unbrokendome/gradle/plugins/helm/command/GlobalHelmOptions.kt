@@ -3,6 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.command
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
+import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 
 
@@ -64,8 +65,13 @@ interface GlobalHelmOptions : HelmOptions {
 
 internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun apply(spec: HelmExecSpec, options: HelmOptions) {
         if (options is GlobalHelmOptions) {
+
+            logger.debug("Applying GlobalHelmOptions: {}", options)
+
             with(spec) {
                 withExecSpec {
                     executable = options.executable.getOrElse("helm")

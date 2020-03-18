@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
+import org.slf4j.LoggerFactory
 
 
 interface HelmValueOptions {
@@ -44,8 +45,14 @@ interface HelmValueOptions {
 
 internal object HelmValueOptionsApplier : HelmOptionsApplier {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+
     override fun apply(spec: HelmExecSpec, options: HelmOptions) {
         if (options is HelmValueOptions) {
+
+            logger.debug("Applying HelmValueOptions: {}", options)
+
             with(spec) {
 
                 val (stringValues, otherValues) = options.values.getOrElse(emptyMap()).toList()

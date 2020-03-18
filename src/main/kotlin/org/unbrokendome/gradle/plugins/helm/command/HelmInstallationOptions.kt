@@ -1,19 +1,15 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
-import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.slf4j.LoggerFactory
 import java.net.URI
 
 
-internal interface HelmInstallationOptions : HelmServerOptions {
+internal interface HelmInstallationOptions : HelmServerOptions, HelmValueOptions {
 
     /**
      * Release name.
@@ -127,42 +123,6 @@ internal interface HelmInstallationOptions : HelmServerOptions {
 
 
     /**
-     * Values to be used for the release.
-     *
-     * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
-     * `--set` option (for all other types).
-     */
-    @get:Input
-    val values: MapProperty<String, Any>
-
-
-    /**
-     * Values read from the contents of files, to be used for the release.
-     *
-     * Corresponds to the `--set-file` CLI option.
-     *
-     * The values of the map can be of any type that is accepted by [Project.file]. Additionally, when adding a
-     * [Provider] that represents an output file of another task, this task will automatically have a task
-     * dependency on the producing task.
-     *
-     * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
-     */
-    @get:Input
-    val fileValues: MapProperty<String, Any>
-
-
-    /**
-     * A collection of YAML files containing values for this release.
-     *
-     * Corresponds to the `--values` CLI option.
-     *
-     * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
-     */
-    @get:InputFiles
-    val valueFiles: ConfigurableFileCollection
-
-
-    /**
      * If `true`, verify the package before installing it.
      *
      * Corresponds to the `--verify` CLI parameter.
@@ -191,8 +151,14 @@ internal interface HelmInstallationOptions : HelmServerOptions {
 
 internal object HelmInstallationOptionsApplier : HelmOptionsApplier {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+
     override fun apply(spec: HelmExecSpec, options: HelmOptions) {
         if (options is HelmInstallationOptions) {
+
+            logger.debug("Applying HelmInstallationOptions: {}", options)
+
             with(spec) {
 
                 args(options.releaseName)
@@ -216,5 +182,5 @@ internal object HelmInstallationOptionsApplier : HelmOptionsApplier {
     }
 
     override val implies: List<HelmOptionsApplier>
-        get() = listOf(HelmValueOptionsApplier)
+        get() = listOf(HelmServerOptionsApplier, HelmValueOptionsApplier)
 }
