@@ -4,6 +4,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.unbrokendome.gradle.plugins.helm.command.helmCommandSupport
 import org.unbrokendome.gradle.plugins.helm.util.property
 
 
@@ -38,12 +39,30 @@ open class HelmUninstall : AbstractHelmServerCommandTask() {
         project.objects.property()
 
 
+    init {
+        outputs.upToDateWhen {
+            !doesReleaseExist()
+        }
+    }
+
+
     @TaskAction
     fun uninstallRelease() {
+
         execHelm("uninstall") {
             args(releaseName)
             flag("--dry-run", dryRun)
             flag("--keep-history", keepHistory)
         }
+    }
+
+
+    private fun doesReleaseExist(): Boolean {
+        val release = helmCommandSupport.getRelease(releaseName)
+        if (release == null) {
+            logger.info("Release \"{}\" does not exist. Skipping uninstall.")
+            return false
+        }
+        return true
     }
 }
