@@ -227,3 +227,457 @@ install or upgrade based on the following logic:
 ** if the release exists but previously failed, it will call `helm install --replace`. This works around the
   `UPGRADE FAILED: "<name>" has no deployed releases` issue if a previous call to `helm install` was not successful.
 ** Otherwise, it will call `helm upgrade --install` (also if the release does not exist).
+
+
+== Installation Task Dependencies
+
+Sometimes it is necessary to execute other task dependencies before a release can be installed. For example, when
+using Helm and link:https://plugins.gradle.org/plugin/com.google.cloud.tools.jib[jib] together, you may want to
+call the `jib` task that builds your Docker image before you install the release.
+
+You can declare such dependencies using the `installDependsOn` property or method on the release:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releases {
+
+    myApp {
+        // ...
+        installDependsOn 'jib'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releases {
+
+    create("myApp") {
+        // ...
+        installDependsOn("jib")
+    }
+}
+----
+
+
+== Using Release Targets
+
+A frequent requirement when using Helm is to designate different _release targets_, with target-specific configuration
+applied to each chart depending on the target. For example, you might use release targets to model different
+server environments, stages of development (e.g. dev / test / production), or different variants of installation.
+
+=== Defining Release Targets
+
+Use the `helm.releaseTargets` container in the Gradle build script to add release targets. For example, you might
+want to use a different `kubeContext` for each target, and use the `--atomic` flag only for production installs:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releaseTargets {
+        local {
+            kubeContext = 'docker-for-desktop'
+        }
+        production {
+            kubeContext = 'aws'
+            atomic = true
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releaseTargets {
+        create("local") {
+            kubeContext.set("docker-for-desktop")
+        }
+        create("production") {
+            kubeContext.set("aws")
+            atomic.set(true)
+        }
+    }
+}
+----
+
+INFO: If you don't create your own release targets, the plugin will create a release target named `default` that
+uses all the default properties. As soon as you create other release targets, the `default` target will back away.
+
+Values (and related properties) can be added to a release target as well, and they will be used for _every_ release
+that is installed to this target:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releaseTargets {
+        local {
+            values.put('replication.enabled', false)
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releaseTargets {
+        create("local") {
+            values.put("replication.enabled", false)
+        }
+    }
+}
+----
+
+
+When a release is installed to a target, the parameters for the `helm install` / `helm upgrade` call are determined
+from the properties of both the release and the release target. If a property is defined on both the release and the
+release target, the release has precedence (except for values, which will be merged from both sources).
+
+
+=== Installing to and Uninstalling From a Specific Target
+
+For each Gradle run, one of the release targets will be the _active_ release target. This can be controlled by setting
+the `helm.release.target` property:
+
+[source,bash]
+----
+./gradlew helmInstall -Phelm.release.target=production
+----
+
+It is also useful to set a default value for this property in your `gradle.properties` file, to indicate a default
+release target that can be selectively overridden on the command line:
+
+[source]
+.gradle.properties
+----
+helm.release.target=local
+----
+
+TIP: For each Gradle build with the plugin, there can only ever be one active release target. You cannot install
+charts to multiple targets from within the same build. Even though the plugin registers tasks like
+`helmInstallMyReleaseToLocal` even for inactive targets, those will be SKIPPED when part of the task execution graph.
+
+
+=== Target-Specific Release Configuration
+
+Inside a `release`, you can add a `forTarget { }` block that applies configuration only for a specific target.
+For example, many Helm charts can be configured to create a `Secret` or use an existing secret:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releaseTargets {
+        local
+        production
+    }
+
+    releases {
+        myApp {
+            from 'my-repo/my-application'
+            forTarget('local') {
+                values.put('auth.username', 'username')
+                values.put('auth.password', 'password')
+            }
+            forTarget('production') {
+                values.put('auth.existingSecret', 'some-existing-secret')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releaseTargets {
+        create("local")
+        create("production")
+    }
+
+    releases {
+        create("myApp") {
+            from("my-repo/my-application")
+            forTarget("local") {
+                values.put("auth.username", "username")
+                values.put("auth.password", "password")
+            }
+            forTarget("production") {
+                values.put("auth.existingSecret", "some-existing-secret")
+            }
+        }
+    }
+}
+----
+
+TIP: If you prefix the argument to `forTarget` with an exclamation mark (e.g. `forTarget("!local")`), the block
+will be evaluated for all targets _but_ the given one.
+
+`forTarget` blocks are evaluated lazily when the release is actually installed to the given target. You can modify
+most of the properties of the `release` in the `forTarget` block. For example, to add additional installation task
+dependencies based on the target, call `installDependsOn` inside a `forTarget` block:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releases {
+        myApp {
+            from 'my-repo/my-application'
+            forTarget('local') {
+                installDependsOn 'jibDockerBuild'
+            }
+            forTarget('production') {
+                installDependsOn 'jib'
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releases {
+        create("myApp") {
+            from("my-repo/my-application")
+            forTarget("local") {
+                installDependsOn("jibDockerBuild")
+            }
+            forTarget("!local") {
+                installDependsOn("jib")
+            }
+        }
+    }
+}
+----
+
+If you need to apply dynamic target-specific configuration that depends on the target name, the scope of each
+`forTarget` block contains a `target` property that allows access to the target for which the release is being
+configured. In the case where this `target` reference is all you need, you could even use `forAnyTarget`, which
+is always called.
+
+For example, to pass a specific file to `fileValues`, whose name depends on the release target name,
+you could do this:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releases {
+        myApp {
+            from 'my-repo/my-application'
+            forAnyTarget {
+                fileValues.put('tls.certificate', "cert/cert-${target.name}.pem")
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releases {
+        create("myApp") {
+            from("my-repo/my-application")
+            forAnyTarget {
+                fileValues.put("tls.certificate", "cert/cert-${target.name}.pem")
+            }
+        }
+    }
+}
+----
+
+TIP: For more advanced scenarios, both the release and the release target DSL objects are `ExtensionAware`, which
+means they have an extra properties extension where you can store custom properties that can then be accessed
+in a `forTarget` or `forAnyTarget` block.
+
+
+==== Directories of Value Files
+
+Since values and value files are the most common thing to customize per target, there exists another handy mechanism
+which allows you to declare a `valuesDir` directory containing YAML files with filenames according to a specific
+convention. Assuming you have a directory containing value files like this:
+
+----
+📂 myapp-values
+  📄 values.yaml
+  📄 values-local.yaml
+  📄 values-production.yaml
+----
+
+Pass the path of the directory to the release by calling `valuesDir`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releases {
+        myApp {
+            from 'my-repo/my-application'
+            valuesDir 'myapp-values'
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releases {
+        create("myApp") {
+            from("my-repo/my-application")
+            valuesDir("myapp-values")
+        }
+    }
+}
+----
+
+When installing a release to a given target, the `values-<target>.yaml` file is automatically passed to the
+`helm install` or `helm upgrade` command. If the directory contains a `values.yaml` file (without a suffix), then it
+will be used for all targets, but with a lower precedence than the target-specific values files, meaning you can
+define common defaults in `values.yaml` and then selectively override them for each target.
+
+Each of the files in the values directory is optional, if a certain file name pattern does not exist, it will not
+be used.
+
+In the above example, when installing `myApp` to the `local` target, it would call `helm install` / `helm upgrade`
+with the option `--values myapp-values/values.yaml,myapp-values/values-local.yaml`. Similarly, when installing to the
+`production` target, it would use the option `--values myapp-values/values.yaml,myapp-values/values-production.yaml`.
+
+[TIP]
+====
+Use the built-in Gradle mechanisms to automatically declare a `valuesDir` for each release according to your own
+convention. Assuming your directory structure contains value files for each release in a subdirectory
+`$projectDir/helm-values/<release-name>`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releases.all {
+    valuesDir "helm-values/$name"
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releases.all {
+    valuesDir("helm-values/$name")
+}
+----
+====
+
+
+== Using Tags to Select Releases
+
+Often you want to declare multiple releases in your build script, but you want to selectively install only a subset
+of them. For example, when installing a set of applications in a local cluster, you might want to include infrastructure
+components like a database or message queue as well, but exclude them when installing to production because they can
+be assumed to be managed externally.
+
+The `helm-releases` plugin offers a powerful tagging mechanism for such setups:
+
+* Each release may be assigned a set of tags
+* A release target may contain a selection expression to use only a subset of releases
+* A global selection expression allows you to further filter the set of releases per-build
+
+In the following example, we create two releases `myApp` and `mongodb`, and assign them tags `application` and
+`database`, respectively:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releases {
+    myApp {
+        from 'my-repo/my-application'
+        tags 'application'
+    }
+    mongodb {
+        from 'bitnami/mongodb'
+        tags 'database'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releases {
+    create("myApp") {
+        from("my-repo/my-application")
+        tags("application")
+    }
+    create("mongodb") {
+        from("bitnami/mongodb")
+        tags("database")
+    }
+}
+----
+
+Now we can specify a select expression in our release targets to configure which releases should be installed to
+each target. In its simplest form, the select expression is just the name of a tag, which must then be present on
+the release. The expression `*` (which is also the default) matches any release.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releaseTargets {
+    local {
+        // this is the default
+        selectTags = '*'
+    }
+    production {
+        // When installing to production, only install releases tagged "application"
+        selectTags = 'application'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releaseTargets {
+    create("local") {
+        // this is the default
+        selectTags = "*"
+    }
+    create("production") {
+        // When installing to production, only install releases tagged "application"
+        selectTags = "application"
+    }
+}
+----
+
+You can combine tags in a select expression using the operators `&` (and), `|` (or) and `!` (not). Comma and space also
+mean "or". Some examples:
+
+* `!database` matches any release except ones tagged with `database`
+* `application,infrastructure` matches any release tagged `application` _or_ `infrastructure`
+* `infrastructure & !database` matches any release tagged `infrastructure`, but not tagged `database`
+
+In addition to setting `selectTags` on a release target, you can also set the property `helm.release.tags` on the
+command line to further narrow down the set of releases per-build.
+
+[source,bash]
+----
+# this will install only "application"-tagged releases to the "local" target
+./gradlew helmInstall -Phelm.release.target=local -Phelm.release.tags=application
+----
+
+INFO: If both `helm.release.tags` and the active release target contain a select expression for tags, they will be
+both combined using "and". This means that a release will only be installed if it matches _both_ the `helm.release.tags`
+expression and the `selectTags` expression of the release target.
+

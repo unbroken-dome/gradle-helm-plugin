@@ -6,7 +6,17 @@ import assertk.assertions.support.show
 import org.gradle.api.plugins.ExtensionAware
 
 
-inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null) =
+fun Assert<Any>.hasExtensionNamed(name: String): Assert<Any> =
+    transform("extension \"$name\"") { actual ->
+        if (actual !is ExtensionAware) {
+            expected("to be ExtensionAware")
+        }
+        actual.extensions.findByName(name)
+            ?: expected("to have an extension named \"$name\"")
+    }
+
+
+inline fun <reified E : Any> Assert<Any>.hasExtension(name: String? = null): Assert<E> =
     transform("extension " + (name?.let { "\"$it\"" } ?: show(E::class))) { actual ->
         if (actual !is ExtensionAware) {
             expected("to be ExtensionAware")
@@ -14,27 +24,16 @@ inline fun <reified E : Any> Assert<*>.hasExtension(name: String? = null) =
         val extensions = actual.extensions
 
         if (name != null) {
-            extensions.findByName(name)
-                .let {
-                    if (it == null) {
-                        expected("to have an extension named \"$name\" of type ${show(E::class)}")
-                    }
-                    if (it !is E) {
-                        expected(
-                            "to have an extension named \"$name\" of type ${show(E::class)}, but actual type was: ${show(
-                                it.javaClass
-                            )}"
-                        )
-                    }
-                    it
-                }
+            val extension = extensions.findByName(name)
+                ?: expected("to have an extension named \"$name\" of type ${show(E::class)}")
+            (extension as? E)
+                ?: expected(
+                    "to have an extension named \"$name\" of type ${show(E::class)}, " +
+                            "but actual type was: ${show(extension.javaClass)}"
+                )
+
         } else {
             extensions.findByType(E::class.java)
-                .let {
-                    if (it == null) {
-                        expected("to have an extension of type ${show(E::class)}")
-                    }
-                    it
-                }
+                ?: expected("to have an extension of type ${show(E::class)}")
         }
     }

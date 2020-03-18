@@ -19,6 +19,24 @@ interface HelmInstallationOptions : HelmServerOperationOptions {
 }
 
 
+fun HelmInstallationOptions.withDefaults(defaults: HelmInstallationOptions): HelmInstallationOptions =
+    object : HelmInstallationOptions,
+        HelmServerOperationOptions by withDefaults(defaults as HelmServerOperationOptions) {
+
+        override val atomic: Provider<Boolean>
+            get() = this@withDefaults.atomic.orElse(defaults.atomic)
+
+        override val devel: Provider<Boolean>
+            get() = this@withDefaults.devel.orElse(defaults.devel)
+
+        override val verify: Provider<Boolean>
+            get() = this@withDefaults.verify.orElse(defaults.verify)
+
+        override val wait: Provider<Boolean>
+            get() = this@withDefaults.wait.orElse(defaults.wait)
+    }
+
+
 interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationOptions, HelmInstallationOptions {
 
     /**
@@ -83,10 +101,10 @@ internal data class HelmInstallationOptionsHolder(
     constructor(objects: ObjectFactory)
     : this(
         serverOperationOptions = HelmServerOperationOptionsHolder(objects),
-        atomic = objects.property<Boolean>().convention(false),
-        devel = objects.property<Boolean>().convention(false),
-        verify = objects.property<Boolean>().convention(false),
-        wait = objects.property<Boolean>().convention(false)
+        atomic = objects.property<Boolean>(),
+        devel = objects.property<Boolean>(),
+        verify = objects.property<Boolean>(),
+        wait = objects.property<Boolean>()
     )
 }
 

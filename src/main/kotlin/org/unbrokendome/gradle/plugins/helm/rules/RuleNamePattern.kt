@@ -43,6 +43,18 @@ internal class RuleNamePattern(
 
 
     /**
+     * Finds the most likely source name for the given target name.
+     *
+     * @param targetName the target name
+     * @return the source name candidate, or `null` if the given [targetName] does not match the pattern
+     */
+    fun sourceName(targetName: String): String? =
+        if (matches(targetName)) {
+            targetName.substring(prefix.length, targetName.length - suffix.length).decapitalize()
+        } else null
+
+
+    /**
      * Finds a source object that would map to the given target name according to this pattern.
      *
      * @param targetName the target name
@@ -133,6 +145,19 @@ internal class RuleNamePattern2(
      */
     fun matches(targetName: String) =
         regex.matches(targetName)
+
+
+    /**
+     * Finds the most likely source names for the given target name.
+     *
+     * @param targetName the target name
+     * @return the [Pair] of source name candidates, or `null` if the given [targetName] does not match the pattern
+     */
+    fun sourceNames(targetName: String): Pair<String, String>? =
+        regex.matchEntire(targetName)?.let { result ->
+            val (varPart1, varPart2) = result.destructured
+            varPart1.decapitalize() to varPart2.decapitalize()
+        }
 
 
     /**

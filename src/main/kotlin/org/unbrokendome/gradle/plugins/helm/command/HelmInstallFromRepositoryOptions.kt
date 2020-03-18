@@ -78,17 +78,6 @@ interface ConfigurableHelmInstallFromRepositoryOptions
 }
 
 
-internal fun ConfigurableHelmInstallFromRepositoryOptions.conventionsFrom(source: HelmInstallFromRepositoryOptions) {
-    conventionsFrom(source as HelmInstallationOptions)
-    repository.convention(source.repository)
-    username.convention(source.username)
-    password.convention(source.password)
-    caFile.convention(source.caFile)
-    certFile.convention(source.certFile)
-    keyFile.convention(source.keyFile)
-}
-
-
 internal fun ConfigurableHelmInstallFromRepositoryOptions.setFrom(source: HelmInstallFromRepositoryOptions) {
     setFrom(source as HelmInstallationOptions)
     repository.set(source.repository)

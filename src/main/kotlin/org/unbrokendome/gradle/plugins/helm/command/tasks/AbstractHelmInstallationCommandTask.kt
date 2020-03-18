@@ -56,7 +56,7 @@ abstract class AbstractHelmInstallationCommandTask :
      *
      * Corresponds to the `--version` Helm CLI parameter.
      */
-    @get:Internal
+    @get:[Input Optional]
     val version: Property<String> =
         project.objects.property()
 
@@ -122,7 +122,7 @@ abstract class AbstractHelmInstallationCommandTask :
      *
      * Corresponds to the `--devel` CLI parameter.
      */
-    @get:Input
+    @get:[Input Optional]
     final override val devel: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(false)

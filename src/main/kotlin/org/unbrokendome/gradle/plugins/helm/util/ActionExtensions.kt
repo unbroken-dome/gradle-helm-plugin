@@ -19,3 +19,20 @@ internal fun <T> Action<T>?.andThen(other: Action<T>?): Action<T>? =
             other.execute(it)
         }
     }
+
+
+/**
+ * Returns a single action that is equivalent to executing all the given actions in order of iteration.
+ *
+ * @receiver a [Collection] of [Action]s
+ * @return a single [Action] that executes all given actions in order, or `null` if the collection is empty
+ */
+internal fun <T> Collection<Action<in T>>.combine(): Action<T>? {
+    if (isEmpty()) return null
+
+    return Action {
+        for (action in this) {
+            action.execute(it)
+        }
+    }
+}
