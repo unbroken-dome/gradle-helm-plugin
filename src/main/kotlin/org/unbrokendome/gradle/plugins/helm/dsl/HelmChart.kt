@@ -92,9 +92,21 @@ interface HelmChart : Named, Buildable {
      * The file will be placed inside the [baseOutputDir] and have a name according to the pattern
      * `<chart>-<version>.tgz`.
      */
+    val packageFile: Provider<RegularFile>
+
+
+    /**
+     * The location of the packaged chart file.
+     *
+     * The file will be placed inside the [baseOutputDir] and have a name according to the pattern
+     * `<chart>-<version>.tgz`.
+     *
+     * @deprecated use [packageFile] instead
+     */
     @JvmDefault
+    @Deprecated(message = "use packageFile", replaceWith = ReplaceWith("packageFile"))
     val packageOutputFile: Provider<RegularFile>
-        get() = baseOutputDir.flatMap { it.file(packageFileName) }
+        get() = packageFile
 
 
     /**
@@ -152,6 +164,9 @@ private open class DefaultHelmChart
     objects: ObjectFactory
 ) : HelmChart, HelmChartInternal {
 
+    private val tasks = project.tasks
+
+
     final override fun getName(): String =
         name
 
@@ -173,6 +188,10 @@ private open class DefaultHelmChart
     final override val baseOutputDir: DirectoryProperty =
         objects.directoryProperty()
             .convention(baseOutputDir)
+
+
+    final override val packageFile: Provider<RegularFile>
+        get() = tasks.named(packageTaskName, HelmPackage::class.java).flatMap { it.packageFile }
 
 
     final override fun getBuildDependencies(): TaskDependency =

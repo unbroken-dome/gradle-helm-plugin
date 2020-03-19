@@ -41,7 +41,6 @@ internal class PackageTaskRule(
 
         sourceDir.set(chart.outputDir)
         updateDependencies.set(false)
-        chartOutputPath
 
         dependsOn(
             chart.updateDependenciesTaskName,

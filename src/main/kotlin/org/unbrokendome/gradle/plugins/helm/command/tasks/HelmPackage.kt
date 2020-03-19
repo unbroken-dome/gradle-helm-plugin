@@ -103,7 +103,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      *
      * Default destination is `helm/charts/` under the project's build directory.
      */
-    @get:Internal("Represented as part of chartOutputPath")
+    @get:Internal("Represented as part of packageFile")
     val destinationDir: DirectoryProperty =
         project.objects.directoryProperty()
             .convention(project.layout.buildDirectory.dir("helm/charts"))
@@ -112,7 +112,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
     /**
      * The name of the packaged chart file.
      */
-    @get:Internal("Represented as part of chartOutputPath")
+    @get:Internal("Represented as part of packageFile")
     val chartFileName: Provider<String> =
         packagedChartFileName(chartName, chartVersion)
 
@@ -121,8 +121,20 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * The full path of the packaged chart file (read-only property).
      */
     @get:OutputFile
-    val chartOutputPath: Provider<RegularFile> =
+    val packageFile: Provider<RegularFile> =
         destinationDir.file(chartFileName)
+
+
+    /**
+     * The full path of the packaged chart file (read-only property).
+     *
+     * @deprecated use [packageFile] instead
+     */
+    @Suppress("unused")
+    @Deprecated(message = "use packageFile", replaceWith = ReplaceWith("packageFile"))
+    @get:Internal("replaced by packageFile property")
+    val chartOutputPath: Provider<RegularFile>
+        get() = packageFile
 
 
     @TaskAction

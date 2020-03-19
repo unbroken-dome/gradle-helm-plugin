@@ -48,7 +48,7 @@ internal class ChartPackagedArtifactRule(
         isCanBeConsumed = true
 
         outgoing { publications ->
-            publications.artifact(chart.packageOutputFile) { artifact ->
+            publications.artifact(chart.packageFile) { artifact ->
                 artifact.builtBy(tasks.named(chart.packageTaskName))
                 artifact.name = chart.chartName.get()
                 artifact.extension = "tgz"
