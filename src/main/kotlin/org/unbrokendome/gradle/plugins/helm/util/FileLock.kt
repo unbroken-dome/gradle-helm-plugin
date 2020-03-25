@@ -15,6 +15,7 @@ internal fun <T> withLockFile(file: File, block: () -> T): T {
     // with a ReentrantLock
     return locksByLockFile.computeIfAbsent(file) { ReentrantLock() }
         .withLock {
+            file.parentFile.mkdirs()
             RandomAccessFile(file, "rw").channel.use { channel ->
                 channel.lock().use {
                     block()
