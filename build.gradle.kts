@@ -27,11 +27,11 @@ dependencies {
     implementation("org.json:json:20190722")
     implementation("org.apache.httpcomponents:httpclient:4.5.6")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.22")
+    testImplementation("io.mockk:mockk:1.9.3")
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
@@ -60,7 +60,9 @@ tasks.withType<Test> {
     // always execute tests
     outputs.upToDateWhen { false }
 
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeEngines("spek2")
+    }
 
     // give tests a temporary directory below the build dir so
     // we don't pollute the system temp dir (Gradle tests don't clean up)

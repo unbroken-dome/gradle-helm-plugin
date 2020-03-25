@@ -1,58 +1,62 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
 import assertk.assertThat
-import assertk.assertions.hasSize
 import assertk.assertions.isSuccess
-import assertk.assertions.prop
-import org.junit.jupiter.api.Test
-import org.unbrokendome.gradle.plugins.helm.AbstractGradleProjectTest
+import assertk.fail
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
+import org.unbrokendome.gradle.plugins.helm.spek.gradleProject
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
+import org.unbrokendome.gradle.plugins.helm.testutil.evaluate
 
 
-class HelmCommandsPluginTest : AbstractGradleProjectTest() {
+object HelmCommandsPluginTest : Spek({
 
-    @Test
-    fun `Project can be evaluated successfully`() {
-        applyPlugin()
+    val project by gradleProject()
 
-        assertThat { evaluateProject() }.isSuccess()
+
+    describe("applying the helm-commands plugin") {
+
+        beforeEachTest {
+            project.plugins.apply(HelmCommandsPlugin::class.java)
+        }
+
+
+        it("project can be evaluated successfully") {
+            assertThat {
+                project.evaluate()
+            }.isSuccess()
+        }
+
+
+        it("should create a helm DSL extension") {
+            assertThat(project)
+                .hasExtension<HelmExtension>("helm")
+        }
+
+
+        it("should create a helm lint DSL extension") {
+            assertThat(project)
+                .hasExtension<HelmExtension>("helm")
+                .hasExtension<Linting>("lint")
+        }
+
     }
 
 
-    @Test
-    fun `Plugin should create a helm DSL extension`() {
-        applyPlugin()
+    describe("plugin should not create any tasks automatically") {
 
-        assertThat(this::project)
-            .hasExtension<HelmExtension>("helm")
+        beforeEachTest {
+            project.tasks.whenObjectAdded {
+                fail("plugin should not add any tasks")
+            }
+        }
+
+
+        it("should not create any tasks automatically") {
+            project.plugins.apply(HelmCommandsPlugin::class.java)
+        }
     }
-
-
-    @Test
-    fun `Plugin should create a helm lint DSL extension`() {
-        applyPlugin()
-
-        assertThat(this::project)
-            .hasExtension<HelmExtension>("helm")
-            .hasExtension<Linting>("lint")
-    }
-
-
-    @Test
-    fun `Plugin should not create any tasks`() {
-        val taskCountBefore = project.tasks.size
-
-        applyPlugin()
-
-        assertThat(this::project)
-            .prop("tasks") { it.tasks }
-            .hasSize(taskCountBefore)
-    }
-
-
-    private fun applyPlugin() {
-        project.plugins.apply(HelmCommandsPlugin::class.java)
-    }
-}
+})

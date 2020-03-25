@@ -1,8 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.testutil.assertions
 
 import assertk.Assert
-import assertk.assertions.isNull
 import assertk.assertions.support.expected
+import assertk.assertions.support.show
 import org.gradle.api.NamedDomainObjectCollection
 
 
@@ -12,5 +12,9 @@ fun <T : Any> Assert<NamedDomainObjectCollection<T>>.containsItem(name: String) 
     }
 
 
-fun <T : Any> Assert<NamedDomainObjectCollection<T>>.doesNotContainItem(name: String) =
-    transform { actual -> actual.findByName(name) }.isNull()
+fun <T : Any> Assert<NamedDomainObjectCollection<T>>.doesNotContainItem(name: String) = given { actual ->
+    val item = actual.findByName(name)
+    if (item != null) {
+        expected("to contain no item named \"$name\", but did contain: ${show(item)}")
+    }
+}

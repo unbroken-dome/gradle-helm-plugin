@@ -14,7 +14,6 @@ import com.jayway.jsonpath.spi.json.JacksonJsonProvider
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
 import java.io.File
 import java.nio.charset.Charset
-import java.util.Optional
 import kotlin.reflect.KClass
 
 
@@ -94,18 +93,4 @@ fun Assert<JsonPathWrapper>.isNotPresent() = given { actual ->
     } catch (e: PathNotFoundException) {
         // ok
     }
-}
-
-
-val <T : Any> Assert<Optional<T>>.value: Assert<T>
-    get() = transform { actual ->
-        if (actual.isEmpty) {
-            expected("to have a value")
-        } else actual.get()
-    }
-
-
-fun <T : Any> Assert<Optional<T>>.isEmpty() = given { actual ->
-    if (actual.isEmpty) return
-    expected("to be empty")
 }
