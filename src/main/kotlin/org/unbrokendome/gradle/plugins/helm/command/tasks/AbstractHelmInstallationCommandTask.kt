@@ -12,22 +12,28 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.File
 import java.net.URI
 
 
-abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTask(), HelmInstallationOptions {
+abstract class AbstractHelmInstallationCommandTask :
+    AbstractHelmServerOperationCommandTask(),
+    ConfigurableHelmInstallFromRepositoryOptions,
+    ConfigurableHelmValueOptions {
 
     /**
      * Release name.
      */
     @get:Input
-    final override val releaseName: Property<String> =
+    val releaseName: Property<String> =
         project.objects.property()
 
 
@@ -41,7 +47,17 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
      * - simple chart reference, e.g. `mariadb` (you must also set the [repository] property in this case)
      */
     @get:Input
-    final override val chart: Property<String> =
+    val chart: Property<String> =
+        project.objects.property()
+
+
+    /**
+     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
+     *
+     * Corresponds to the `--version` Helm CLI parameter.
+     */
+    @get:Internal
+    val version: Property<String> =
         project.objects.property()
 
 
@@ -113,16 +129,6 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
 
 
     /**
-     * If `true`, simulate an install.
-     *
-     * Corresponds to the `--dry-run` CLI parameter.
-     */
-    @get:Internal
-    final override val dryRun: Property<Boolean> =
-        project.objects.property()
-
-
-    /**
      * Identify HTTPS client using this SSL key file.
      *
      * Corresponds to the `--key-file` CLI parameter.
@@ -130,16 +136,6 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
     @get:Internal
     final override val keyFile: RegularFileProperty =
         project.objects.fileProperty()
-
-
-    /**
-     * If `true`, prevent hooks from running during the operation.
-     *
-     * Corresponds to the `--no-hooks` CLI parameter.
-     */
-    @get:Internal
-    final override val noHooks: Property<Boolean> =
-        project.objects.property()
 
 
     /**
@@ -224,16 +220,6 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
 
 
     /**
-     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
-     *
-     * Corresponds to the `--version` Helm CLI parameter.
-     */
-    @get:Internal
-    final override val version: Property<String> =
-        project.objects.property()
-
-
-    /**
      * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
      * state before marking the release as successful. It will wait for as along as [remoteTimeout].
      */
@@ -252,5 +238,7 @@ abstract class AbstractHelmInstallationCommandTask : AbstractHelmServerCommandTa
 
 
     override val execProviderSupport: HelmExecProviderSupport
-        get() = super.execProviderSupport.withOptionsApplier(HelmInstallationOptionsApplier)
+        get() = super.execProviderSupport.addOptionsAppliers(
+            HelmInstallationOptionsApplier, HelmInstallFromRepositoryOptionsApplier, HelmValueOptionsApplier
+        )
 }

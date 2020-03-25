@@ -11,21 +11,13 @@ import org.unbrokendome.gradle.plugins.helm.util.property
 /**
  * Uninstalls a release from the cluster. Corresponds to the `helm uninstall` CLI command.
  */
-open class HelmUninstall : AbstractHelmServerCommandTask() {
+open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
 
     /**
      * The name of the release to be uninstalled.
      */
     @get:Input
     val releaseName: Property<String> =
-        project.objects.property()
-
-
-    /**
-     * If `true`, simulate an uninstall.
-     */
-    @get:Internal
-    val dryRun: Property<Boolean> =
         project.objects.property()
 
 

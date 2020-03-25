@@ -5,17 +5,16 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.util.property
-import java.time.Duration
 
 
 /**
  * Base class for tasks representing Helm CLI commands that communicate with the remote Kubernetes cluster.
  */
-abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), HelmServerOptions {
+abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), ConfigurableHelmServerOptions {
 
     /**
      * Path to the Kubernetes configuration file.
@@ -39,16 +38,6 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), HelmSe
 
 
     /**
-     * Time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks). Default is 300.
-     *
-     * Corresponds to the `--timeout` command line option in the Helm CLI.
-     */
-    @get:Internal
-    final override val remoteTimeout: Property<Duration> =
-        project.objects.property()
-
-
-    /**
      * Namespace scope for this request.
      *
      * Corresponds to the `--namespace` CLI parameter.
@@ -59,5 +48,5 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), HelmSe
 
 
     override val execProviderSupport: HelmExecProviderSupport
-        get() = super.execProviderSupport.withOptionsApplier(HelmServerOptionsApplier)
+        get() = super.execProviderSupport.addOptionsApplier(HelmServerOptionsApplier)
 }

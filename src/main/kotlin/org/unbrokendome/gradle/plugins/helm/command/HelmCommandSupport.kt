@@ -28,7 +28,7 @@ internal class HelmCommandSupport(
     fun getRelease(releaseName: Provider<String>): Release? {
 
         val result = execProvider
-            .withOptionsApplier(HelmServerOptionsApplier)
+            .withOptionsAppliers(GlobalHelmOptionsApplier, HelmServerOptionsApplier)
             .withDescription("get release info")
             .execHelmCaptureOutput("ls") {
                 option("-o", "json")

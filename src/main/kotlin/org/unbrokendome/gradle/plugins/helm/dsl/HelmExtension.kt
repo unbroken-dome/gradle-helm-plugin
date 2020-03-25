@@ -5,37 +5,31 @@ import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.process.ExecResult
-import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableGlobalHelmOptions
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecResult
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsHolder
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
-import java.time.Duration
 import javax.inject.Inject
 
 
 /**
  * The main Helm DSL extension, accessible using the `helm { ... }` block in build scripts.
  */
-interface HelmExtension : HelmExecProvider, GlobalHelmOptions, HelmServerOptions {
-
-    override val executable: Property<String>
-
-    override val debug: Property<Boolean>
+interface HelmExtension : HelmExecProvider, ConfigurableGlobalHelmOptions, ConfigurableHelmServerOptions {
 
     /**
      * Base output directory for Helm charts.
@@ -62,7 +56,8 @@ private open class DefaultHelmExtension
     private val project: Project,
     objects: ObjectFactory,
     layout: ProjectLayout
-) : HelmExtension, HelmExtensionInternal {
+) : HelmExtension, HelmExtensionInternal,
+    ConfigurableHelmServerOptions by HelmServerOptionsHolder(objects).applyConventions(project) {
 
     final override val executable: Property<String> =
         objects.property<String>()
@@ -75,26 +70,6 @@ private open class DefaultHelmExtension
     final override val debug: Property<Boolean> =
         objects.property<Boolean>()
             .convention(project.booleanProviderFromProjectProperty("helm.debug"))
-
-
-    final override val kubeContext: Property<String> =
-        objects.property<String>()
-            .convention(project.providerFromProjectProperty("helm.kubeContext"))
-
-
-    final override val kubeConfig: RegularFileProperty =
-        objects.fileProperty()
-            .convention(project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true))
-
-
-    final override val remoteTimeout: Property<Duration> =
-        objects.property<Duration>()
-            .convention(project.durationProviderFromProjectProperty("helm.remoteTimeout"))
-
-
-    final override val namespace: Property<String> =
-        objects.property<String>()
-            .convention(project.providerFromProjectProperty("helm.namespace"))
 
 
     final override val extraArgs: ListProperty<String> =
@@ -153,6 +128,19 @@ private open class DefaultHelmExtension
 
     private val execProviderSupport: HelmExecProviderSupport
         get() = HelmExecProviderSupport(project, this, GlobalHelmOptionsApplier)
+}
+
+
+private fun ConfigurableHelmServerOptions.applyConventions(project: Project) = apply {
+    kubeContext.convention(
+        project.providerFromProjectProperty("helm.kubeContext")
+    )
+    kubeConfig.convention(
+        project.fileProviderFromProjectProperty("helm.kubeConfig", evaluateGString = true)
+    )
+    namespace.convention(
+        project.providerFromProjectProperty("helm.namespace")
+    )
 }
 
 

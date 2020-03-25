@@ -6,12 +6,15 @@ import org.gradle.api.plugins.ExtensionAware
 import org.unbrokendome.gradle.plugins.helm.HELM_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
+import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerCommandTask
+import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerOperationCommandTask
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.dsl.createHelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
 
 
 class HelmCommandsPlugin
@@ -25,10 +28,11 @@ class HelmCommandsPlugin
 
         project.objects.createLinting()
             .apply {
-                enabled.set(
-                    project.booleanProviderFromProjectProperty("helm.lint.enabled", true)
+                enabled.convention(
+                    project.booleanProviderFromProjectProperty("helm.lint.enabled")
+                        .orElse(true)
                 )
-                strict.set(
+                strict.convention(
                     project.booleanProviderFromProjectProperty("helm.lint.strict")
                 )
 
@@ -39,23 +43,32 @@ class HelmCommandsPlugin
 
         // Apply the global Helm options as defaults to each command task
         project.tasks.withType(AbstractHelmCommandTask::class.java) { task ->
-            task.run {
-                executable.set(helmExtension.executable)
-                debug.set(helmExtension.debug)
-                extraArgs.addAll(helmExtension.extraArgs)
-                xdgDataHome.set(helmExtension.xdgDataHome)
-                xdgConfigHome.set(helmExtension.xdgConfigHome)
-                xdgCacheHome.set(helmExtension.xdgCacheHome)
-            }
+            task.globalOptions.set(helmExtension)
         }
 
         project.tasks.withType(AbstractHelmServerCommandTask::class.java) { task ->
-            task.run {
-                kubeConfig.set(helmExtension.kubeConfig)
-                kubeContext.set(helmExtension.kubeContext)
-                remoteTimeout.set(helmExtension.remoteTimeout)
-                namespace.set(helmExtension.namespace)
-            }
+            task.conventionsFrom(helmExtension as ConfigurableHelmServerOptions)
+        }
+
+        project.tasks.withType(AbstractHelmServerOperationCommandTask::class.java) { task ->
+            task.dryRun.convention(
+                project.booleanProviderFromProjectProperty("helm.dryRun")
+            )
+            task.noHooks.convention(
+                project.booleanProviderFromProjectProperty("helm.noHooks")
+            )
+            task.remoteTimeout.convention(
+                project.durationProviderFromProjectProperty("helm.remoteTimeout")
+            )
+        }
+
+        project.tasks.withType(AbstractHelmInstallationCommandTask::class.java) { task ->
+            task.atomic.convention(
+                project.booleanProviderFromProjectProperty("helm.atomic")
+            )
+            task.wait.convention(
+                project.booleanProviderFromProjectProperty("helm.wait")
+            )
         }
     }
 }

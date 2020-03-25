@@ -101,17 +101,10 @@ internal class HelmExecProviderSupport(
 
             val helmExecSpec = DefaultHelmExecSpec(execSpec, command, subcommand)
 
-            val optionsAppliersCalled = mutableSetOf<HelmOptionsApplier>()
-
-            fun applyAll(optionsApplier: HelmOptionsApplier) {
-                if (optionsAppliersCalled.add(optionsApplier)) {
-                    optionsApplier.implies.forEach { applyAll(it) }
-                    logger.debug("Calling OptionsApplier: {} with options: {}", optionsApplier, options)
-                    optionsApplier.apply(helmExecSpec, options)
-                }
+            for (optionsApplier in optionsAppliers) {
+                logger.debug("Calling OptionsApplier: {} with options: {}", optionsApplier, options)
+                optionsApplier.apply(helmExecSpec, options)
             }
-
-            optionsAppliers.forEach(::applyAll)
 
             action?.execute(helmExecSpec)
 
@@ -169,16 +162,6 @@ internal class HelmExecProviderSupport(
     /**
      * Returns a new [HelmExecProviderSupport] that uses the same options but a different strategy to apply them.
      *
-     * @param optionsApplier the new [HelmOptionsApplier] strategy to use
-     * @return a new [HelmExecProviderSupport] that uses the given strategy to apply options
-     */
-    fun withOptionsApplier(optionsApplier: HelmOptionsApplier) =
-        withOptionsAppliers(listOf(optionsApplier))
-
-
-    /**
-     * Returns a new [HelmExecProviderSupport] that uses the same options but a different strategy to apply them.
-     *
      * @param optionsAppliers the new [HelmOptionsApplier] strategies to use
      * @return a new [HelmExecProviderSupport] that uses the given strategy to apply options
      */
@@ -194,6 +177,16 @@ internal class HelmExecProviderSupport(
      */
     fun addOptionsApplier(optionsApplier: HelmOptionsApplier) =
         withOptionsAppliers(this.optionsAppliers + optionsApplier)
+
+
+    /**
+     * Returns a new [HelmExecProviderSupport] that uses the same options and additional strategies to apply them.
+     *
+     * @param optionsAppliers the additional [HelmOptionsApplier] strategies to use
+     * @return a new [HelmExecProviderSupport] that uses the given strategy to apply options
+     */
+    fun addOptionsAppliers(vararg optionsAppliers: HelmOptionsApplier) =
+        withOptionsAppliers(this.optionsAppliers + optionsAppliers.toList())
 
 
     private val ExecSpec.maskedCommandLine: List<String>

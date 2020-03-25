@@ -1,34 +1,52 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 
 
+interface GlobalHelmOptions : HelmOptions {
+
+    val executable: Provider<String>
+
+    val debug: Provider<Boolean>
+
+    val extraArgs: Provider<List<String>>
+
+    val xdgDataHome: Provider<Directory>
+
+    val xdgConfigHome: Provider<Directory>
+
+    val xdgCacheHome: Provider<Directory>
+}
+
+
 /**
  * Holds options that apply to all Helm commands.
  */
-interface GlobalHelmOptions : HelmOptions {
+interface ConfigurableGlobalHelmOptions : GlobalHelmOptions, ConfigurableHelmOptions {
 
     /**
      * The name or path of the Helm executable. The `PATH` variable is taken into account, so this
      * can just be `"helm"` if the Helm client is installed in a suitable location.
      */
-    val executable: Provider<String>
+    override val executable: Property<String>
 
     /**
      * Indicates whether to use the verbose output (`--debug` flag) when invoking commands.
      */
-    val debug: Provider<Boolean>
+    override val debug: Property<Boolean>
 
     /**
      * Additional command-line arguments to pass to the Helm CLI.
      *
      * This can be used for command-line options that have no counterpart in the plugin.
      */
-    val extraArgs: ListProperty<String>
+    override val extraArgs: ListProperty<String>
 
     /**
      * Base directory for storing data.
@@ -38,7 +56,7 @@ interface GlobalHelmOptions : HelmOptions {
      *
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
-    val xdgDataHome: DirectoryProperty
+    override val xdgDataHome: DirectoryProperty
 
     /**
      * Base directory for storing configuration.
@@ -48,7 +66,7 @@ interface GlobalHelmOptions : HelmOptions {
      *
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
-    val xdgConfigHome: DirectoryProperty
+    override val xdgConfigHome: DirectoryProperty
 
     /**
      * Base directory for storing cached data.
@@ -58,9 +76,41 @@ interface GlobalHelmOptions : HelmOptions {
      *
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
-    val xdgCacheHome: DirectoryProperty
+    override val xdgCacheHome: DirectoryProperty
 }
 
+
+internal fun ConfigurableGlobalHelmOptions.conventionsFrom(source: GlobalHelmOptions) = apply {
+    executable.convention(source.executable)
+    extraArgs.addAll(source.extraArgs)
+    xdgDataHome.convention(source.xdgDataHome)
+    xdgConfigHome.convention(source.xdgConfigHome)
+    xdgCacheHome.convention(source.xdgCacheHome)
+}
+
+
+internal class DelegateGlobalHelmOptions(
+    private val provider: Provider<GlobalHelmOptions>
+) : GlobalHelmOptions {
+
+    override val executable: Provider<String>
+        get() = provider.flatMap { it.executable }
+
+    override val debug: Provider<Boolean>
+        get() = provider.flatMap { it.debug }
+
+    override val extraArgs: Provider<List<String>>
+        get() = provider.flatMap { it.extraArgs }
+
+    override val xdgDataHome: Provider<Directory>
+        get() = provider.flatMap { it.xdgDataHome }
+
+    override val xdgConfigHome: Provider<Directory>
+        get() = provider.flatMap { it.xdgConfigHome }
+
+    override val xdgCacheHome: Provider<Directory>
+        get() = provider.flatMap { it.xdgCacheHome }
+}
 
 
 internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
@@ -70,7 +120,7 @@ internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
     override fun apply(spec: HelmExecSpec, options: HelmOptions) {
         if (options is GlobalHelmOptions) {
 
-            logger.debug("Applying GlobalHelmOptions: {}", options)
+            logger.debug("Applying options: {}", options)
 
             with(spec) {
                 withExecSpec {

@@ -44,6 +44,9 @@ open class HelmUpgrade : AbstractHelmInstallationCommandTask() {
     @TaskAction
     fun upgradeRelease() {
         execHelm("upgrade") {
+            args(releaseName)
+            args(chart)
+            option("--version", version)
             flag("--install", install)
             flag("--reset-values", resetValues)
             flag("--reuse-values", reuseValues)

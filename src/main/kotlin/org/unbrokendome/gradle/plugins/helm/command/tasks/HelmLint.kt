@@ -15,8 +15,8 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
@@ -27,7 +27,7 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * Runs a series of tests to verify that a chart is well-formed.
  * Corresponds to the `helm lint` CLI command.
  */
-open class HelmLint : AbstractHelmCommandTask(), HelmValueOptions {
+open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
 
     /**
      * The directory that contains the sources for the Helm chart.

@@ -4,6 +4,9 @@ package org.unbrokendome.gradle.plugins.helm.command
 interface HelmOptions
 
 
+interface ConfigurableHelmOptions : HelmOptions
+
+
 /**
  * Strategy interface to apply [HelmOptions] to a [HelmExecSpec].
  */
@@ -16,11 +19,4 @@ internal interface HelmOptionsApplier {
      * @param options the options to apply
      */
     fun apply(spec: HelmExecSpec, options: HelmOptions)
-
-
-    /**
-     * A list of other [HelmOptionsApplier]s that must also be applied when this [HelmOptionsApplier] is used.
-     */
-    val implies: List<HelmOptionsApplier>
-        get() = emptyList()
 }

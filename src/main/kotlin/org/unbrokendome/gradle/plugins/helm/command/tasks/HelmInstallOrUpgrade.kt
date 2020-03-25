@@ -58,11 +58,15 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
 
         if (shouldUseInstallReplace()) {
             execHelm("install") {
+                args(releaseName)
+                args(chart)
                 flag("--replace")
             }
 
         } else {
             execHelm("upgrade") {
+                args(releaseName)
+                args(chart)
                 flag("--install")
                 flag("--reset-values", resetValues)
                 flag("--reuse-values", reuseValues)

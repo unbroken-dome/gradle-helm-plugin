@@ -4,14 +4,26 @@ import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
 import org.slf4j.LoggerFactory
+import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import java.util.concurrent.Callable
 
 
-interface HelmValueOptions {
+interface HelmValueOptions : HelmOptions {
+
+    val values: Provider<Map<String, Any>>
+
+    val fileValues: Provider<Map<String, Any>>
+
+    val valueFiles: FileCollection
+}
+
+
+interface ConfigurableHelmValueOptions : HelmValueOptions, ConfigurableHelmOptions {
 
     /**
      * Values to be passed directly.
@@ -19,7 +31,7 @@ interface HelmValueOptions {
      * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
      * `--set` option (for all other types).
      */
-    val values: MapProperty<String, Any>
+    override val values: MapProperty<String, Any>
 
 
     /**
@@ -33,7 +45,7 @@ interface HelmValueOptions {
      *
      * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
      */
-    val fileValues: MapProperty<String, Any>
+    override val fileValues: MapProperty<String, Any>
 
 
     /**
@@ -43,7 +55,29 @@ interface HelmValueOptions {
      *
      * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
-    val valueFiles: ConfigurableFileCollection
+    override val valueFiles: ConfigurableFileCollection
+}
+
+
+internal fun ConfigurableHelmValueOptions.mergeValues(toMerge: HelmValueOptions) = apply {
+    values.putAll(toMerge.values)
+    fileValues.putAll(toMerge.fileValues)
+    valueFiles.from(toMerge.valueFiles)
+}
+
+
+internal data class HelmValueOptionsHolder(
+    override val values: MapProperty<String, Any>,
+    override val fileValues: MapProperty<String, Any>,
+    override val valueFiles: ConfigurableFileCollection
+) : ConfigurableHelmValueOptions {
+
+    constructor(objects: ObjectFactory)
+            : this(
+        values = objects.mapProperty(),
+        fileValues = objects.mapProperty(),
+        valueFiles = objects.fileCollection()
+    )
 }
 
 
@@ -55,7 +89,7 @@ internal object HelmValueOptionsApplier : HelmOptionsApplier {
     override fun apply(spec: HelmExecSpec, options: HelmOptions) {
         if (options is HelmValueOptions) {
 
-            logger.debug("Applying HelmValueOptions: {}", options)
+            logger.debug("Applying options: {}", options)
 
             with(spec) {
 

@@ -22,6 +22,9 @@ open class HelmInstall : AbstractHelmInstallationCommandTask() {
     @TaskAction
     fun install() {
         execHelm("install") {
+            args(releaseName)
+            args(chart)
+            option("--version", version)
             flag("--replace", replace)
         }
     }
