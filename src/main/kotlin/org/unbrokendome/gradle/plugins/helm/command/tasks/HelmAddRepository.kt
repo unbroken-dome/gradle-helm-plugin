@@ -1,7 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.Task
-import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -39,7 +39,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--ca-file` CLI parameter.
      */
     @get:[Input Optional]
-    val caFile: Property<RegularFile> =
+    val caFile: RegularFileProperty =
         project.objects.fileProperty()
 
 
@@ -69,7 +69,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--cert-file` CLI parameter.
      */
     @get:[Input Optional]
-    val certificateFile: Property<RegularFile> =
+    val certificateFile: RegularFileProperty =
         project.objects.fileProperty()
 
 
@@ -79,7 +79,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--key-file` CLI parameter.
      */
     @get:[Input Optional]
-    val keyFile: Property<RegularFile> =
+    val keyFile: RegularFileProperty =
         project.objects.fileProperty()
 
 
@@ -97,6 +97,8 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
     fun addRepository() {
         execHelm("repo", "add") {
             option("--ca-file", caFile)
+            option("--cert-file", certificateFile)
+            option("--key-file", keyFile)
             option("--username", username)
             option("--password", password)
             flag("--no-update", failIfExists)
