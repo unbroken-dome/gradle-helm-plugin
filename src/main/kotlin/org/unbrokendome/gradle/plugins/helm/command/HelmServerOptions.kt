@@ -19,6 +19,19 @@ interface HelmServerOptions : HelmOptions {
 }
 
 
+internal fun HelmServerOptions.withDefaults(defaults: HelmServerOptions): HelmServerOptions =
+    object : HelmServerOptions {
+        override val kubeConfig: Provider<RegularFile>
+            get() = this@withDefaults.kubeConfig.orElse(defaults.kubeConfig)
+
+        override val kubeContext: Provider<String>
+            get() = this@withDefaults.kubeContext.orElse(defaults.kubeContext)
+
+        override val namespace: Provider<String>
+            get() = this@withDefaults.namespace.orElse(defaults.namespace)
+    }
+
+
 interface ConfigurableHelmServerOptions : HelmServerOptions, ConfigurableHelmOptions {
 
     /**

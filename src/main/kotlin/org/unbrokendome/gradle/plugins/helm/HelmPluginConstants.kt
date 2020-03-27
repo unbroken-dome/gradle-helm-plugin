@@ -52,6 +52,24 @@ const val HELM_MAIN_CHART_NAME = "main"
 
 
 /**
- * The name of the `releases` DSL sub.extension.
+ * The name of the `releases` DSL sub-extension.
  */
 const val HELM_RELEASES_EXTENSION_NAME = "releases"
+
+
+/**
+ * The name of the `releaseTargets` DSL sub-extension.
+ */
+const val HELM_RELEASE_TARGETS_EXTENSION_NAME = "releaseTargets"
+
+
+/**
+ * The name of the `activeReleaseTarget` DSL sub-extension.
+ */
+const val HELM_ACTIVE_RELEASE_TARGET_EXTENSION_NAME = "activeReleaseTarget"
+
+
+/**
+ * The name of the special "default" release target.
+ */
+const val HELM_DEFAULT_RELEASE_TARGET = "default"

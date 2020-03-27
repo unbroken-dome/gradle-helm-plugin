@@ -19,6 +19,21 @@ interface HelmServerOperationOptions : HelmServerOptions {
 }
 
 
+internal fun HelmServerOperationOptions.withDefaults(defaults: HelmServerOperationOptions): HelmServerOperationOptions =
+    object : HelmServerOperationOptions,
+        HelmServerOptions by withDefaults(defaults as HelmServerOptions) {
+
+        override val dryRun: Provider<Boolean>
+            get() = this@withDefaults.dryRun.orElse(defaults.dryRun)
+
+        override val noHooks: Provider<Boolean>
+            get() = this@withDefaults.noHooks.orElse(defaults.noHooks)
+
+        override val remoteTimeout: Provider<Duration>
+            get() = this@withDefaults.remoteTimeout.orElse(defaults.remoteTimeout)
+    }
+
+
 interface ConfigurableHelmServerOperationOptions : ConfigurableHelmServerOptions, HelmServerOperationOptions {
 
     /**
@@ -55,15 +70,7 @@ internal fun ConfigurableHelmServerOperationOptions.conventionsFrom(source: Helm
 
 
 internal fun ConfigurableHelmServerOperationOptions.setFrom(source: HelmServerOperationOptions) = apply {
-    val logger = LoggerFactory.getLogger(ConfigurableHelmServerOperationOptions::class.java)
-    logger.info("""
-        Setting properties of {} from source: {}
-          dryRun: {}
-          noHooks: {}
-          remoteTimeout: {}
-        """.trimIndent(), this, source, source.dryRun, source.noHooks, source.remoteTimeout)
-
-    setFrom(source as ConfigurableHelmServerOptions)
+    setFrom(source as HelmServerOptions)
     dryRun.set(source.dryRun)
     noHooks.set(source.noHooks)
     remoteTimeout.set(source.remoteTimeout)

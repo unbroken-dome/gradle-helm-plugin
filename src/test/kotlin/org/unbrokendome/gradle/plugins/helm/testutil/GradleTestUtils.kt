@@ -24,6 +24,12 @@ fun Task.execute(checkUpToDate: Boolean = true) {
 }
 
 
+fun Task.isSkipped(): Boolean {
+    this as TaskInternal
+    return onlyIf.isSatisfiedBy(this)
+}
+
+
 fun Project.evaluate() {
     (this as ProjectInternal).evaluate()
 }

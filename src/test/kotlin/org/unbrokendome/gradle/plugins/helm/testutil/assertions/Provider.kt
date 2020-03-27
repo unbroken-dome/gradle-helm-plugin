@@ -13,7 +13,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
 
-fun <T : Any> Assert<Provider<T>>.isPresent() = transform { actual ->
+fun <T : Any?> Assert<Provider<T>>.isPresent() = transform { actual ->
     actual.orNull ?: expected("${show(actual)} to have a value", actual = actual)
 }
 
@@ -26,7 +26,7 @@ fun Assert<Provider<Boolean>>.isFalse() =
     isPresent().isFalse()
 
 
-fun <T : Any> Assert<Provider<T>>.hasValueEqualTo(value: T) =
+fun <T : Any?> Assert<Provider<T>>.hasValueEqualTo(value: T) =
     isPresent().isEqualTo(value)
 
 

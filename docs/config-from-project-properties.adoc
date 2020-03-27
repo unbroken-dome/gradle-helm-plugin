@@ -42,7 +42,7 @@ allow for easier overriding.
 
 | `helm.remoteTimeout`
 | Time to wait for an individual Kubernetes operation (like Jobs or hooks).
-+
+
 May be specified in Helm format (e.g. `3m30s`), in ISO format (e.g. `PT3M30S`) or as a plain number indicating the
 number of seconds (e.g. `210`).
 |
@@ -133,9 +133,21 @@ You can configure repositories entirely from Gradle properties -- just the prese
 |===
 | Property | Description
 
+| `helm.atomic`
+| Perform releases atomically (use `--atomic` flag).
+
 | `helm.dryRun`
 | Only perform a dry run when installing or deleting releases.
 
-| `helm.atomic`
-| Perform releases atomically.
+| `helm.noHooks`
+| Use the `--no-hooks` flag when installing or uninstalling.
+
+| `helm.release.target`
+| Specify the active release target. Defaults to `default`.
+
+| `helm.release.tags`
+| Specify an expression to filter releases by tag. By default, all releases are matched.
+
+| `helm.wait`
+| Use the `--wait` flag when installing.
 |===

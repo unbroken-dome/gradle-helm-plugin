@@ -1,32 +1,47 @@
 package org.unbrokendome.gradle.plugins.helm.release.dsl
 
+import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.MapProperty
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
+import org.slf4j.LoggerFactory
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
+import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
+import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.mergeValues
+import org.unbrokendome.gradle.plugins.helm.command.setFrom
+import org.unbrokendome.gradle.plugins.helm.command.withDefaults
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
+import org.unbrokendome.gradle.plugins.helm.util.andThen
+import org.unbrokendome.gradle.plugins.helm.util.asFile
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.unbrokendome.gradle.plugins.helm.util.combine
+import org.unbrokendome.gradle.plugins.helm.util.listProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.setProperty
 import java.io.File
 import java.net.URI
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 
 /**
- * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
+ * Contains the configurable properties of a Helm release; these can be modified on the core release object
+ * as well as a target-specific variant.
  */
-interface HelmRelease : Named {
+interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOptions, ConfigurableHelmValueOptions {
 
     /**
      * The release name to use for any Helm CLI command. Defaults to the [name][getName] of the release in the
@@ -42,6 +57,14 @@ interface HelmRelease : Named {
      * of argument types.
      */
     val chart: Property<ChartReference>
+
+
+    /**
+     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
+     *
+     * Corresponds to the `--version` Helm CLI parameter.
+     */
+    val version: Property<String>
 
 
     /**
@@ -80,6 +103,7 @@ interface HelmRelease : Named {
      *   * `chart`: the name of the chart inside the Gradle project
      *
      * @param notation a [Map] containing the chart reference properties
+     * @return a [ChartReference] that can be used as a value for the [chart] property
      */
     @JvmDefault
     fun chart(notation: Map<*, *>): ChartReference =
@@ -113,47 +137,6 @@ interface HelmRelease : Named {
 
 
     /**
-     * Chart repository URL where to locate the requested chart.
-     *
-     * Use this when the [chart] property contains only a simple chart reference, without a symbolic repository name.
-     */
-    val repository: Property<URI>
-
-
-    /**
-     * The namespace to install the release into.
-     *
-     * Defaults to the current kubeconfig namespace.
-     */
-    val namespace: Property<String>
-
-
-    /**
-     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
-     */
-    val version: Property<String>
-
-
-    /**
-     * If `true`, any action for this release will only be simulated.
-     */
-    val dryRun: Property<Boolean>
-
-
-    /**
-     * If `true`, will execute the release atomically.
-     */
-    val atomic: Property<Boolean>
-
-
-    /**
-     * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
-     * state before marking the release as successful.
-     */
-    val wait: Property<Boolean>
-
-
-    /**
      * If `true`, the associated `helmInstall` task will replace an existing release with the same name
      * (using `helm install --replace` instead of `helm upgrade --install`).
      *
@@ -169,39 +152,6 @@ interface HelmRelease : Named {
      * Defaults to `false`.
      */
     val keepHistoryOnUninstall: Property<Boolean>
-
-
-    /**
-     * Values to be used for the release.
-     *
-     * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
-     * `--set` option (for all other types).
-     */
-    val values: MapProperty<String, Any>
-
-
-    /**
-     * Values read from the contents of files, to be used for the release.
-     *
-     * Corresponds to the `--set-file` CLI option.
-     *
-     * The values of the map can be of any type that is accepted by [Project.file]. Additionally, when adding a
-     * [Provider] that represents an output file of another task, the corresponding install/upgrade task will
-     * automatically have a task dependency on the producing task.
-     *
-     * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
-     */
-    val fileValues: MapProperty<String, Any>
-
-
-    /**
-     * A collection of YAML files containing values for this release.
-     *
-     * Corresponds to the `--values` CLI option.
-     *
-     * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
-     */
-    val valueFiles: ConfigurableFileCollection
 
 
     /**
@@ -235,17 +185,213 @@ interface HelmRelease : Named {
     fun dependsOn(vararg releaseNames: String) {
         this.dependsOn.addAll(*releaseNames)
     }
+
+
+    /**
+     * A set of additional dependencies for the task that installs this release.
+     * May contain any of the notations supported by [Task.dependsOn].
+     *
+     * @see [Task.dependsOn]
+     */
+    val installDependsOn: MutableSet<Any>
+
+
+    /**
+     * Declare additional dependencies for the task that installs this release.
+     *
+     * @param paths Additional installation dependencies.
+     *              May contain any of the notations supported by [Task.dependsOn].
+     */
+    @JvmDefault
+    fun installDependsOn(paths: Iterable<Any>) {
+        this.installDependsOn.addAll(paths)
+    }
+
+
+    /**
+     * Declare additional dependencies for the task that installs this release.
+     *
+     * @param paths Additional installation dependencies.
+     *              May contain any of the notations supported by [Task.dependsOn].
+     */
+    @JvmDefault
+    fun installDependsOn(vararg paths: Any) {
+        installDependsOn(paths.toList())
+    }
 }
 
 
-private open class DefaultHelmRelease
-@Inject constructor(
+/**
+ * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
+ *
+ * Provides methods for target-specific configuration of the release.
+ */
+interface HelmCoreRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFromRepositoryOptions {
+
+    /**
+     * Tags for this release.
+     *
+     * Tags can be used to filter the set of releases to be installed or uninstalled. Releases that do not have any
+     * tags will always be installed.
+     */
+    val tags: MutableSet<String>
+
+
+    /**
+     * Declare tags for this release.
+     *
+     * Tags can be used to filter the set of releases to be installed or uninstalled. Releases that do not have any
+     * tags will always be installed.
+     *
+     * @param tags the tags to use for this release
+     */
+    @JvmDefault
+    fun tags(tags: Iterable<String>) {
+        this.tags.addAll(tags)
+    }
+
+
+    /**
+     * Declare tags for this release.
+     *
+     * Tags can be used to filter the set of releases to be installed or uninstalled. Releases that do not have any
+     * tags will always be installed.
+     *
+     * @param tags the tags to use for this release
+     */
+    @JvmDefault
+    fun tags(vararg tags: String) {
+        tags(tags.toList())
+    }
+
+
+    /**
+     * A list of directories that contain target-specific values files for the release.
+     *
+     * From each directory in the list, in the order of appearance, the following files are used if they exist:
+     * * A file named `values.yaml`
+     * * A file named `values-<target>.yaml`, where `<target>` is the currently active release target.
+     */
+    val valuesDirs: ListProperty<File>
+
+
+    /**
+     * Adds directories containing values files to the release.
+     *
+     * @param directories the directories to add. Each entry is evaluated as per [Project.file].
+     */
+    fun valuesDirs(directories: Iterable<Any>)
+
+
+    /**
+     * Adds directories containing values files to the release.
+     *
+     * @param directories the directories to add. Each entry is evaluated as per [Project.file].
+     */
+    @JvmDefault
+    fun valuesDirs(vararg directories: Any) {
+        valuesDirs(directories.toList())
+    }
+
+
+    /**
+     * Adds a directory containing values files to the release.
+     *
+     * @param directory the directory to add. It is evaluated as per [Project.file].
+     */
+    @JvmDefault
+    fun valuesDir(directory: Any) {
+        valuesDirs(listOf(directory))
+    }
+
+
+    /**
+     * Adds a target-specific configuration action for the given release targets.
+     *
+     * Target names can be prefixed with an exclamation mark (e.g. `!target`) to apply the configuration for
+     * any _but_ the given target.
+     *
+     * @param targets the names of release targets
+     * @param action the target-specific configuration to apply
+     */
+    fun forTargets(targets: Iterable<String>, action: Action<TargetSpecific>)
+
+
+    /**
+     * Adds a target-specific configuration action for the given release targets.
+     *
+     * Target names can be prefixed with an exclamation mark (e.g. `!target`) to apply the configuration for
+     * any _but_ the given target.
+     *
+     * @param targets the names of release targets
+     * @param action the target-specific configuration to apply
+     */
+    @JvmDefault
+    fun forTargets(vararg targets: String, action: Action<TargetSpecific>) =
+        forTargets(targets.toList(), action)
+
+
+    /**
+     * Adds a target-specific configuration action for the given release target.
+     *
+     * The target name can be prefixed with an exclamation mark (e.g. `!target`) to apply the configuration for
+     * any _but_ the given target.
+     *
+     * @param target the name of the release target
+     * @param action the target-specific configuration to apply
+     */
+    @JvmDefault
+    fun forTarget(target: String, action: Action<TargetSpecific>) =
+        forTargets(listOf(target), action)
+
+
+    /**
+     * Adds a target-specific configuration action for any target.
+     *
+     * Use this method to specify a custom configuration block that depends on the [HelmReleaseTarget], which is
+     * available via the [TargetSpecific.target] property in the action parameter.
+     *
+     * @param action the target-specific configuration to apply
+     */
+    @JvmDefault
+    fun forAnyTarget(action: Action<TargetSpecific>) =
+        forTarget("", action)
+
+
+    /**
+     * Used to configure a [HelmCoreRelease] for a specific release target.
+     */
+    interface TargetSpecific : HelmReleaseProperties {
+
+        /**
+         * The [HelmReleaseTarget] for which target-specific configuration is being applied.
+         */
+        val target: HelmReleaseTarget
+    }
+}
+
+
+internal interface HelmReleaseInternal {
+    /**
+     * Returns a [HelmReleaseProperties] with target-specific configuration applied
+     * when evaluated.
+     *
+     * @param target the [HelmReleaseTarget] for which to apply target-specific configuration
+     * @return a [HelmReleaseProperties] with target-specific configuration applied
+     */
+    fun resolveForTarget(target: HelmReleaseTarget): HelmReleaseProperties
+}
+
+
+private abstract class AbstractHelmRelease(
     objects: ObjectFactory,
     private val name: String,
-    private val project: Project
-) : HelmRelease {
+    protected val project: Project
+) : Named, HelmReleaseProperties,
+    ConfigurableHelmInstallFromRepositoryOptions by HelmInstallFromRepositoryOptionsHolder(objects),
+    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
 
-    final override fun getName(): String =
+    override fun getName(): String =
         name
 
 
@@ -256,6 +402,28 @@ private open class DefaultHelmRelease
 
     final override val chart: Property<ChartReference> =
         objects.property()
+
+
+    final override val version: Property<String> =
+        objects.property()
+
+
+    final override fun from(notation: Any) {
+        if (notation is Provider<*>) {
+            chart.set(notation.map(this::notationToChartReference))
+        } else {
+            chart.set(notationToChartReference(notation))
+        }
+    }
+
+
+    private fun notationToChartReference(notation: Any): ChartReference =
+        when (notation) {
+            is ChartReference -> notation
+            is FileCollection -> FileCollectionChartReference(notation)
+            is HelmChart -> HelmChartReference(project, notation.name)
+            else -> SimpleChartReference(notation.toString())
+        }
 
 
     final override fun chart(project: String?, chart: String): ChartReference =
@@ -282,30 +450,6 @@ private open class DefaultHelmRelease
         }
 
 
-    final override val repository: Property<URI> =
-        objects.property()
-
-
-    final override val namespace: Property<String> =
-        objects.property()
-
-
-    final override val version: Property<String> =
-        objects.property()
-
-
-    final override val dryRun: Property<Boolean> =
-        objects.property()
-
-
-    final override val atomic: Property<Boolean> =
-        objects.property()
-
-
-    final override val wait: Property<Boolean> =
-        objects.property()
-
-
     final override val replace: Property<Boolean> =
         objects.property<Boolean>()
             .convention(false)
@@ -316,48 +460,170 @@ private open class DefaultHelmRelease
             .convention(false)
 
 
-    final override val values: MapProperty<String, Any> =
-        objects.mapProperty()
-
-
-    final override val fileValues: MapProperty<String, Any> =
-        objects.mapProperty()
-
-
-    final override val valueFiles: ConfigurableFileCollection =
-        objects.fileCollection()
-
-
     final override val dependsOn: SetProperty<String> =
         objects.setProperty()
 
 
-    final override fun from(notation: Any) {
-        if (notation is Provider<*>) {
-            chart.set(notation.map(this::notationToChartReference))
-        } else {
-            chart.set(notationToChartReference(notation))
+    final override val installDependsOn: MutableSet<Any> = mutableSetOf()
+}
+
+
+private open class DefaultHelmCoreRelease
+@Inject constructor(
+    objects: ObjectFactory,
+    name: String,
+    project: Project
+) : AbstractHelmRelease(objects, name, project), HelmCoreRelease, HelmReleaseInternal {
+
+    private val targetSpecificActions = mutableMapOf<String, Action<HelmCoreRelease.TargetSpecific>>()
+    private val targetSpecificCache: MutableMap<String, HelmReleaseProperties> = ConcurrentHashMap()
+
+
+    override val tags = mutableSetOf<String>()
+
+
+    override val valuesDirs: ListProperty<File> =
+        objects.listProperty()
+
+
+    override fun valuesDirs(directories: Iterable<Any>) {
+        for (directory in directories) {
+            when (directory) {
+                is Directory -> valuesDirs.add(directory.asFile)
+                is File -> valuesDirs.add(directory)
+                is String -> valuesDirs.add(project.file(directory))
+                else -> {
+                    val provider = project.layout.dir(project.provider { project.file(directory) }).asFile()
+                    valuesDirs.add(provider)
+                }
+            }
         }
     }
 
 
-    private fun notationToChartReference(notation: Any): ChartReference =
-        when (notation) {
-            is ChartReference -> notation
-            is FileCollection -> FileCollectionChartReference(notation)
-            is HelmChart -> HelmChartReference(project, notation.name)
-            else -> SimpleChartReference(notation.toString())
+    private fun getValuesFilesForAnyTarget(): FileCollection =
+        getValuesFilesWithFileName("values.yaml")
+
+
+    private fun getValuesFilesForTarget(target: String): FileCollection =
+        getValuesFilesWithFileName("values-$target.yaml")
+
+
+    private fun getValuesFilesWithFileName(fileName: String): FileCollection {
+        val provider = valuesDirs.map { dirs ->
+            dirs.asSequence()
+                .map { it.resolve(fileName) }
+                .filter { it.exists() }
+                .asIterable()
+                .let { project.files(it) }
         }
+        return project.files(provider)
+    }
+
+
+    override fun forTargets(targets: Iterable<String>, action: Action<HelmCoreRelease.TargetSpecific>) {
+        for (target in targets) {
+            targetSpecificActions.merge(target, action) { action1, action2 -> action1.andThen(action2) }
+        }
+    }
+
+
+    override fun resolveForTarget(target: HelmReleaseTarget): HelmReleaseProperties =
+        targetSpecificCache.computeIfAbsent(target.name) {
+            doResolveForTarget(target)
+        }
+
+
+
+    private fun doResolveForTarget(target: HelmReleaseTarget): HelmReleaseProperties {
+
+        val logger = LoggerFactory.getLogger(DefaultHelmCoreRelease::class.java)
+
+        logger.info("Constructing target-specific release \"{}\" for target \"{}\"", this.name, target.name)
+
+        return TargetSpecific(project.objects, name, project, target).also { targetSpecific ->
+
+            // Call setFrom(HelmInstallFromRepositoryOptions) to assign all the options properties that only exist
+            // on HelmRelease, but not on HelmReleaseTarget
+            targetSpecific.setFrom(this)
+            // Call setFrom(HelmInstallationOptions) to assign the options properties that exist on both HelmRelease
+            // and HelmReleaseTarget; using properties from the release and falling back to release target
+            targetSpecific.setFrom(this.withDefaults(target))
+
+            // Assign all the other properties that don't map to an option
+            targetSpecific.releaseName.set(this.releaseName)
+            targetSpecific.chart.set(this.chart)
+            targetSpecific.version.set(this.version)
+            targetSpecific.replace.set(this.replace)
+            targetSpecific.keepHistoryOnUninstall.set(this.keepHistoryOnUninstall)
+            targetSpecific.dependsOn.addAll(this.dependsOn)
+            targetSpecific.installDependsOn.addAll(this.installDependsOn)
+
+            // Merge in the values from all sources
+            logger.debug("Merging values from release target")
+            targetSpecific.mergeValues(target)
+            logger.debug("Merging values from release")
+            targetSpecific.mergeValues(this)
+            targetSpecific.valueFiles.from(getValuesFilesForAnyTarget())
+            targetSpecific.valueFiles.from(getValuesFilesForTarget(target.name))
+
+            // Apply all matching target-specific actions
+            val action = (
+                    // action for any target
+                    listOfNotNull(targetSpecificActions[""]) +
+                            // negative-match actions for other targets
+                            targetSpecificActions.filterKeys { it.startsWith("!") && it != "!${target.name}" }.values +
+                            // positive-match action for the given target
+                            listOfNotNull(targetSpecificActions[target.name])
+                    ).combine()
+            if (action != null) {
+                logger.debug("Applying target-specific configuration actions")
+                action.execute(targetSpecific)
+            } else {
+                logger.debug("No target-specific configuration actions specified")
+            }
+        }
+    }
+
+
+    private class TargetSpecific(
+        objects: ObjectFactory,
+        name: String,
+        project: Project,
+        override val target: HelmReleaseTarget
+    ) : AbstractHelmRelease(objects, name, project), HelmCoreRelease.TargetSpecific
 }
 
 
 /**
- * Creates a [NamedDomainObjectContainer] that holds [HelmRelease]s.
+ * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
+ *
+ * This interface also exposes [ExtensionAware], so that build scripts can access the `ext` (Groovy) / `extra`
+ * (Kotlin) properties of the release.
+ */
+interface HelmRelease : Named, HelmCoreRelease, ExtensionAware
+
+
+/**
+ * Decorator around [HelmCoreRelease] and [HelmReleaseInternal] to expose the [ExtensionAware]ness of the
+ * domain object to the build script.
+ */
+private class HelmReleaseDecorator(
+    private val delegate: HelmCoreRelease
+) : HelmRelease,
+    HelmCoreRelease by delegate,
+    HelmReleaseInternal by delegate as HelmReleaseInternal,
+    ExtensionAware by delegate as ExtensionAware
+
+
+/**
+ * Creates a [NamedDomainObjectContainer] that holds [HelmCoreRelease]s.
  *
  * @receiver the Gradle [Project]
  * @return the container for `HelmRelease`s
  */
 internal fun Project.helmReleaseContainer(): NamedDomainObjectContainer<HelmRelease> =
     container(HelmRelease::class.java) { name ->
-        objects.newInstance(DefaultHelmRelease::class.java, name, this)
+        val delegate = objects.newInstance(DefaultHelmCoreRelease::class.java, name, this)
+        HelmReleaseDecorator(delegate)
     }
