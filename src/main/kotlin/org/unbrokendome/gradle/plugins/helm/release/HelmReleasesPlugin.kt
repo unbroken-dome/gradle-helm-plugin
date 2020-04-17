@@ -52,8 +52,10 @@ class HelmReleasesPlugin : Plugin<Project> {
             // Add an extension property "activeReleaseTarget" to the helm extension
             val activeReleaseTarget = objects.property<String>()
                 .convention(
-                    providerFromProjectProperty("helm.release.target")
-                        .orElse(HELM_DEFAULT_RELEASE_TARGET)
+                    providerFromProjectProperty(
+                        "helm.release.target",
+                        defaultValue = HELM_DEFAULT_RELEASE_TARGET
+                    )
                 )
             (helm as ExtensionAware).extensions.add(
                 object : TypeOf<Property<String>>() {}, "activeReleaseTarget", activeReleaseTarget
@@ -118,9 +120,8 @@ class HelmReleasesPlugin : Plugin<Project> {
     private fun Project.createReleaseTargetsExtension(): NamedDomainObjectContainer<HelmReleaseTarget> {
 
         val globalSelectTagsExpression: TagExpression = TagExpression.fromProvider(
-            providerFromProjectProperty("helm.release.tags")
+            providerFromProjectProperty("helm.release.tags", defaultValue = "*")
                 .map { TagExpression.parse(it) }
-                .orElse(TagExpression.alwaysMatch())
         )
 
         return helmReleaseTargetContainer(globalSelectTagsExpression)

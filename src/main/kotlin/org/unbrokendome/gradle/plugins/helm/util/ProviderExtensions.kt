@@ -4,6 +4,8 @@ import groovy.lang.Closure
 import groovy.util.Eval
 import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.util.GradleVersion
 import java.io.File
 import java.net.URI
 
@@ -55,3 +57,23 @@ internal fun Provider<String>.toUri(): Provider<URI> =
  */
 internal fun <T : FileSystemLocation> Provider<T>.asFile(): Provider<File> =
     map { it.asFile }
+
+
+internal fun <T : Any> Provider<T>.withDefault(value: T, providers: ProviderFactory): Provider<T> =
+    if (GradleVersion.current() >= GRADLE_VERSION_5_6) {
+        orElse(value)
+    } else {
+        providers.provider {
+            this.orNull ?: value
+        }
+    }
+
+
+internal fun <T : Any> Provider<T>.withDefault(provider: Provider<T>, providers: ProviderFactory): Provider<T> =
+    if (GradleVersion.current() >= GRADLE_VERSION_5_6) {
+        orElse(provider)
+    } else {
+        providers.provider {
+            this.orNull ?: provider.orNull
+        }
+    }

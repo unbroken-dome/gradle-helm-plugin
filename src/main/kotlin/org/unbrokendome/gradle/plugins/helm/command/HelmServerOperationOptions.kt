@@ -3,9 +3,11 @@ package org.unbrokendome.gradle.plugins.helm.command
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.toHelmString
+import org.unbrokendome.gradle.plugins.helm.util.withDefault
 import java.time.Duration
 
 
@@ -19,18 +21,20 @@ interface HelmServerOperationOptions : HelmServerOptions {
 }
 
 
-internal fun HelmServerOperationOptions.withDefaults(defaults: HelmServerOperationOptions): HelmServerOperationOptions =
+internal fun HelmServerOperationOptions.withDefaults(
+    defaults: HelmServerOperationOptions, providers: ProviderFactory
+): HelmServerOperationOptions =
     object : HelmServerOperationOptions,
-        HelmServerOptions by withDefaults(defaults as HelmServerOptions) {
+        HelmServerOptions by withDefaults(defaults as HelmServerOptions, providers) {
 
         override val dryRun: Provider<Boolean>
-            get() = this@withDefaults.dryRun.orElse(defaults.dryRun)
+            get() = this@withDefaults.dryRun.withDefault(defaults.dryRun, providers)
 
         override val noHooks: Provider<Boolean>
-            get() = this@withDefaults.noHooks.orElse(defaults.noHooks)
+            get() = this@withDefaults.noHooks.withDefault(defaults.noHooks, providers)
 
         override val remoteTimeout: Provider<Duration>
-            get() = this@withDefaults.remoteTimeout.orElse(defaults.remoteTimeout)
+            get() = this@withDefaults.remoteTimeout.withDefault(defaults.remoteTimeout, providers)
     }
 
 

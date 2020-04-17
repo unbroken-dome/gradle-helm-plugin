@@ -194,8 +194,7 @@ class HelmPlugin
         val filtering = objects.createFiltering()
             .apply {
                 enabled.convention(
-                    booleanProviderFromProjectProperty("helm.filtering.enabled")
-                        .orElse(true)
+                    booleanProviderFromProjectProperty("helm.filtering.enabled", defaultValue = true)
                 )
             }
         (helm as ExtensionAware).extensions
