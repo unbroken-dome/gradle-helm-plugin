@@ -8,7 +8,7 @@ import java.net.URL
 plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
-    id("com.gradle.plugin-publish") version "0.10.0"
+    id("com.gradle.plugin-publish") version "0.11.0"
     id("org.jetbrains.dokka") version "0.9.17"
     id("maven-publish")
     id("org.asciidoctor.convert") version "1.5.9.2"
