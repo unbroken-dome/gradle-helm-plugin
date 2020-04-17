@@ -106,24 +106,9 @@ internal object HelmValueOptionsApplier : HelmOptionsApplier {
                     option("--set", otherValues)
                 }
 
-                option("--set-file",
-                    options.fileValues.map<String> { m ->
-
-                        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-                        m.takeIf { it.isNotEmpty() }
-                            ?.entries?.joinToString(separator = ",") { (key, value) ->
-
-                            val valueRepresentation = when (val resolvedValue = resolveValue(value)) {
-                                is FileCollection -> resolvedValue.singleFile
-                                is TextResource -> resolvedValue.asFile()
-                                else -> resolvedValue
-                            }
-
-                            "$key=$valueRepresentation"
-
-                        }
-                    }
-                )
+                buildFileValuesArg(options).takeIf { it.isNotBlank() }?.let { arg ->
+                    option("--set-file", arg)
+                }
 
                 options.valueFiles.takeUnless { it.isEmpty }
                     ?.let { valueFiles ->
@@ -133,6 +118,18 @@ internal object HelmValueOptionsApplier : HelmOptionsApplier {
         }
     }
 
+    private fun buildFileValuesArg(options: HelmValueOptions): String =
+        options.fileValues.getOrElse(emptyMap())
+                .entries
+                .joinToString(separator = ",") { (key, value) ->
+                    val valueRepresentation = when (val resolvedValue = resolveValue(value)) {
+                        is FileCollection -> resolvedValue.singleFile
+                        is TextResource -> resolvedValue.asFile()
+                        else -> resolvedValue
+                    }
+
+                    "$key=$valueRepresentation"
+                }
 
     private fun resolveValue(value: Any?): Any? =
         when (value) {
