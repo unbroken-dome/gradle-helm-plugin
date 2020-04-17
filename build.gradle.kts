@@ -25,7 +25,9 @@ dependencies {
 
     implementation("org.yaml:snakeyaml:1.25")
     implementation("org.json:json:20190722")
-    implementation("org.apache.httpcomponents:httpclient:4.5.6")
+
+    compileOnly("com.squareup.okhttp3:okhttp:4.5.0")
+    compileOnly("com.squareup.okhttp3:okhttp-tls:4.5.0")
 
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")

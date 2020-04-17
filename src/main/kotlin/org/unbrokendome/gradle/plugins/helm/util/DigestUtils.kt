@@ -1,6 +1,5 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
-import org.apache.commons.codec.binary.Hex
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.ReadableByteChannel
@@ -77,5 +76,13 @@ internal fun calculateDigestHex(
     bufferSize: Int = 4096
 ): String {
     val digestBytes = calculateDigest(path, algorithm, bufferSize)
-    return Hex.encodeHexString(digestBytes)
+    return buildString(digestBytes.size * 2) {
+        digestBytes.forEach { byte ->
+            append(HEX_ALPHABET[(byte.toInt() shr 4) and 0x0F])
+            append(HEX_ALPHABET[byte.toInt() and 0x0F])
+        }
+    }
 }
+
+
+private val HEX_ALPHABET: CharArray = "01234567890abcdef".toCharArray()

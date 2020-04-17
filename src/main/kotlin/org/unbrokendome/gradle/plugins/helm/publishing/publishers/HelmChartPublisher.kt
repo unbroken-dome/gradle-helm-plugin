@@ -14,6 +14,7 @@ internal interface HelmChartPublisher {
      * @param chartName the name of the chart
      * @param chartVersion the version of the chart
      * @param chartFile the path to the chart package file (`.tgz`) on disk
+     * @throws HttpResponseException if the response code indicates an error
      */
     fun publish(chartName: String, chartVersion: String, chartFile: File)
 }
