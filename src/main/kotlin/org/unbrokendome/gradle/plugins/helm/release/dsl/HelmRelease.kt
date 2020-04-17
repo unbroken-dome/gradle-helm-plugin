@@ -548,7 +548,7 @@ private open class DefaultHelmCoreRelease
             targetSpecific.setFrom(this)
             // Call setFrom(HelmInstallationOptions) to assign the options properties that exist on both HelmRelease
             // and HelmReleaseTarget; using properties from the release and falling back to release target
-            targetSpecific.setFrom(this.withDefaults(target))
+            targetSpecific.setFrom(this.withDefaults(target, project.providers))
 
             // Assign all the other properties that don't map to an option
             targetSpecific.releaseName.set(this.releaseName)

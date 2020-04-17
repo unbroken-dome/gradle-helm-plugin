@@ -101,6 +101,7 @@ internal fun Project.intProviderFromProjectProperty(propertyName: String): Provi
  *
  * @receiver the Gradle [Project]
  * @param propertyName the name of the property
+ * @param defaultPath an optional default path for the provider, if the project property is not defined
  * @param evaluateGString if `true`, the string is evaluated as if it was a Groovy GString, with the [Project]
  *        as evaluation context
  * @return a [Provider] that returns the project property value as a [Directory] if it exists, or is empty if the
@@ -108,9 +109,10 @@ internal fun Project.intProviderFromProjectProperty(propertyName: String): Provi
  */
 internal fun Project.dirProviderFromProjectProperty(
     propertyName: String,
+    defaultPath: String? = null,
     evaluateGString: Boolean = false
 ): Provider<Directory> =
-    providerFromProjectProperty(propertyName, evaluateGString = evaluateGString)
+    providerFromProjectProperty(propertyName, evaluateGString = evaluateGString, defaultValue = defaultPath)
         .let { pathProvider ->
             project.layout.projectDirectory.dir(pathProvider)
         }

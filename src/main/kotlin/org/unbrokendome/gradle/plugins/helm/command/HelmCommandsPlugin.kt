@@ -29,8 +29,7 @@ class HelmCommandsPlugin
         project.objects.createLinting()
             .apply {
                 enabled.convention(
-                    project.booleanProviderFromProjectProperty("helm.lint.enabled")
-                        .orElse(true)
+                    project.booleanProviderFromProjectProperty("helm.lint.enabled", defaultValue = true)
                 )
                 strict.convention(
                     project.booleanProviderFromProjectProperty("helm.lint.strict")

@@ -2,9 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -54,16 +52,16 @@ internal interface HelmExtensionInternal : HelmExtension {
 private open class DefaultHelmExtension
 @Inject constructor(
     private val project: Project,
-    objects: ObjectFactory,
-    layout: ProjectLayout
+    objects: ObjectFactory
 ) : HelmExtension, HelmExtensionInternal,
     ConfigurableHelmServerOptions by HelmServerOptionsHolder(objects).applyConventions(project) {
 
     final override val executable: Property<String> =
         objects.property<String>()
             .convention(
-                project.providerFromProjectProperty("helm.executable", evaluateGString = true)
-                    .orElse("helm")
+                project.providerFromProjectProperty(
+                    "helm.executable", evaluateGString = true, defaultValue = "helm"
+                )
             )
 
 
@@ -79,40 +77,50 @@ private open class DefaultHelmExtension
     final override val outputDir: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.outputDir", evaluateGString = true)
-                    .orElse(layout.buildDirectory.dir("helm/charts"))
+                project.dirProviderFromProjectProperty(
+                    "helm.outputDir",
+                    defaultPath = "\$buildDir/helm/charts", evaluateGString = true
+                )
             )
 
 
     final override val tmpDir: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.tmpDir", evaluateGString = true)
-                    .orElse(layout.buildDirectory.dir("tmp/helm"))
+                project.dirProviderFromProjectProperty(
+                    "helm.tmpDir",
+                    defaultPath = "\$buildDir/tmp/helm", evaluateGString = true
+                )
             )
 
 
     final override val xdgDataHome: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.xdgDataHome", evaluateGString = true)
-                    .orElse(project.layout.buildDirectory.dir("helm/data"))
+                project.dirProviderFromProjectProperty(
+                    "helm.xdgDataHome",
+                    defaultPath = "\$buildDir/helm/data", evaluateGString = true
+                )
             )
 
 
     final override val xdgConfigHome: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.xdgConfigHome", evaluateGString = true)
-                    .orElse(project.layout.buildDirectory.dir("helm/config"))
+                project.dirProviderFromProjectProperty(
+                    "helm.xdgConfigHome",
+                    defaultPath = "\$buildDir/helm/config", evaluateGString = true
+                )
             )
 
 
     final override val xdgCacheHome: DirectoryProperty =
         objects.directoryProperty()
             .convention(
-                project.dirProviderFromProjectProperty("helm.xdgCacheHome", evaluateGString = true)
-                    .orElse(project.rootDirAsDirectory.dir(".gradle/helm/cache"))
+                project.dirProviderFromProjectProperty(
+                    "helm.xdgCacheHome",
+                    defaultPath = "\$rootDir/.gradle/helm/cache", evaluateGString = true
+                )
             )
 
 
@@ -142,16 +150,6 @@ private fun ConfigurableHelmServerOptions.applyConventions(project: Project) = a
         project.providerFromProjectProperty("helm.namespace")
     )
 }
-
-
-/**
- * Returns the root directory of this project as a [Directory].
- *
- * @receiver the Gradle [Project]
- * @see Project.getRootDir
- */
-private val Project.rootDirAsDirectory: Directory
-    get() = project.rootProject.layout.projectDirectory
 
 
 /**

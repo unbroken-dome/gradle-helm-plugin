@@ -5,8 +5,10 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.withDefault
 
 
 interface HelmServerOptions : HelmOptions {
@@ -19,16 +21,18 @@ interface HelmServerOptions : HelmOptions {
 }
 
 
-internal fun HelmServerOptions.withDefaults(defaults: HelmServerOptions): HelmServerOptions =
+internal fun HelmServerOptions.withDefaults(
+    defaults: HelmServerOptions, providers: ProviderFactory
+): HelmServerOptions =
     object : HelmServerOptions {
         override val kubeConfig: Provider<RegularFile>
-            get() = this@withDefaults.kubeConfig.orElse(defaults.kubeConfig)
+            get() = this@withDefaults.kubeConfig.withDefault(defaults.kubeConfig, providers)
 
         override val kubeContext: Provider<String>
-            get() = this@withDefaults.kubeContext.orElse(defaults.kubeContext)
+            get() = this@withDefaults.kubeContext.withDefault(defaults.kubeContext, providers)
 
         override val namespace: Provider<String>
-            get() = this@withDefaults.namespace.orElse(defaults.namespace)
+            get() = this@withDefaults.namespace.withDefault(defaults.namespace, providers)
     }
 
 
