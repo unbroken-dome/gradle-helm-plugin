@@ -20,29 +20,31 @@ The following properties can be set on the `helm` extension in the Gradle build 
 |===
 | Property | Description | `helm` CLI option
 
-`executable`
-Path to the `helm` executable. The `PATH` environment variable is taken into account, so this can just be `helm`
+| `executable`
+| Path to the `helm` executable. The `PATH` environment variable is taken into account, so this can just be `helm`
  (which is the default) if the Helm client is installed in a suitable location.
+|
 
-`extraArgs`
-Additional arguments to pass to _every_ invocation of `helm`. This can be used for command-line options that have
+| `extraArgs`
+| Additional arguments to pass to _every_ invocation of `helm`. This can be used for command-line options that have
  no counterpart in the plugin.
+|
 
-`kubeConfig`
-Path to the Kubernetes configuration file.
-Environment variable `KUBECONFIG`
+| `kubeConfig`
+| Path to the Kubernetes configuration file.
+| Environment variable `KUBECONFIG`
 
-`kubeContext`
-Name of the kubeconfig context to use.
-`--kube-context`
+| `kubeContext`
+| Name of the kubeconfig context to use.
+| `--kube-context`
 
-`namespace`
-Kubernetes namespace scope.
-`--namespace`
+| `namespace`
+| Kubernetes namespace scope.
+| `--namespace`
 
-`remoteTimeout`
-Time to wait for any individual Kubernetes operation (like Jobs for hooks).
-`--timeout` (on certain commands like `install`, `upgrade` or `uninstall`)
+| `remoteTimeout`
+| Time to wait for any individual Kubernetes operation (like Jobs for hooks).
+| `--timeout` (on certain commands like `install`, `upgrade` or `uninstall`)
 |===
 
 
@@ -63,20 +65,20 @@ by the Helm CLI.
 |===
 | `helm` extension property | Description | Environment variable | Default Value
 
-`xdgDataHome`
-Base directory for storing data. (Note: this does not currently seem to be used by any `helm` command.)
-`XDG_DATA_HOME`
-`build/helm/data` under the project dir
+| `xdgDataHome`
+| Base directory for storing data. (Note: this does not currently seem to be used by any `helm` command.)
+| `XDG_DATA_HOME`
+| `build/helm/data` under the project dir
 
-`xdgConfigHome`
-Base directory for storing configuration.
-`XDG_CONFIG_HOME`
-`build/helm/config` under the project dir
+| `xdgConfigHome`
+| Base directory for storing configuration.
+| `XDG_CONFIG_HOME`
+| `build/helm/config` under the project dir
 
-`xdgCacheHome`
-Base directory for storing cached data.
-`XDG_CACHE_HOME`
-`.gradle/helm/cache` under the _root_ project dir
+| `xdgCacheHome`
+| Base directory for storing cached data.
+| `XDG_CACHE_HOME`
+| `.gradle/helm/cache` under the _root_ project dir
 |===
 
 [NOTE]
@@ -104,3 +106,96 @@ helm {
 }
 ----
 ====
+
+
+== Automatic Download of the Helm Client
+
+As an alternative to using a locally installed Helm client, the plugin can automatically download a Helm client
+distribution from the official Helm website. This allows build scripts to be more independent from the environment
+found on the local machine where the Gradle build runs.
+
+The download can be configured either through the `helm.downloadClient` DSL block or through project properties (e.g.
+in the `gradle.properties` file). Project properties have the advantage of being automatically inherited by subprojects,
+and are easier to adapt for the local machine.
+
+The following example shows how the download can be configured in the build script:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    downloadClient {
+        enabled = true
+        version = '3.2.0'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    downloadClient {
+        enabled.set(true)
+        version.set("3.2.0")
+    }
+}
+----
+
+
+The following example shows how the download can be configured using the gradle.properties file:
+
+[source,properties]
+.gradle.properties
+----
+helm.client.download.enabled=true
+helm.client.download.version=3.2.0
+----
+
+
+
+The following properties control the download of the Helm client:
+
+|===
+| DSL property under `helm.downloadClient` | Project property | Description | Default Value
+
+| `enabled`
+| `helm.client.download.enabled`
+| If set to `true`, the Helm client is downloaded from the remote location.
+| `false`
+
+| `version`
+| `helm.client.download.version`
+| The version of the Helm client to be downloaded.
+| The latest version of Helm available at the time the plugin is published (currently `3.2.0`)
+
+| `destinationDir`
+|
+| The base directory where Helm client executables are extracted. By default, this is a directory under
+ `(rootDir)/.gradle`, so the client will only be downloaded and extracted once in a multi-module build, and is not
+ removed by a `clean` task. You can set this to a different directory (e.g. under the `build` directory) if you
+ prefer different behavior.
+| `.gradle/helm/client` under the _root_ project dir
+
+|
+| `helm.client.download.baseUrl`
+| The base URL for downloading the client executables.
+
+  You can change this to a different URL if required, for example when behind a corporate proxy.
+| `https://get.helm.sh/`
+
+|
+| `helm.client.download.group`
+| A pseudo "group" coordinate for the Helm client artifacts; required for Gradle artifact resolution.
+
+  Change this to a different value in the unlikely case that the default group name `sh.helm` conflicts
+  with other external dependencies used by the build script.
+| `sh.helm`
+
+|
+| `helm.client.download.osClassifier`
+| Override the OS classifier (the suffix of the downloaded filename) if auto-detection does not work as expected.
+| Auto-detected for the current system based on Java system properties.
+
+  For example, `darwin-amd64` or `windows-amd64`.
+|===
