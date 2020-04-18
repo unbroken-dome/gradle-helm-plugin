@@ -8,7 +8,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.gradle.process.ExecResult
+import org.gradle.workers.WorkerExecutor
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
@@ -16,6 +16,7 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.execHelm
 import org.unbrokendome.gradle.plugins.helm.util.property
+import javax.inject.Inject
 
 
 /**
@@ -27,6 +28,11 @@ abstract class AbstractHelmCommandTask
     init {
         group = HELM_GROUP
     }
+
+
+    @get:[Internal Inject]
+    internal open val workerExecutor: WorkerExecutor
+        get() = throw UnsupportedOperationException()
 
 
     @get:Internal("represented by other properties")
@@ -81,11 +87,12 @@ abstract class AbstractHelmCommandTask
 
     protected fun execHelm(
         command: String, subcommand: String? = null, action: (HelmExecSpec.() -> Unit)? = null
-    ): ExecResult =
+    ) {
         execProviderSupport.execHelm(command, subcommand, action)
+    }
 
 
     @get:Internal
     internal open val execProviderSupport: HelmExecProviderSupport
-        get() = HelmExecProviderSupport(project, this, GlobalHelmOptionsApplier)
+        get() = HelmExecProviderSupport(project, workerExecutor, this, GlobalHelmOptionsApplier)
 }

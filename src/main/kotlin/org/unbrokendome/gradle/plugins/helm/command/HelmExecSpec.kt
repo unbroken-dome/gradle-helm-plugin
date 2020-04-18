@@ -1,6 +1,5 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
-import org.gradle.api.Action
 import org.gradle.api.provider.Provider
 import org.gradle.process.ExecSpec
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
@@ -12,11 +11,28 @@ import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 interface HelmExecSpec {
 
     /**
+     * Sets the name of the executable to use.
+     *
+     * @param executable the executable
+     */
+    fun executable(executable: String)
+
+    /**
      * Adds some arguments to the CLI invocation.
      *
      * @param args the command line argument(s) to be added
      */
-    fun args(vararg args: Any)
+    fun args(args: Iterable<Any?>)
+
+    /**
+     * Adds some arguments to the CLI invocation.
+     *
+     * @param args the command line argument(s) to be added
+     */
+    @JvmDefault
+    fun args(vararg args: Any?) {
+        args(args.toList())
+    }
 
     /**
      * Adds arguments supplied by a Gradle [Provider] to the CLI invocation.
@@ -29,7 +45,16 @@ interface HelmExecSpec {
      *
      * @param provider the provider of the command line argument(s) to be added
      */
-    fun args(provider: Provider<out Any>)
+    @JvmDefault
+    fun args(provider: Provider<out Any>) {
+        provider.ifPresent { value ->
+            if (value is Collection<*>) {
+                args(value)
+            } else {
+                args(listOf(value))
+            }
+        }
+    }
 
     /**
      * Adds a flag argument to the command line.
@@ -45,7 +70,12 @@ interface HelmExecSpec {
      * @param value whether the flag should be set or unset
      * @param defaultValue whether the flag is considered set or unset by default
      */
-    fun flag(name: String, value: Boolean = true, defaultValue: Boolean = false)
+    @JvmDefault
+    fun flag(name: String, value: Boolean = true, defaultValue: Boolean = false) {
+        if (value != defaultValue) {
+            args(if (value) name else "$name=false")
+        }
+    }
 
     /**
      * Adds a flag argument to the command line, using a [Provider] to supply the flag value.
@@ -65,7 +95,14 @@ interface HelmExecSpec {
      * @param provider provider of the flag value
      * @param defaultValue whether the flag is considered set or unset by default
      */
-    fun flag(name: String, provider: Provider<Boolean>, defaultValue: Boolean = false)
+    @JvmDefault
+    fun flag(name: String, provider: Provider<Boolean>, defaultValue: Boolean = false) {
+        provider.orNull
+            ?.takeIf { it != defaultValue }
+            ?.let { value ->
+                args(if (value) name else "$name=false")
+            }
+    }
 
     /**
      * Adds an option argument to the command line, using the given value.
@@ -75,7 +112,10 @@ interface HelmExecSpec {
      * @param name the name of the option, including the leading dashes (e.g. `--home`)
      * @param value the value of the option
      */
-    fun option(name: String, value: Any)
+    @JvmDefault
+    fun option(name: String, value: Any) {
+        args(name, value)
+    }
 
     /**
      * Adds an option argument to the command line, using a [Provider] to supply the option value.
@@ -88,7 +128,12 @@ interface HelmExecSpec {
      * @param name the name of the option, including the leading dashes (e.g. `--home`)
      * @param provider the value of the option
      */
-    fun option(name: String, provider: Provider<out Any>)
+    @JvmDefault
+    fun option(name: String, provider: Provider<out Any>) {
+        provider.ifPresent { value ->
+            option(name, value)
+        }
+    }
 
     /**
      * Sets an environment variable for the process, using a [Provider] to supply the variable value.
@@ -105,22 +150,6 @@ interface HelmExecSpec {
      * a non-zero exit code.
      */
     fun assertSuccess(assertSuccess: Boolean = true)
-
-    /**
-     * Adds an action that directly manipulates the underlying [ExecSpec].
-     *
-     * @param action the action to execute on the [ExecSpec]
-     */
-    fun withExecSpec(action: Action<ExecSpec>)
-
-    /**
-     * Adds an action that directly manipulates the underlying [ExecSpec].
-     *
-     * @param action the action to execute on the [ExecSpec]
-     */
-    @JvmDefault
-    fun withExecSpec(action: ExecSpec.() -> Unit) =
-        withExecSpec(Action(action))
 }
 
 
@@ -139,47 +168,13 @@ internal class DefaultHelmExecSpec(
     }
 
 
-    override fun args(vararg args: Any) {
-        execSpec.args(*args)
+    override fun executable(executable: String) {
+        execSpec.executable(executable)
     }
 
 
-    override fun args(provider: Provider<out Any>) {
-        provider.ifPresent { value ->
-            if (value is Collection<*>) {
-                execSpec.args(*value.toTypedArray())
-            } else {
-                execSpec.args(value)
-            }
-        }
-    }
-
-
-    override fun flag(name: String, value: Boolean, defaultValue: Boolean) {
-        if (value != defaultValue) {
-            execSpec.args(if (value) name else "$name=false")
-        }
-    }
-
-
-    override fun flag(name: String, provider: Provider<Boolean>, defaultValue: Boolean) {
-        provider.orNull
-            ?.takeIf { it != defaultValue }
-            ?.let { value ->
-                execSpec.args(if (value) name else "$name=false")
-            }
-    }
-
-
-    override fun option(name: String, value: Any) {
-        execSpec.args(name, value)
-    }
-
-
-    override fun option(name: String, provider: Provider<out Any>) {
-        provider.ifPresent { value ->
-            option(name, value)
-        }
+    override fun args(args: Iterable<Any?>) {
+        execSpec.args(args)
     }
 
 
@@ -192,10 +187,5 @@ internal class DefaultHelmExecSpec(
 
     override fun assertSuccess(assertSuccess: Boolean) {
         execSpec.isIgnoreExitValue = !assertSuccess
-    }
-
-
-    override fun withExecSpec(action: Action<ExecSpec>) {
-        action.execute(execSpec)
     }
 }

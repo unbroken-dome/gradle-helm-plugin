@@ -4,3 +4,4 @@ import org.gradle.util.GradleVersion
 
 
 internal val GRADLE_VERSION_5_6 = GradleVersion.version("5.6")
+internal val GRADLE_VERSION_6_0 = GradleVersion.version("6.0")

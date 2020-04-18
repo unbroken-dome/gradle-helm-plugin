@@ -14,6 +14,10 @@ import java.util.BitSet
 private typealias StringAssertion = Assert<String>.() -> Unit
 
 
+/**
+ * "Stateful" variant of [Invocation] that removes arguments from the command line when they are checked. This
+ * allows us to verify that there are no arguments besides the ones that were verified.
+ */
 class StatefulInvocation(
     private val invocation: Invocation
 ) : AbstractInvocation(), Invocation by invocation {
