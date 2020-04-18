@@ -1,23 +1,19 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.publishers
 
-import org.apache.http.auth.AuthScope
-import org.apache.http.auth.UsernamePasswordCredentials
-import org.apache.http.client.config.CookieSpecs
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.RequestBuilder
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.FileEntity
-import org.apache.http.impl.client.BasicCredentialsProvider
-import org.apache.http.impl.client.BasicResponseHandler
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClientBuilder
-import org.gradle.api.credentials.Credentials
-import org.gradle.api.internal.provider.Providers
-import org.gradle.api.provider.Provider
+import okhttp3.Credentials
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Interceptor
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.tls.HandshakeCertificates
+import okhttp3.tls.HeldCertificate
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
-import org.unbrokendome.gradle.plugins.helm.util.ifPresent
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCertificateCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializablePasswordCredentials
 import java.io.File
 import java.net.URI
 
@@ -27,7 +23,7 @@ import java.net.URI
  */
 internal abstract class AbstractHttpHelmChartPublisher(
     private val url: URI,
-    private val credentials: Provider<Credentials> = Providers.notDefined()
+    private val credentials: SerializableCredentials? = null
 ) : HelmChartPublisher {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -48,7 +44,7 @@ internal abstract class AbstractHttpHelmChartPublisher(
 
 
     private companion object {
-        val CONTENT_TYPE_GZIP: ContentType = ContentType.create("application/x-gzip")
+        val MEDIA_TYPE_GZIP: MediaType = "application/x-gzip".toMediaType()
     }
 
 
@@ -68,59 +64,62 @@ internal abstract class AbstractHttpHelmChartPublisher(
 
         val uploadUrl = buildFullUploadUrl(chartName, chartVersion)
 
-        createHttpClient().use { httpClient ->
+        logger.info(
+            "Uploading chart file {} via {} to repository URL {}",
+            chartFile, uploadMethod, uploadUrl
+        )
 
-            val request = RequestBuilder.create(uploadMethod)
-                .setUri(uploadUrl)
-                .also { b ->
-                    additionalHeaders(chartName, chartVersion, chartFile).forEach { (key, value) ->
-                        b.addHeader(key, value)
-                    }
-                }
-                .setEntity(FileEntity(chartFile, CONTENT_TYPE_GZIP))
-                .build()
+        val httpClient = createHttpClient()
 
-            logger.info(
-                "Uploading chart file {} via {} to repository URL {}",
-                chartFile, uploadMethod, uploadUrl
-            )
-
-            httpClient.execute(request, BasicResponseHandler())
+        val request = Request.Builder().run {
+            url(uploadUrl.toHttpUrl())
+            method(uploadMethod, chartFile.asRequestBody(MEDIA_TYPE_GZIP))
+            build()
         }
+
+        httpClient.newCall(request)
+            .execute()
+            .use { response ->
+                if (response.code !in 200..299) {
+                    throw HttpResponseException(uploadMethod, uploadUrl, response.code, response.message)
+                }
+            }
     }
 
 
-    private fun createHttpClient(): CloseableHttpClient {
-        return HttpClientBuilder.create()
-            .apply {
+    private fun createHttpClient(): OkHttpClient =
+        OkHttpClient.Builder().run {
 
-                // The "default" CookieSpec does not always understand RFC-6265 compliant cookies, which
-                // may be used by Artifactory
-                setDefaultRequestConfig(
-                    RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()
-                )
+            if (credentials != null) {
+                when (credentials) {
+                    is SerializablePasswordCredentials ->
+                        addInterceptor(credentials.createAuthInterceptor())
 
-                credentials.ifPresent { credentials ->
-                    when (credentials) {
-                        is PasswordCredentials ->
-                            BasicCredentialsProvider()
-                                .apply {
-                                    setCredentials(AuthScope.ANY, credentials.toHttpClientCredentials())
-                                }
-                                .let(this::setDefaultCredentialsProvider)
-
-                        is CertificateCredentials ->
-                            TODO("Authentication by client certificates is not yet implemented")
-
-                        else ->
-                            throw IllegalStateException("Unsupported credentials type: ${credentials.javaClass.name}")
+                    is SerializableCertificateCredentials -> {
+                        val handshakeCertificates = HandshakeCertificates.Builder()
+                            .heldCertificate(credentials.createHeldCertificate())
+                            .addPlatformTrustedCertificates()
+                            .build()
+                        sslSocketFactory(handshakeCertificates.sslSocketFactory(), handshakeCertificates.trustManager)
                     }
                 }
             }
+
+            build()
+        }
+
+
+    private fun SerializablePasswordCredentials.createAuthInterceptor(): Interceptor = Interceptor { chain ->
+        val request = chain.request().newBuilder()
+            .addHeader("Authorization", "Basic ${Credentials.basic(username, password ?: "")}")
             .build()
+        chain.proceed(request)
     }
 
 
-    private fun PasswordCredentials.toHttpClientCredentials(): UsernamePasswordCredentials =
-        UsernamePasswordCredentials(username.orNull, password.orNull)
+    private fun SerializableCertificateCredentials.createHeldCertificate(): HeldCertificate {
+        val certText = certificateFile.readText()
+        val keyText = keyFile.readText()
+        return HeldCertificate.decode("$certText\n$keyText")
+    }
 }

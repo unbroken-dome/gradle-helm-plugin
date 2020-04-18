@@ -1,10 +1,11 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
-import org.gradle.api.credentials.Credentials
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Provider
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.toSerializable
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
+import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
 import org.unbrokendome.gradle.plugins.helm.util.calculateDigestHex
 import java.io.File
 import java.net.URI
@@ -20,12 +21,27 @@ private open class DefaultArtifactoryHelmPublishingRepository
     objects: ObjectFactory
 ) : AbstractHelmPublishingRepository(objects, name), ArtifactoryHelmPublishingRepository {
 
-    override val publisher: HelmChartPublisher
-        get() = Publisher(url.get(), configuredCredentials)
+    override val publisherParams: PublisherParams
+        get() = ArtifactoryPublisherParams(
+            url = url.get(),
+            credentials = configuredCredentials.orNull?.toSerializable()
+        )
 
 
-    private class Publisher(url: URI, credentials: Provider<Credentials>) :
-        AbstractHttpHelmChartPublisher(url, credentials) {
+    private class ArtifactoryPublisherParams(
+        private val url: URI,
+        private val credentials: SerializableCredentials?
+    ) : PublisherParams {
+
+        override fun createPublisher(): HelmChartPublisher =
+            ArtifactoryPublisher(url, credentials)
+    }
+
+
+    private class ArtifactoryPublisher(
+        url: URI,
+        credentials: SerializableCredentials?
+    ) : AbstractHttpHelmChartPublisher(url, credentials) {
 
         override val uploadMethod: String
             get() = "PUT"

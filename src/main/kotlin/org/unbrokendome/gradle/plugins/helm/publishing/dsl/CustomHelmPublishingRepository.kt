@@ -1,11 +1,12 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
-import org.gradle.api.credentials.Credentials
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.toSerializable
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
+import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
 import javax.inject.Inject
@@ -51,13 +52,30 @@ private open class DefaultCustomHelmPublishingRepository
             .convention("")
 
 
-    override val publisher: HelmChartPublisher
-        get() = Publisher(url.get(), configuredCredentials, uploadMethod.get(), uploadPath.get())
+    override val publisherParams: PublisherParams
+        get() = CustomPublisherParams(
+            url = url.get(),
+            credentials = configuredCredentials.orNull?.toSerializable(),
+            uploadMethod = uploadMethod.get(),
+            uploadPath = uploadPath.get()
+        )
 
 
-    private class Publisher(
+    private class CustomPublisherParams(
+        private val url: URI,
+        private val credentials: SerializableCredentials?,
+        private val uploadMethod: String,
+        private val uploadPath: String
+    ) : PublisherParams {
+
+        override fun createPublisher(): HelmChartPublisher =
+            CustomPublisher(url, credentials, uploadMethod, uploadPath)
+    }
+
+
+    private class CustomPublisher(
         url: URI,
-        credentials: Provider<Credentials>,
+        credentials: SerializableCredentials?,
         override val uploadMethod: String,
         private val uploadPath: String
     ) : AbstractHttpHelmChartPublisher(url, credentials) {
