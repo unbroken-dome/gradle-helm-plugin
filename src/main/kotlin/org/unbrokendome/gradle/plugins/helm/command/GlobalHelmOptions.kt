@@ -123,14 +123,14 @@ internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
             logger.debug("Applying options: {}", options)
 
             with(spec) {
-                withExecSpec {
-                    executable = options.executable.getOrElse("helm")
 
-                    options.extraArgs.ifPresent { extraArgs ->
-                        args(extraArgs)
-                    }
-                }
+                executable(options.executable.getOrElse("helm"))
+
                 flag("--debug", options.debug)
+
+                options.extraArgs.ifPresent { extraArgs ->
+                    args(extraArgs)
+                }
 
                 environment("XDG_DATA_HOME", options.xdgDataHome)
                 environment("XDG_CONFIG_HOME", options.xdgConfigHome)

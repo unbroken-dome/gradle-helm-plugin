@@ -79,20 +79,6 @@ object GlobalOptionsTests : AbstractOptionsTests({
     val execMock: GradleExecMock by memoized()
 
 
-    variant("with custom helm executable") {
-
-        beforeEachTest {
-            project.helm.executable.set("my-helm")
-        }
-
-        afterEachTest {
-            execMock.eachInvocation {
-                expectExecutable("my-helm")
-            }
-        }
-    }
-
-
     variant("with debug flag") {
 
         beforeEachTest {

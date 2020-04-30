@@ -6,13 +6,11 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.process.ExecResult
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableGlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecResult
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsHolder
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
@@ -124,18 +122,17 @@ private open class DefaultHelmExtension
             )
 
 
-    final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =
-        execProviderSupport.execHelm(command, subcommand, action)
+    final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?) =
+        execProvider.execHelm(command, subcommand, action)
 
 
     final override fun execHelmCaptureOutput(
         command: String, subcommand: String?, action: Action<HelmExecSpec>?
-    ): HelmExecResult =
-        execProviderSupport.execHelmCaptureOutput(command, subcommand, action)
+    ) = execProvider.execHelmCaptureOutput(command, subcommand, action)
 
 
-    private val execProviderSupport: HelmExecProviderSupport
-        get() = HelmExecProviderSupport(project, this, GlobalHelmOptionsApplier)
+    private val execProvider: HelmExecProvider
+        get() = HelmExecProviderSupport(project, null, this, GlobalHelmOptionsApplier)
 }
 
 

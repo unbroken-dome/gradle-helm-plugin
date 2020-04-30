@@ -38,6 +38,8 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
 
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.5.0")
+
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))
 }
@@ -65,6 +67,8 @@ tasks.withType<Test> {
     useJUnitPlatform {
         includeEngines("spek2")
     }
+
+    testLogging.showStandardStreams = true
 
     // give tests a temporary directory below the build dir so
     // we don't pollute the system temp dir (Gradle tests don't clean up)
