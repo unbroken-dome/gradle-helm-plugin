@@ -25,7 +25,9 @@ dependencies {
 
     implementation("org.yaml:snakeyaml:1.25")
     implementation("org.json:json:20190722")
-    implementation("org.apache.httpcomponents:httpclient:4.5.6")
+
+    compileOnly("com.squareup.okhttp3:okhttp:4.5.0")
+    compileOnly("com.squareup.okhttp3:okhttp-tls:4.5.0")
 
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
@@ -35,6 +37,8 @@ dependencies {
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
+
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.5.0")
 
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))
@@ -63,6 +67,8 @@ tasks.withType<Test> {
     useJUnitPlatform {
         includeEngines("spek2")
     }
+
+    testLogging.showStandardStreams = true
 
     // give tests a temporary directory below the build dir so
     // we don't pollute the system temp dir (Gradle tests don't clean up)

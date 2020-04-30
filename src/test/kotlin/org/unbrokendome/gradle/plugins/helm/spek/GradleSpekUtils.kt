@@ -6,10 +6,13 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.spekframework.spek2.dsl.LifecycleAware
+import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.lifecycle.MemoizedValue
+import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
+import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.testutil.exec.DefaultExecutableGradleExecMock
+import org.unbrokendome.gradle.plugins.helm.testutil.exec.ExecutableGradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.ProcessOperationsGradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.install
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.withStatefulVerification
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
@@ -97,17 +100,41 @@ inline fun <reified T : Task> LifecycleAware.gradleTask(name: String? = null, no
     gradleTask(T::class, name, config)
 
 
-fun LifecycleAware.gradleExecMock(): MemoizedValue<GradleExecMock> {
-    val project: Project by memoized()
+/**
+ * Uses a [GradleExecMock] for tests that invoke external processes.
+ *
+ * @param executableFileName the name of the fake executable file. This will be created as an executable shell script
+ *        inside the project directory. Exec actions must set their `executable` property to this path.
+ * @return a [GradleExecMock] as a Spek [MemoizedValue]
+ */
+fun LifecycleAware.gradleExecMock(executableFileName: String = "helm"): MemoizedValue<GradleExecMock> {
 
-    val processOperationsExecMock by memoized { ProcessOperationsGradleExecMock.create(project) }
+    val executableExecMock: ExecutableGradleExecMock by memoized(
+        mode = CachingMode.SCOPE,
+        factory = {
+            val execMock: ExecutableGradleExecMock = DefaultExecutableGradleExecMock()
+            execMock.start()
+            execMock
+        },
+        destructor = { it.close() }
+    )
 
     beforeEachTest {
-        processOperationsExecMock.install(project)
+        val project: Project by memoized()
+        val scriptFilePath = project.projectDir.resolve(executableFileName)
+
+        executableExecMock.createScriptFile(scriptFilePath)
+
+        project.plugins.withType(HelmCommandsPlugin::class.java) {
+            project.helm.executable.set(scriptFilePath.absolutePath)
+        }
     }
 
-    @Suppress("UNUSED_VARIABLE")
-    val execMock by memoized { processOperationsExecMock.withStatefulVerification() }
+    afterEachTest {
+        executableExecMock.reset()
+    }
 
-    return memoized()
+    return memoized(mode = CachingMode.TEST) {
+        executableExecMock.withStatefulVerification()
+    }
 }

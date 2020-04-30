@@ -33,16 +33,14 @@ object HelmUninstallTest : ExecutionResultAwareSpek({
 
             beforeEachTest {
                 lsExecMock.everyExec {
-                    printsOnStdout { pw ->
-                        pw.println(
-                            """[{
-                              "name": "awesome-release", "namespace": "default",
-                              "revision": "42", "updated": "2020-03-15 10:56:45.906903 +0100 CET",
-                              "status": "deployed", "chart": "my-repo/awesome-chart",
-                              "app_version": "1.2.3"
-                            }]"""
-                        )
-                    }
+                    printsOnStdout(
+                        """[{
+                          "name": "awesome-release", "namespace": "default",
+                          "revision": "42", "updated": "2020-03-15 10:56:45.906903 +0100 CET",
+                          "status": "deployed", "chart": "my-repo/awesome-chart",
+                          "app_version": "1.2.3"
+                        }]""".trimIndent()
+                    )
                 }
             }
 
@@ -73,7 +71,6 @@ object HelmUninstallTest : ExecutionResultAwareSpek({
                     task.keepHistory.set(true)
 
                     task.execute()
-
 
                     commandExecMock.singleInvocation {
                         expectCommand("uninstall")

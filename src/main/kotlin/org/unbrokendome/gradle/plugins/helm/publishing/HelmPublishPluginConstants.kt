@@ -4,13 +4,19 @@ package org.unbrokendome.gradle.plugins.helm.publishing
 /**
  * The name of the `publishing` sub-extension.
  */
-const val HELM_PUBLISHING_EXTENSION_NAME = "publishing"
+internal const val HELM_PUBLISHING_EXTENSION_NAME = "publishing"
 
 
 /**
  * The name of the `publishing.repositories` sub-extension.
  */
-const val HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME = "repositories"
+internal const val HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME = "repositories"
+
+
+/**
+ * The name of the `publishing.httpClient` sub-extension.
+ */
+internal const val HELM_PUBLISHING_HTTPCLIENT_EXTENSION_NAME = "httpClient"
 
 
 /**

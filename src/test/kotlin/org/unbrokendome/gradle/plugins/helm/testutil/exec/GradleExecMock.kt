@@ -1,15 +1,30 @@
 package org.unbrokendome.gradle.plugins.helm.testutil.exec
 
 
+/**
+ * Represents a single invocation of an external process, which can be verified by the test.
+ */
 interface Invocation {
 
+    /**
+     * The entire command line, including the executable and all arguments.
+     */
     val commandLine: List<String>
         get() = listOf(executable) + args
 
+    /**
+     * The executable of the invocation.
+     */
     val executable: String
 
+    /**
+     * The command line arguments (not including the executable).
+     */
     val args: List<String>
 
+    /**
+     * The environment variables.
+     */
     val environment: Map<String, String>
 }
 
@@ -19,6 +34,13 @@ abstract class AbstractInvocation : Invocation {
     override fun toString(): String =
         commandLine.toString()
 }
+
+
+class DefaultInvocation(
+    override val executable: String,
+    override val args: List<String>,
+    override val environment: Map<String, String>
+) : AbstractInvocation()
 
 
 interface GradleExecMock {
@@ -51,7 +73,7 @@ interface GradleExecMock {
     /**
      * Sets up mocking behavior.
      */
-    fun everyExec(block: GradleExecResultBuilder.() -> Unit)
+    fun everyExec(block: GradleExecBehaviorBuilder.() -> Unit)
 
 
     /**

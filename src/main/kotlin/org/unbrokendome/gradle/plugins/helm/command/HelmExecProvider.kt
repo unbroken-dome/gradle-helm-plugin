@@ -2,10 +2,14 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.process.ExecResult
 import org.gradle.process.ExecSpec
+import org.gradle.util.GradleVersion
+import org.gradle.workers.WorkerExecutor
 import org.slf4j.LoggerFactory
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_6_0
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.util.UUID
 
 
 /**
@@ -19,9 +23,8 @@ interface HelmExecProvider {
      * @param command the name of the command (e.g. `"dependency"`)
      * @param subcommand optionally, the name of the subcommand (e.g. `"update"`)
      * @param action an optional [Action] that further customizes the CLI invocation
-     * @return an [ExecResult] indicating the result of the invocation
      */
-    fun execHelm(command: String, subcommand: String? = null, action: Action<HelmExecSpec>? = null): ExecResult
+    fun execHelm(command: String, subcommand: String? = null, action: Action<HelmExecSpec>? = null)
 
 
     /**
@@ -30,25 +33,12 @@ interface HelmExecProvider {
      * @param command the name of the command
      * @param subcommand optionally, the name of the subcommand
      * @param action an [Action] that further customizes the CLI invocation
-     * @return a [HelmExecResult] that describes the result of the invocation and contains the captured output
+     * @return a [String] containing the captured standard output
      */
     fun execHelmCaptureOutput(
         command: String, subcommand: String? = null, action: Action<HelmExecSpec>? = null
-    ): HelmExecResult
+    ): String
 }
-
-
-/**
- * Provides information about the result of a Helm CLI invocation.
- */
-data class HelmExecResult(
-    /** The Gradle [ExecResult]. */
-    val execResult: ExecResult,
-    /** The captured standard output. */
-    val stdout: String,
-    /** The captured standard error output. */
-    val stderr: String
-)
 
 
 /**
@@ -59,12 +49,10 @@ data class HelmExecResult(
  * @param command the name of the command (e.g. `"dependency"`)
  * @param subcommand optionally, the name of the subcommand (e.g. `"update"`)
  * @param action an [Action] that further customizes the CLI invocation
- * @return an [ExecResult] indicating the result of the invocation
  */
 fun HelmExecProvider.execHelm(
     command: String, subcommand: String? = null, action: (HelmExecSpec.() -> Unit)? = null
-): ExecResult =
-    execHelm(command, subcommand, action?.let { Action(it) })
+) = execHelm(command, subcommand, action?.let { Action(it) })
 
 
 /**
@@ -75,7 +63,7 @@ fun HelmExecProvider.execHelm(
  * @param command the name of the command
  * @param subcommand optionally, the name of the subcommand
  * @param action an [Action] that further customizes the CLI invocation
- * @return a [HelmExecResult] that describes the result of the invocation and contains the captured output
+ * @return a [String] containing the captured standard output
  */
 internal fun HelmExecProvider.execHelmCaptureOutput(
     command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit
@@ -84,57 +72,117 @@ internal fun HelmExecProvider.execHelmCaptureOutput(
 
 internal class HelmExecProviderSupport(
     private val project: Project,
+    private val workerExecutor: WorkerExecutor?,
     private val options: HelmOptions,
     private val optionsAppliers: Iterable<HelmOptionsApplier>,
     private val description: String? = null
 ) : HelmExecProvider {
 
-    constructor(project: Project, options: HelmOptions, optionsApplier: HelmOptionsApplier)
-    : this(project, options, listOf(optionsApplier))
+    constructor(
+        project: Project, workerExecutor: WorkerExecutor?, options: HelmOptions,
+        optionsApplier: HelmOptionsApplier
+    ) : this(project, workerExecutor, options, listOf(optionsApplier))
 
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
 
-    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?): ExecResult =
-        project.exec { execSpec ->
-
-            val helmExecSpec = DefaultHelmExecSpec(execSpec, command, subcommand)
-
-            for (optionsApplier in optionsAppliers) {
-                logger.debug("Calling OptionsApplier: {} with options: {}", optionsApplier, options)
-                optionsApplier.apply(helmExecSpec, options)
-            }
-
-            action?.execute(helmExecSpec)
-
-            logger.info("Executing: {}", execSpec.maskedCommandLine)
+    override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?) {
+        if (shouldExecInWorker()) {
+            execHelmInWorker(command, subcommand, action)
+        } else {
+            execHelmSync(command, subcommand, action)
         }
+    }
+
+
+    private fun shouldExecInWorker(): Boolean =
+        // Even though the new worker API exists since Gradle 5.6, it is only possible to inject an
+        // ExecOperations service into the work action since Gradle 6.0, which we need to call an external
+        // process from the work action. For earlier Gradle versions, we will call exec in-process.
+        workerExecutor != null && GradleVersion.current() >= GRADLE_VERSION_6_0
 
 
     override fun execHelmCaptureOutput(
         command: String,
         subcommand: String?,
         action: Action<HelmExecSpec>?
-    ): HelmExecResult {
-        val stdout = ByteArrayOutputStream()
-        val stderr = ByteArrayOutputStream()
+    ): String {
 
-        val execResult = execHelm(command, subcommand) {
-            action?.execute(this)
-            withExecSpec {
-                standardOutput = stdout
-                errorOutput = stderr
-                isIgnoreExitValue = true
+        if (shouldExecInWorker()) {
+            // Use a unique ID for this invocation, to name our stdout/stderr capture files
+            val uniqueId = UUID.randomUUID().toString()
+            val stdoutFile = project.buildDir.resolve("tmp/helm/$uniqueId.out")
+
+            try {
+                execHelmInWorker(command, subcommand, action, stdoutFile)
+                return stdoutFile.takeIf { it.exists() }?.readText().orEmpty()
+
+            } finally {
+                stdoutFile.takeIf { it.exists() }?.delete()
             }
+
+        } else {
+
+            val stdout = ByteArrayOutputStream()
+
+            execHelmSync(command, subcommand, action) {
+                standardOutput = stdout
+            }
+            return String(stdout.toByteArray())
         }
-        if (execResult.exitValue != 0) {
-            throw HelmExecException(
-                command, subcommand, execResult, String(stderr.toByteArray()),
-                description?.let { "Error trying to $it" }
-            )
+    }
+
+
+    private fun execHelmSync(
+        command: String, subcommand: String?,
+        action: Action<HelmExecSpec>?, withExecSpec: (ExecSpec.() -> Unit)? = null
+    ) = project.exec { execSpec ->
+
+        val helmExecSpec = DefaultHelmExecSpec(execSpec, command, subcommand)
+        withExecSpec?.invoke(execSpec)
+        applyOptions(helmExecSpec)
+        action?.execute(helmExecSpec)
+
+        if (logger.isInfoEnabled) {
+            logger.info("Executing: {}", maskCommandLine(execSpec.commandLine))
         }
-        return HelmExecResult(execResult, String(stdout.toByteArray()), String(stderr.toByteArray()))
+    }
+
+
+    private fun execHelmInWorker(
+        command: String, subcommand: String?, action: Action<HelmExecSpec>?,
+        stdoutFile: File? = null
+    ) {
+
+        val workQueue = checkNotNull(workerExecutor).noIsolation()
+
+        workQueue.submit(HelmExecWorkAction::class.java) { params ->
+            params.args.add(command)
+            if (subcommand != null) {
+                params.args.add(subcommand)
+            }
+
+            val helmExecSpec = WorkParametersHelmExecSpec(params)
+
+            applyOptions(helmExecSpec)
+            action?.execute(helmExecSpec)
+
+            stdoutFile?.let { params.stdoutFile.set(it) }
+        }
+
+        // If a stdoutFile was passed, we need to wait for the worker action to finish
+        if (stdoutFile != null) {
+            workQueue.await()
+        }
+    }
+
+
+    private fun applyOptions(helmExecSpec: HelmExecSpec) {
+        for (optionsApplier in optionsAppliers) {
+            logger.debug("Calling OptionsApplier: {} with options: {}", optionsApplier, options)
+            optionsApplier.apply(helmExecSpec, options)
+        }
     }
 
 
@@ -146,7 +194,7 @@ internal class HelmExecProviderSupport(
      * @return a new [HelmExecProviderSupport] that uses the given description
      */
     fun withDescription(description: String): HelmExecProviderSupport =
-        HelmExecProviderSupport(project, options, optionsAppliers, description)
+        HelmExecProviderSupport(project, workerExecutor, options, optionsAppliers, description)
 
 
     /**
@@ -156,7 +204,7 @@ internal class HelmExecProviderSupport(
      * @return a new [HelmExecProviderSupport] that uses the given strategy to apply options
      */
     fun withOptionsAppliers(optionsAppliers: Iterable<HelmOptionsApplier>): HelmExecProviderSupport =
-        HelmExecProviderSupport(project, options, optionsAppliers, description)
+        HelmExecProviderSupport(project, workerExecutor, options, optionsAppliers, description)
 
 
     /**
@@ -187,15 +235,14 @@ internal class HelmExecProviderSupport(
      */
     fun addOptionsAppliers(vararg optionsAppliers: HelmOptionsApplier) =
         withOptionsAppliers(this.optionsAppliers + optionsAppliers.toList())
-
-
-    private val ExecSpec.maskedCommandLine: List<String>
-        get() =
-            commandLine.mapIndexed { index, arg ->
-                if (index > 0 && shouldMaskOptionValue(commandLine[index - 1])) "******" else arg
-            }
-
-
-    private fun shouldMaskOptionValue(arg: String) =
-        arg.startsWith("--") && arg.contains("password")
 }
+
+
+internal fun maskCommandLine(commandLine: List<String>): List<String> =
+    commandLine.mapIndexed { index, arg ->
+        if (index > 0 && shouldMaskOptionValue(commandLine[index - 1])) "******" else arg
+    }
+
+
+private fun shouldMaskOptionValue(arg: String) =
+    arg.startsWith("--") && arg.contains("password")

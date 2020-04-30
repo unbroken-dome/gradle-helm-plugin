@@ -1,10 +1,11 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.provider.Provider
+import org.gradle.workers.WorkerExecutor
 import org.json.JSONArray
 import org.json.JSONObject
+import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
 import org.unbrokendome.gradle.plugins.helm.model.Release
 
 
@@ -15,8 +16,9 @@ internal class HelmCommandSupport(
     private val execProvider: HelmExecProviderSupport
 ) {
     constructor(
-        project: Project, options: HelmOptions, optionsApplier: HelmOptionsApplier = GlobalHelmOptionsApplier
-    ) : this(HelmExecProviderSupport(project, options, optionsApplier))
+        project: Project, workerExecutor: WorkerExecutor, options: HelmOptions,
+        optionsApplier: HelmOptionsApplier = GlobalHelmOptionsApplier
+    ) : this(HelmExecProviderSupport(project, workerExecutor, options, optionsApplier))
 
 
     /**
@@ -27,7 +29,7 @@ internal class HelmCommandSupport(
      */
     fun getRelease(releaseName: Provider<String>): Release? {
 
-        val result = execProvider
+        val stdout = execProvider
             .withOptionsAppliers(GlobalHelmOptionsApplier, HelmServerOptionsApplier)
             .withDescription("get release info")
             .execHelmCaptureOutput("ls") {
@@ -35,7 +37,7 @@ internal class HelmCommandSupport(
                 option("-f", releaseName.map { "^${Regex.escape(it)}$" })
             }
 
-        return JSONArray(result.stdout)
+        return JSONArray(stdout)
             .asSequence()
             .map { Release.fromJson(it as JSONObject) }
             .firstOrNull()
@@ -43,6 +45,5 @@ internal class HelmCommandSupport(
 }
 
 
-internal val <T> T.helmCommandSupport
-        where T : Task, T : HelmOptions
-    get() = HelmCommandSupport(project, this)
+internal val <T : AbstractHelmCommandTask> T.helmCommandSupport
+    get() = HelmCommandSupport(project, workerExecutor, this)
