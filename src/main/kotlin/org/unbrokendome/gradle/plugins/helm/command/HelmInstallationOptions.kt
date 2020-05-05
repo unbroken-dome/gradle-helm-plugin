@@ -18,6 +18,8 @@ interface HelmInstallationOptions : HelmServerOperationOptions {
     val verify: Provider<Boolean>
 
     val wait: Provider<Boolean>
+
+    val version: Provider<String>
 }
 
 
@@ -38,6 +40,9 @@ fun HelmInstallationOptions.withDefaults(
 
         override val wait: Provider<Boolean>
             get() = this@withDefaults.wait.withDefault(defaults.wait, providers)
+
+        override val version: Provider<String>
+            get() = this@withDefaults.version.withDefault(defaults.version, providers)
     }
 
 
@@ -98,7 +103,8 @@ internal data class HelmInstallationOptionsHolder(
     override val atomic: Property<Boolean>,
     override val devel: Property<Boolean>,
     override val verify: Property<Boolean>,
-    override val wait: Property<Boolean>
+    override val wait: Property<Boolean>,
+    override val version: Property<String>
 ) : ConfigurableHelmInstallationOptions,
     ConfigurableHelmServerOperationOptions by serverOperationOptions {
 
@@ -108,7 +114,8 @@ internal data class HelmInstallationOptionsHolder(
         atomic = objects.property<Boolean>(),
         devel = objects.property<Boolean>(),
         verify = objects.property<Boolean>(),
-        wait = objects.property<Boolean>()
+        wait = objects.property<Boolean>(),
+        version = objects.property<String>()
     )
 }
 
@@ -124,6 +131,7 @@ internal object HelmInstallationOptionsApplier : HelmOptionsApplier {
             logger.debug("Applying options: {}", options)
 
             with(spec) {
+                option("--version", options.version)
                 flag("--atomic", options.atomic)
                 flag("--devel", options.devel)
                 flag("--verify", options.verify)

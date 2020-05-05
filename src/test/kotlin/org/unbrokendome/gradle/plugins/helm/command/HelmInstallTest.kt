@@ -20,6 +20,7 @@ object HelmInstallTest : ExecutionResultAwareSpek({
     val task by gradleTask<HelmInstall> {
         releaseName.set("awesome-release")
         chart.set("custom/awesome")
+        version.set("3.14.5")
     }
 
 
@@ -38,8 +39,10 @@ object HelmInstallTest : ExecutionResultAwareSpek({
 
                 execMock.singleInvocation {
                     expectCommand("install")
+                    expectFlag("--install")
                     expectArg("awesome-release")
                     expectArg("custom/awesome")
+                    expectOption("--version", "3.14.5")
                 }
             }
 

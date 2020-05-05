@@ -64,7 +64,7 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      *
      * Corresponds to the `--version` Helm CLI parameter.
      */
-    val version: Property<String>
+    override val version: Property<String>
 
 
     /**
