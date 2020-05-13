@@ -18,6 +18,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
 import org.unbrokendome.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
+import java.io.File
 
 
 private val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
@@ -125,7 +126,10 @@ open class HelmFilterSources : DefaultTask() {
     @TaskAction
     fun filterSources() {
         val result = project.sync { spec ->
-            spec.from(sourceDir)
+            // TODO: File instance should be a configurable parameter
+            val helmIgnoreEntries = parseHelmIgnoreEntries(project.file(".helmignore"))
+
+            spec.from(sourceDir).exclude(helmIgnoreEntries)
             spec.into(targetDir)
             spec.applyChartInfoOverrides()
             spec.applyFiltering()
@@ -133,6 +137,10 @@ open class HelmFilterSources : DefaultTask() {
         didWork = result.didWork
     }
 
+    private fun parseHelmIgnoreEntries(file: File): List<String> =
+        file.readLines().mapNotNull { ignoreEntry ->
+            ignoreEntry.substringBefore("#").takeIf { it.isNotEmpty() }
+        }
 
     private fun CopySpec.applyChartInfoOverrides() {
         if (overrideChartInfo.get()) {
