@@ -28,6 +28,23 @@ import javax.inject.Inject
 interface HelmExtension : HelmExecProvider, ConfigurableGlobalHelmOptions, ConfigurableHelmServerOptions {
 
     /**
+     * Configures the download of the Helm client executable.
+     */
+    val downloadClient: HelmDownloadClient
+
+
+    /**
+     * Configures the download of the Helm client executable.
+     *
+     * @param configureAction an [Action] that modifies the [HelmDownloadClient] settings
+     */
+    @JvmDefault
+    fun downloadClient(configureAction: Action<HelmDownloadClient>) {
+        configureAction.execute(downloadClient)
+    }
+
+
+    /**
      * Base output directory for Helm charts.
      *
      * Defaults to `"${project.buildDir}/helm/charts"`.
@@ -54,12 +71,14 @@ private open class DefaultHelmExtension
 ) : HelmExtension, HelmExtensionInternal,
     ConfigurableHelmServerOptions by HelmServerOptionsHolder(objects).applyConventions(project) {
 
+    final override val downloadClient: HelmDownloadClient =
+        DefaultHelmDownloadClient(project)
+
+
     final override val executable: Property<String> =
         objects.property<String>()
             .convention(
-                project.providerFromProjectProperty(
-                    "helm.executable", evaluateGString = true, defaultValue = "helm"
-                )
+                project.providerFromProjectProperty("helm.executable", evaluateGString = true)
             )
 
 

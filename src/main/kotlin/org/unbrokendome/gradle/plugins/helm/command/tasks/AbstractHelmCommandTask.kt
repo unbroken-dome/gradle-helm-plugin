@@ -16,6 +16,7 @@ import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.execHelm
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.withDefault
 import javax.inject.Inject
 
 
@@ -42,7 +43,17 @@ abstract class AbstractHelmCommandTask
 
     @get:Input
     final override val executable: Provider<String>
-        get() = globalOptions.flatMap { it.executable }
+            get() = localExecutable.withDefault(downloadedExecutable, project.providers)
+
+
+    @get:Internal
+    internal val localExecutable: Provider<String> =
+        globalOptions.flatMap { it.executable }
+
+
+    @get:Internal
+    internal val downloadedExecutable: Property<String> =
+        project.objects.property()
 
 
     @get:Console
