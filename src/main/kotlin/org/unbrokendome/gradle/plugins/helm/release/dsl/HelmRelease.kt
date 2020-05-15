@@ -396,10 +396,6 @@ private abstract class AbstractHelmRelease(
         objects.property()
 
 
-    final override val version: Property<String> =
-        objects.property()
-
-
     final override fun from(notation: Any) {
         if (notation is Provider<*>) {
             chart.set(notation.map(this::notationToChartReference))
@@ -545,7 +541,6 @@ private open class DefaultHelmCoreRelease
             // Assign all the other properties that don't map to an option
             targetSpecific.releaseName.set(this.releaseName)
             targetSpecific.chart.set(this.chart)
-            targetSpecific.version.set(this.version)
             targetSpecific.replace.set(this.replace)
             targetSpecific.keepHistoryOnUninstall.set(this.keepHistoryOnUninstall)
             targetSpecific.dependsOn.addAll(this.dependsOn)
@@ -609,7 +604,7 @@ private class HelmReleaseDecorator(
 
 
 /**
- * Creates a [NamedDomainObjectContainer] that holds [HelmCoreRelease]s.
+ * Creates a [NamedDomainObjectContainer] that holds [HelmRelease]s.
  *
  * @receiver the Gradle [Project]
  * @return the container for `HelmRelease`s
