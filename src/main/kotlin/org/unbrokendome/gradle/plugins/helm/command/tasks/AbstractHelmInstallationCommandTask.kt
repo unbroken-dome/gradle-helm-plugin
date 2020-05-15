@@ -57,7 +57,7 @@ abstract class AbstractHelmInstallationCommandTask :
      * Corresponds to the `--version` Helm CLI parameter.
      */
     @get:[Input Optional]
-    val version: Property<String> =
+    override val version: Property<String> =
         project.objects.property()
 
 
