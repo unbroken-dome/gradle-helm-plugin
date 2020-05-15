@@ -60,14 +60,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
 
 
     /**
-     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
-     *
-     * Corresponds to the `--version` Helm CLI parameter.
-     */
-    override val version: Property<String>
-
-
-    /**
      * Returns a reference to a chart, which can be used as a value for the [chart] property.
      *
      * @param project the path to the project that contains the chart, e.g. `":someProject"`. If `null`, refer to
