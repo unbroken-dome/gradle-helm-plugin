@@ -77,6 +77,14 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      * state before marking the release as successful. It will wait for as long as [remoteTimeout].
      */
     override val wait: Property<Boolean>
+
+
+    /**
+     * Specify the exact chart version to install. If this is not specified, the latest version is installed.
+     *
+     * Corresponds to the `--version` CLI parameter.
+     */
+    override val version: Property<String>
 }
 
 
@@ -86,6 +94,7 @@ internal fun ConfigurableHelmInstallationOptions.conventionsFrom(source: HelmIns
     devel.convention(source.devel)
     verify.convention(source.verify)
     wait.convention(source.wait)
+    version.convention(source.version)
 }
 
 
@@ -95,6 +104,7 @@ internal fun ConfigurableHelmInstallationOptions.setFrom(source: HelmInstallatio
     devel.set(source.devel)
     verify.set(source.verify)
     wait.set(source.wait)
+    version.set(source.version)
 }
 
 
@@ -131,11 +141,11 @@ internal object HelmInstallationOptionsApplier : HelmOptionsApplier {
             logger.debug("Applying options: {}", options)
 
             with(spec) {
-                option("--version", options.version)
                 flag("--atomic", options.atomic)
                 flag("--devel", options.devel)
                 flag("--verify", options.verify)
                 flag("--wait", options.wait)
+                option("--version", options.version)
             }
         }
     }
