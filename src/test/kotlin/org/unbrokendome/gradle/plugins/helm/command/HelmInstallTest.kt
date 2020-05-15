@@ -28,6 +28,7 @@ object HelmInstallTest : ExecutionResultAwareSpek({
         GlobalOptionsTests,
         GlobalServerOptionsTests,
         ServerOperationOptionsTests("install"),
+        InstallationOptionsTests("install"),
         InstallFromRepositoryOptionsTests("install")
     ) {
 

@@ -20,6 +20,8 @@ interface HelmInstallationOptions : HelmServerOperationOptions {
     val wait: Provider<Boolean>
 
     val version: Provider<String>
+
+    val createNamespace: Provider<Boolean>
 }
 
 
@@ -43,6 +45,9 @@ fun HelmInstallationOptions.withDefaults(
 
         override val version: Provider<String>
             get() = this@withDefaults.version.withDefault(defaults.version, providers)
+
+        override val createNamespace: Provider<Boolean>
+            get() = this@withDefaults.createNamespace.withDefault(defaults.createNamespace, providers)
     }
 
 
@@ -85,6 +90,14 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      * Corresponds to the `--version` CLI parameter.
      */
     override val version: Property<String>
+
+
+    /**
+     * If `true`, create the release namespace if not present.
+     *
+     * Corresponds to the `--create-namespace` CLI parameter.
+     */
+    override val createNamespace: Property<Boolean>
 }
 
 
@@ -95,6 +108,7 @@ internal fun ConfigurableHelmInstallationOptions.conventionsFrom(source: HelmIns
     verify.convention(source.verify)
     wait.convention(source.wait)
     version.convention(source.version)
+    createNamespace.convention(source.createNamespace)
 }
 
 
@@ -105,6 +119,7 @@ internal fun ConfigurableHelmInstallationOptions.setFrom(source: HelmInstallatio
     verify.set(source.verify)
     wait.set(source.wait)
     version.set(source.version)
+    createNamespace.set(source.createNamespace)
 }
 
 
@@ -114,18 +129,20 @@ internal data class HelmInstallationOptionsHolder(
     override val devel: Property<Boolean>,
     override val verify: Property<Boolean>,
     override val wait: Property<Boolean>,
-    override val version: Property<String>
+    override val version: Property<String>,
+    override val createNamespace: Property<Boolean>
 ) : ConfigurableHelmInstallationOptions,
     ConfigurableHelmServerOperationOptions by serverOperationOptions {
 
     constructor(objects: ObjectFactory)
     : this(
         serverOperationOptions = HelmServerOperationOptionsHolder(objects),
-        atomic = objects.property<Boolean>(),
-        devel = objects.property<Boolean>(),
-        verify = objects.property<Boolean>(),
-        wait = objects.property<Boolean>(),
-        version = objects.property<String>()
+        atomic = objects.property(),
+        devel = objects.property(),
+        verify = objects.property(),
+        wait = objects.property(),
+        version = objects.property(),
+        createNamespace = objects.property()
     )
 }
 
@@ -146,6 +163,7 @@ internal object HelmInstallationOptionsApplier : HelmOptionsApplier {
                 flag("--verify", options.verify)
                 flag("--wait", options.wait)
                 option("--version", options.version)
+                flag("--create-namespace", options.createNamespace)
             }
         }
     }

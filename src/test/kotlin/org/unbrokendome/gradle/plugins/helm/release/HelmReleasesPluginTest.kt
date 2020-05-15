@@ -183,6 +183,7 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(HelmRelease::devel, HelmInstallOrUpgrade::devel, true),
                 propertyMappingInfo(HelmRelease::verify, HelmInstallOrUpgrade::verify, true),
                 propertyMappingInfo(HelmRelease::wait, HelmInstallOrUpgrade::wait, true),
+                propertyMappingInfo(HelmRelease::version, HelmInstallOrUpgrade::version, "1.2.3"),
                 propertyMappingInfo(HelmRelease::repository, HelmInstallOrUpgrade::repository, URI.create("http://charts.example.com")),
                 propertyMappingInfo(HelmRelease::username, HelmInstallOrUpgrade::username, "john.doe"),
                 propertyMappingInfo(HelmRelease::password, HelmInstallOrUpgrade::password, "topsecret"),

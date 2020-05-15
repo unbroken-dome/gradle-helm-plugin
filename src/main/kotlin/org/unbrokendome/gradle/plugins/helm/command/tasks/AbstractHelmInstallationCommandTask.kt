@@ -228,6 +228,16 @@ abstract class AbstractHelmInstallationCommandTask :
         project.objects.property()
 
 
+    /**
+     * If `true`, create the release namespace if not present.
+     *
+     * Corresponds to the `--create-namespace` CLI parameter.
+     */
+    @get:Internal
+    final override val createNamespace: Property<Boolean> =
+        project.objects.property()
+
+
     init {
         inputs.files(
             fileValues.keySet().map { keys ->

@@ -30,7 +30,7 @@ abstract class AbstractHelmCommandTask
     }
 
 
-    @get:[Internal Inject]
+    @get:Inject
     internal open val workerExecutor: WorkerExecutor
         get() = throw UnsupportedOperationException()
 
