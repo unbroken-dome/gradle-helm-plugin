@@ -63,6 +63,7 @@ internal class HelmUninstallReleaseFromTargetTaskRule(
         dependsOn(TaskDependency {
             releases
                 .matching { otherRelease ->
+                    @Suppress("DEPRECATION")
                     otherRelease != release &&
                         release.name in (otherRelease as HelmReleaseInternal)
                         .resolveForTarget(releaseTarget).dependsOn.get()
@@ -72,5 +73,12 @@ internal class HelmUninstallReleaseFromTargetTaskRule(
                 }
                 .toSet()
         })
+
+        // Add a mustRunAfter relationship between the tasks for each release that this must be uninstalled after
+        mustRunAfter(
+            targetSpecific.mustUninstallAfter.map { otherReleaseName ->
+                releaseTarget.uninstallReleaseTaskName(otherReleaseName)
+            }
+        )
     }
 }
