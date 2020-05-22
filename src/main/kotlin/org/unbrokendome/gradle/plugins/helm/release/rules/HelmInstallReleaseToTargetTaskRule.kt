@@ -67,11 +67,19 @@ internal class HelmInstallReleaseToTargetTaskRule(
         dependsOn.addAll(targetSpecific.installDependsOn)
 
         // Make sure all releases that this release depends on are installed first
+        @Suppress("DEPRECATION")
         dependsOn(
             targetSpecific.dependsOn.map { releaseDependencies ->
                 releaseDependencies.map { dependencyName ->
                     releaseTarget.installReleaseTaskName(dependencyName)
                 }
+            }
+        )
+
+        // Add a mustRunAfter relationship between the tasks for each release that this must be installed after
+        mustRunAfter(
+            targetSpecific.mustInstallAfter.map { otherReleaseName ->
+                releaseTarget.installReleaseTaskName(otherReleaseName)
             }
         )
     }

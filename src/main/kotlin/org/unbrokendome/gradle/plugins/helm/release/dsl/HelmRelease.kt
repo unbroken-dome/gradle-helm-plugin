@@ -153,7 +153,11 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * before, and uninstalled after, the dependent release.
      *
      * Currently such dependencies can be expressed only within the same project.
+     *
+     * Deprecated as of 1.2.0; build scripts should indicate such dependencies using release tags instead, and
+     * specify the preferred installation/uninstallation order using [mustInstallAfter] and [mustUninstallAfter].
      */
+    @Deprecated(message = "use release tags instead")
     val dependsOn: SetProperty<String>
 
 
@@ -164,7 +168,13 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * before, and uninstalled after, the dependent release.
      *
      * Currently such dependencies can be expressed only within the same project.
+     *
+     * Deprecated as of 1.2.0; build scripts should indicate such dependencies using release tags instead, and
+     * specify the preferred installation/uninstallation order using [mustInstallAfter] and [mustUninstallAfter].
      */
+    @Suppress("DEPRECATION", "DeprecatedCallableAddReplaceWith")
+    @Deprecated(message = "use release tags instead")
+    @JvmDefault
     fun dependsOn(releaseName: String) {
         this.dependsOn.add(releaseName)
     }
@@ -172,7 +182,12 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
 
     /**
      * Express a dependency on several other releases.
+     *
+     * Deprecated as of 1.2.0; build scripts should indicate such dependencies using release tags instead, and
+     * specify the preferred installation/uninstallation order using [mustInstallAfter] and [mustUninstallAfter].
      */
+    @Suppress("DEPRECATION", "DeprecatedCallableAddReplaceWith")
+    @Deprecated(message = "use release tags instead")
     @JvmDefault
     fun dependsOn(vararg releaseNames: String) {
         this.dependsOn.addAll(*releaseNames)
@@ -209,6 +224,48 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
     @JvmDefault
     fun installDependsOn(vararg paths: Any) {
         installDependsOn(paths.toList())
+    }
+
+
+    /**
+     * A set of release names that this release must be installed after, if installation of both releases is
+     * requested by the current build.
+     *
+     * @see Task.mustRunAfter
+     */
+    val mustInstallAfter: MutableSet<String>
+
+
+    /**
+     * Specifies that this release must be installed after all the supplied releases.
+     *
+     * @param releaseNames names of releases that this release must be installed after
+     * @see Task.mustRunAfter
+     */
+    @JvmDefault
+    fun mustInstallAfter(vararg releaseNames: String) {
+        mustInstallAfter.addAll(releaseNames.toList())
+    }
+
+
+    /**
+     * A set of release names that this release must be uninstalled after, if uninstallation of both releases is
+     * requested by the current build.
+     *
+     * @see Task.mustRunAfter
+     */
+    val mustUninstallAfter: MutableSet<String>
+
+
+    /**
+     * Specifies that this release must be uninstalled after all the supplied releases.
+     *
+     * @param releaseNames names of releases that this release must be uninstalled after
+     * @see Task.mustRunAfter
+     */
+    @JvmDefault
+    fun mustUninstallAfter(vararg releaseNames: String) {
+        mustUninstallAfter.addAll(releaseNames.toList())
     }
 }
 
@@ -448,11 +505,16 @@ private abstract class AbstractHelmRelease(
             .convention(false)
 
 
+    @Suppress("OverridingDeprecatedMember")
     final override val dependsOn: SetProperty<String> =
         objects.setProperty()
 
 
     final override val installDependsOn: MutableSet<Any> = mutableSetOf()
+
+    final override val mustInstallAfter: MutableSet<String> = mutableSetOf()
+
+    final override val mustUninstallAfter: MutableSet<String> = mutableSetOf()
 }
 
 
@@ -543,8 +605,11 @@ private open class DefaultHelmCoreRelease
             targetSpecific.chart.set(this.chart)
             targetSpecific.replace.set(this.replace)
             targetSpecific.keepHistoryOnUninstall.set(this.keepHistoryOnUninstall)
+            @Suppress("DEPRECATION")
             targetSpecific.dependsOn.addAll(this.dependsOn)
             targetSpecific.installDependsOn.addAll(this.installDependsOn)
+            targetSpecific.mustInstallAfter.addAll(this.mustInstallAfter)
+            targetSpecific.mustUninstallAfter.addAll(this.mustUninstallAfter)
 
             // Merge in the values from all sources
             logger.debug("Merging values from release target")
