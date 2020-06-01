@@ -9,6 +9,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExtractClient
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 
 
 /**
@@ -80,7 +81,9 @@ constructor(
 
     override val version: Property<String> =
         project.objects.property<String>()
-            .convention(HelmDownloadClient.DEFAULT_HELM_CLIENT_VERSION)
+            .convention(
+                project.providerFromProjectProperty("helm.client.download.version", HelmDownloadClient.DEFAULT_HELM_CLIENT_VERSION)
+            )
 
 
     override val destinationDir: DirectoryProperty =
