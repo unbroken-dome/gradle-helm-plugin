@@ -1,7 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -68,11 +67,6 @@ open class HelmPublishChart
         project.objects.fileProperty()
 
 
-    @get:Internal
-    val httpClientArtifact: ConfigurableFileCollection =
-        project.objects.fileCollection()
-
-
     /**
      * The target repository.
      */
@@ -93,10 +87,7 @@ open class HelmPublishChart
 
         if (GradleVersion.current() >= NEW_WORKER_API_GRADLE_VERSION) {
 
-            workerExecutor.classLoaderIsolation { workerSpec ->
-                workerSpec.classpath.from(httpClientArtifact)
-
-            }.submit(PublishChartWorkAction::class.java) { params ->
+            workerExecutor.noIsolation().submit(PublishChartWorkAction::class.java) { params ->
                 params.chartName.set(chartName)
                 params.chartVersion.set(chartVersion)
                 params.chartFile.set(chartFile)
@@ -116,8 +107,7 @@ open class HelmPublishChart
 
             @Suppress("DEPRECATION")
             workerExecutor.submit(PublishChartWorker::class.java) { config ->
-                config.isolationMode = IsolationMode.CLASSLOADER
-                config.classpath(httpClientArtifact)
+                config.isolationMode = IsolationMode.NONE
                 config.setParams(params)
             }
         }

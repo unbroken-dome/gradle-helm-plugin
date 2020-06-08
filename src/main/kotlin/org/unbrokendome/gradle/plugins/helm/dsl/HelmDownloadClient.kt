@@ -6,7 +6,9 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.HelmExtractClient
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_6_2
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
@@ -29,6 +31,10 @@ interface HelmDownloadClient {
          */
         @JvmStatic
         val DEFAULT_HELM_CLIENT_VERSION = "3.2.0"
+
+
+        internal const val DEFAULT_HELM_CLIENT_GROUP = "sh.helm"
+        internal const val REPOSITORY_NAME = "_helmClientReleases"
     }
 
     /**
@@ -68,9 +74,8 @@ internal interface HelmDownloadClientInternal : HelmDownloadClient {
 
 internal class DefaultHelmDownloadClient
 constructor(
-    project: Project
+    private val project: Project
 ) : HelmDownloadClient, HelmDownloadClientInternal {
-
 
     override val enabled: Property<Boolean> =
         project.objects.property<Boolean>()
@@ -82,7 +87,9 @@ constructor(
     override val version: Property<String> =
         project.objects.property<String>()
             .convention(
-                project.providerFromProjectProperty("helm.client.download.version", HelmDownloadClient.DEFAULT_HELM_CLIENT_VERSION)
+                project.providerFromProjectProperty(
+                    "helm.client.download.version", HelmDownloadClient.DEFAULT_HELM_CLIENT_VERSION
+                )
             )
 
 
@@ -105,5 +112,70 @@ constructor(
 
 
     override val executable: Provider<RegularFile>
-        get() = extractClientTask.flatMap { it.executable }
+        // Need to use flatMap here because map isn't allowed to return null
+        get() = enabled.flatMap { enabled ->
+            if (enabled) {
+                extractClientTask.flatMap { it.executable }
+            } else {
+                project.provider { null }
+            }
+        }
+
+    /**
+     * A pseudo "group" coordinate for the Helm client artifacts; it is not used in the actual artifact URL
+     * but to make sure that Helm artifacts are only downloaded from the one repository declared here
+     * and don't interfere with any other repositories declared in the project.
+     */
+    private val helmGroup: Provider<String> =
+        project.providerFromProjectProperty(
+            "helm.client.download.group", defaultValue = HelmDownloadClient.DEFAULT_HELM_CLIENT_GROUP
+        )
+
+
+    init {
+        project.createHelmClientRepository()
+    }
+
+
+    private fun Project.createHelmClientRepository() {
+
+        if (repositories.findByName(HelmDownloadClient.REPOSITORY_NAME) != null) {
+            return
+        }
+
+        val helmGroup = helmGroup.get()
+
+        val repository = repositories.ivy { repo ->
+            repo.name = HelmDownloadClient.REPOSITORY_NAME
+            repo.url = uri(findProperty("helm.client.download.baseUrl") ?: "https://get.helm.sh")
+            repo.patternLayout { layout ->
+                layout.artifact("[module]-v[revision]-[classifier].[ext]")
+            }
+            repo.metadataSources { sources ->
+                sources.artifact()
+            }
+        }
+
+        if (GradleVersion.current() >= GRADLE_VERSION_6_2) {
+            repositories.exclusiveContent {
+                it.filter { filter -> filter.includeGroup(helmGroup) }
+                it.forRepositories(repository)
+            }
+
+        } else {
+            // Before Gradle 6.2, we don't have exclusiveContent, so we need to
+            // (a) specify that our repository hosts the Helm client artifacts, and
+            // (b) specify that all other repositories don't have them
+            repository.content { content ->
+                content.includeGroup(helmGroup)
+            }
+            repositories.all { otherRepo ->
+                if (otherRepo != repository) {
+                    otherRepo.content { content ->
+                        content.excludeGroup(helmGroup)
+                    }
+                }
+            }
+        }
+    }
 }

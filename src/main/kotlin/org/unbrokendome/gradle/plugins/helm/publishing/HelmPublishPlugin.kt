@@ -11,11 +11,8 @@ import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.HttpClientSettings
-import org.unbrokendome.gradle.plugins.helm.dsl.HttpClientSettingsInternal
 import org.unbrokendome.gradle.plugins.helm.dsl.charts
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.newHttpClientSettings
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmChartPublishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmChartPublishConvention
@@ -24,7 +21,6 @@ import org.unbrokendome.gradle.plugins.helm.publishing.dsl.repositories
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartToRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.publishTaskName
-import org.unbrokendome.gradle.plugins.helm.publishing.tasks.HelmPublishChart
 import javax.inject.Inject
 
 
@@ -41,15 +37,6 @@ class HelmPublishPlugin
         project.plugins.apply(HelmCommandsPlugin::class.java)
 
         val publishingExtension = createPublishingExtension(project)
-
-        val httpClientExtension = project.objects.newHttpClientSettings() as HttpClientSettingsInternal
-        (publishingExtension as ExtensionAware).extensions.add(
-            HttpClientSettings::class.java, HELM_PUBLISHING_HTTPCLIENT_EXTENSION_NAME, httpClientExtension
-        )
-
-        project.tasks.withType(HelmPublishChart::class.java) { task ->
-            task.httpClientArtifact.from(httpClientExtension.dependenciesAsFileCollection(project))
-        }
 
         project.plugins.withType(HelmPlugin::class.java) {
 

@@ -170,15 +170,18 @@ task will have a task dependency on the `helmPackage` task so that the chart is 
 up to date before it is installed.
 
 
-== Release Dependencies
+[[release-installation-order]]
+== Release Installation Order
 
-You can express dependencies between releases, to influence the order of installations/deletions
-when using the `helmInstall` or `helmUninstall` task. A release will always be installed after all
-its dependencies, and uninstalled before its dependencies are uninstalled.
+You can influence the order in which releases are installed or uninstalled by calling `mustInstallAfter`
+on the release. This is similar to what the `mustRunAfter` method from the Gradle DSL does for tasks:
+`mustInstallAfter` does not express a "hard" dependency on another release; instead it only influences
+the order in which their install tasks are called when both are requested to be installed in the current
+Gradle invocation.
 
-Currently it is not possible to define dependencies on releases in another Gradle project.
+Currently it is not possible to refer to releases in another Gradle project.
 
-TIP: While a release dependency influences the order of `install` invocations, it does not guarantee
+TIP: While `mustInstallAfter` influences the order of `helm install` invocations, it does not guarantee
 that the release will be up and running on the cluster when the installation of the dependent release
 begins. By default, `helm install` does not wait until the deployment is complete -- if this is what
 you need, you can set `wait` to `true` in the release, so that the install/upgrade command is invoked
@@ -191,10 +194,124 @@ helm.releases {
 
     postgres {
         from 'stable/postgresql'
+
+        // Set the wait property to true if the following release
+        // requires this to be successfully deployed
+        wait = true
     }
 
     myApp {
         // ...
+        mustInstallAfter 'postgres'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releases {
+
+    create("postgres") {
+        from("stable/postgresql")
+
+        // Set the wait property to true if the following release
+        // requires this to be successfully deployed
+        wait = true
+    }
+
+    create("myApp") {
+        // ...
+        mustInstallAfter("postgres")
+    }
+}
+----
+
+Similarly, influencing the order of uninstalls is also possible using the `mustUninstallAfter` method. Note that
+`mustInstallAfter` and `mustUninstallAfter` are completely independent; neither of them implies the other. If you
+want to express both installation and uninstallation ordering between two releases, you must do so explicitly by
+calling both `mustInstallAfter` and `mustUninstallAfter`:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releases {
+
+    postgres {
+        from 'stable/postgresql'
+
+        // Set the wait property to true if the following release
+        // requires this to be successfully deployed
+        wait = true
+
+        // We can refer to a release by name even before it is declared --
+        // the references are resolved lazily
+        mustUninstallAfter 'myApp'
+    }
+
+    myApp {
+        // ...
+        mustInstallAfter 'postgres'
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.releases {
+
+    create("postgres") {
+        from("stable/postgresql")
+
+        // Set the wait property to true if the following release
+        // requires this to be successfully deployed
+        wait = true
+
+        // We can refer to a release by name even before it is declared --
+        // the references are resolved lazily
+        mustUninstallAfter("myApp")
+    }
+
+    create("myApp") {
+        // ...
+        mustInstallAfter("postgres")
+    }
+}
+----
+
+
+== Release Dependencies
+
+[NOTE]
+====
+This feature is now deprecated as of version 1.2.0, and will removed in a future version. Instead, please use
+<<using-tags-to-select-releases,tags>> to specify which releases to install, and
+<<release-installation-order,Release Installation Order>> to indicate in which order they should be installed.
+
+Release dependencies are now deprecated because the side effects of automatically installing or uninstalling a
+dependent release may often be undesirable. If the dependent release is already installed, then it would always
+be upgraded even if that is not necessary. Likewise, the automatic uninstallation is not always desired and should
+be controlled in a more fine-grained way using the other mechanisms documented here.
+====
+
+The `dependsOn` property and method on a release allows you to indicate that a certain release depends on another
+release. As a consequence, when release A depends on release B, then release B will automatically installed before
+release A is installed, and uninstalled after release A is uninstalled.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.releases {
+
+    postgres {
+        from 'stable/postgresql'
+    }
+
+    myApp {
+        // myApp depending on postgres means that whenever myApp is installed,
+        // postgres will be automatically installed first; and whenever myApp
+        // is uninstalled, postgres will be uninstalled afterwards.
         dependsOn 'postgres'
     }
 }
@@ -210,7 +327,9 @@ helm.releases {
     }
 
     create("myApp") {
-        // ...
+        // myApp depending on postgres means that whenever myApp is installed,
+        // postgres will be automatically installed first; and whenever myApp
+        // is uninstalled, postgres will be uninstalled afterwards.
         dependsOn("postgres")
     }
 }
@@ -581,6 +700,7 @@ helm.releases.all {
 ====
 
 
+[[using-tags-to-select-releases]]
 == Using Tags to Select Releases
 
 Often you want to declare multiple releases in your build script, but you want to selectively install only a subset

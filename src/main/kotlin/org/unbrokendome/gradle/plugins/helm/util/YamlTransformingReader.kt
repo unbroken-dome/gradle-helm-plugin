@@ -225,9 +225,10 @@ private fun readFromBuffer(startMark: Mark, endMark: Mark): String {
 
         else -> {
             // Start with the codepoints from startMark's buffer
-            val startPart = String(startMark.buffer, startMark.pointer, startMark.buffer.size)
+            val startPartLength = startMark.buffer.size - startMark.pointer
+            val startPart = String(startMark.buffer, startMark.pointer, startPartLength)
 
-            val codePointsLeft = length - (startMark.buffer.size - startMark.pointer)
+            val codePointsLeft = length - startPartLength
             if (endMark.pointer < codePointsLeft) {
                 throw IllegalStateException("Buffer unavailable")
             }

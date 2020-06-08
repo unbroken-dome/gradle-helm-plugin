@@ -26,8 +26,14 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.25")
     implementation("org.json:json:20190722")
 
-    compileOnly("com.squareup.okhttp3:okhttp:4.5.0")
-    compileOnly("com.squareup.okhttp3:okhttp-tls:4.5.0")
+    implementation("com.squareup.okhttp3:okhttp:4.7.2") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
+    }
+    implementation("com.squareup.okhttp3:okhttp-tls:4.7.2") {
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
+    }
 
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")

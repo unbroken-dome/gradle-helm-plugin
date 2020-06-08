@@ -43,7 +43,9 @@ abstract class AbstractHelmCommandTask
 
     @get:Input
     final override val executable: Provider<String>
-            get() = localExecutable.withDefault(downloadedExecutable, project.providers)
+            get() = localExecutable
+                .withDefault(downloadedExecutable, project.providers)
+                .withDefault("helm", project.providers)
 
 
     @get:Internal
