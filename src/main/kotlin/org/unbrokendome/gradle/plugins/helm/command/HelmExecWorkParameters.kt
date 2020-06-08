@@ -5,7 +5,6 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.putFrom
 import org.gradle.workers.WorkParameters
 
 
@@ -38,7 +37,12 @@ internal class WorkParametersHelmExecSpec(
 
 
     override fun environment(name: String, provider: Provider<out Any>) {
-        params.environment.putFrom(name, provider)
+        // Eagerly evaluate the provider here, to work around a bug in Gradle that makes
+        // the whole MapProperty "missing" if the value provider is missing
+        // see https://github.com/gradle/gradle/issues/13364
+        provider.orNull?.let { value ->
+            params.environment.put(name, value)
+        }
     }
 
 
