@@ -1,7 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
@@ -12,9 +11,8 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_6_2
+import org.unbrokendome.gradle.plugins.helm.dsl.HelmDownloadClient
 import org.unbrokendome.gradle.plugins.helm.util.SystemUtils
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
@@ -25,12 +23,6 @@ import org.unbrokendome.gradle.plugins.helm.util.withLockFile
  * Downloads and extracts a Helm client executable package.
  */
 open class HelmExtractClient : DefaultTask() {
-
-    private companion object {
-
-        const val DEFAULT_HELM_CLIENT_GROUP = "sh.helm"
-    }
-
 
     init {
         group = HELM_GROUP
@@ -45,7 +37,7 @@ open class HelmExtractClient : DefaultTask() {
     @get:Input
     internal val helmGroup: Provider<String> =
         project.providerFromProjectProperty(
-            "helm.client.download.group", defaultValue = DEFAULT_HELM_CLIENT_GROUP
+            "helm.client.download.group", defaultValue = HelmDownloadClient.DEFAULT_HELM_CLIENT_GROUP
         )
 
 
@@ -109,8 +101,6 @@ open class HelmExtractClient : DefaultTask() {
                 return@withLockFile
             }
 
-            project.createHelmClientRepository()
-
             val osClassifier = osClassifier.get()
             val archiveFormat = osClassifier.let {
                 if (it.startsWith("windows-")) "zip" else "tar.gz"
@@ -128,44 +118,6 @@ open class HelmExtractClient : DefaultTask() {
             project.copy { copy ->
                 copy.from(from)
                 copy.into(destinationDir)
-            }
-        }
-    }
-
-
-    private fun Project.createHelmClientRepository() {
-
-        val helmGroup = helmGroup.get()
-
-        val repository = repositories.ivy { repo ->
-            repo.url = uri(findProperty("helm.client.download.baseUrl") ?: "https://get.helm.sh")
-            repo.patternLayout { layout ->
-                layout.artifact("[module]-v[revision]-[classifier].[ext]")
-            }
-            repo.metadataSources { sources ->
-                sources.artifact()
-            }
-        }
-
-        if (GradleVersion.current() >= GRADLE_VERSION_6_2) {
-            repositories.exclusiveContent {
-                it.filter { filter -> filter.includeGroup(helmGroup) }
-                it.forRepositories(repository)
-            }
-
-        } else {
-            // Before Gradle 6.2, we don't have exclusiveContent, so we need to
-            // (a) specify that our repository hosts the Helm client artifacts, and
-            // (b) specify that all other repositories don't have them
-            repository.content { content ->
-                content.includeGroup(helmGroup)
-            }
-            repositories.all { otherRepo ->
-                if (otherRepo != repository) {
-                    otherRepo.content { content ->
-                        content.excludeGroup(helmGroup)
-                    }
-                }
             }
         }
     }
