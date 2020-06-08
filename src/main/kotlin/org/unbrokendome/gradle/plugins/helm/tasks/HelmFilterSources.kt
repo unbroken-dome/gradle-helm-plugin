@@ -15,6 +15,7 @@ import org.gradle.kotlin.dsl.putFrom
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
+import org.unbrokendome.gradle.plugins.helm.util.expand
 import org.unbrokendome.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
@@ -159,7 +160,7 @@ open class HelmFilterSources : DefaultTask() {
                 }
 
             filesMatching(FilteredFilePatterns) { details ->
-                details.expand(valuesFromFiles + values)
+                details.expand(valuesFromFiles + values, true)
             }
         }
     }
