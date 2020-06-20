@@ -69,8 +69,8 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--cert-file` CLI parameter.
      */
     @get:[Input Optional]
-    val certificateFile: RegularFileProperty =
-        project.objects.fileProperty()
+    val certificateFile: Property<String> =
+            project.objects.property()
 
 
     /**
@@ -79,8 +79,8 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--key-file` CLI parameter.
      */
     @get:[Input Optional]
-    val keyFile: RegularFileProperty =
-        project.objects.fileProperty()
+    val keyFile: Property<String> =
+            project.objects.property()
 
 
     /**
@@ -136,8 +136,8 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
             username = username.getOrElse(""),
             password = password.getOrElse(""),
             caFile = caFile.map { it.asFile.absolutePath }.getOrElse(""),
-            certFile = certificateFile.map { it.asFile.absolutePath }.getOrElse(""),
-            keyFile = keyFile.map { it.asFile.absolutePath }.getOrElse("")
+            certFile = certificateFile.getOrElse(""),
+            keyFile = keyFile.getOrElse("")
         )
 
         return if (actualConfig == expectedConfig) {

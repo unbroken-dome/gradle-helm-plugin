@@ -44,8 +44,8 @@ internal class AddRepositoryTaskRule(
                     password.set(credentials.password)
                 }
                 is CertificateCredentials -> {
-                    certificateFile.set(credentials.certificateFile)
-                    keyFile.set(credentials.keyFile)
+                    certificateFile.set(credentials.certificateFile.map { it.asFile.absolutePath })
+                    keyFile.set(credentials.keyFile.map { it.asFile.absolutePath })
                 }
                 else ->
                     throw IllegalArgumentException(
