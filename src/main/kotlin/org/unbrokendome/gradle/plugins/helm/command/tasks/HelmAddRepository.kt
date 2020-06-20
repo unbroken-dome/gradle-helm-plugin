@@ -70,7 +70,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val certificateFile: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
@@ -80,7 +80,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      */
     @get:[Input Optional]
     val keyFile: Property<String> =
-            project.objects.property()
+        project.objects.property()
 
 
     /**
