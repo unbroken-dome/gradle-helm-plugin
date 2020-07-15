@@ -111,7 +111,7 @@ internal abstract class AbstractHttpHelmChartPublisher(
 
     private fun SerializablePasswordCredentials.createAuthInterceptor(): Interceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
-            .addHeader("Authorization", "Basic ${Credentials.basic(username, password ?: "")}")
+            .addHeader("Authorization", "${Credentials.basic(username, password ?: "")}")
             .build()
         chain.proceed(request)
     }
