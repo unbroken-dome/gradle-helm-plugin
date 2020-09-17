@@ -267,6 +267,23 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
     fun mustUninstallAfter(vararg releaseNames: String) {
         mustUninstallAfter.addAll(releaseNames.toList())
     }
+
+
+    /**
+     * Access testing configuration options for this release.
+     */
+    val test: ConfigurableHelmReleaseTestOptions
+
+
+    /**
+     * Configure testing options for this release.
+     *
+     * @param configureAction an [Action] to configure testing options for this release
+     */
+    @JvmDefault
+    fun test(configureAction: Action<ConfigurableHelmReleaseTestOptions>) {
+        configureAction.execute(this.test)
+    }
 }
 
 
@@ -512,9 +529,15 @@ private abstract class AbstractHelmRelease(
 
     final override val installDependsOn: MutableSet<Any> = mutableSetOf()
 
+
     final override val mustInstallAfter: MutableSet<String> = mutableSetOf()
 
+
     final override val mustUninstallAfter: MutableSet<String> = mutableSetOf()
+
+
+    final override val test =
+        DefaultHelmReleaseTestOptions(objects)
 }
 
 
@@ -610,6 +633,12 @@ private open class DefaultHelmCoreRelease
             targetSpecific.installDependsOn.addAll(this.installDependsOn)
             targetSpecific.mustInstallAfter.addAll(this.mustInstallAfter)
             targetSpecific.mustUninstallAfter.addAll(this.mustUninstallAfter)
+
+            with(targetSpecific.test) {
+                setFrom(test.withDefaults(target.test, project.providers))
+                enabled.convention(true)
+                timeout.convention(remoteTimeout)
+            }
 
             // Merge in the values from all sources
             logger.debug("Merging values from release target")

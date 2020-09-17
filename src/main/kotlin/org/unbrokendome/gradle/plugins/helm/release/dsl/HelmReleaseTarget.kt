@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.release.dsl
 
+import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -64,6 +65,23 @@ interface HelmReleaseTargetObject : Named, ConfigurableHelmInstallationOptions, 
      * Tag expression to select releases for this target.
      */
     var selectTags: String
+
+
+    /**
+     * Access testing configuration options for this release target.
+     */
+    val test: ConfigurableHelmReleaseTestOptions
+
+
+    /**
+     * Configure testing options for this release target.
+     *
+     * @param configureAction an [Action] to configure testing options for this release target
+     */
+    @JvmDefault
+    fun test(configureAction: Action<ConfigurableHelmReleaseTestOptions>) {
+        configureAction.execute(this.test)
+    }
 }
 
 
@@ -89,7 +107,7 @@ private open class DefaultHelmReleaseTargetObject
         TagExpression.alwaysMatch()
 
 
-    override fun getName(): String =
+    final override fun getName(): String =
         name
 
 
@@ -100,8 +118,12 @@ private open class DefaultHelmReleaseTargetObject
         }
 
 
-    override val selectTagsExpression: TagExpression
+    final override val selectTagsExpression: TagExpression
         get() = localSelectTagsExpression.and(globalSelectTagsExpression)
+
+
+    final override val test =
+        DefaultHelmReleaseTestOptions(objects)
 }
 
 
