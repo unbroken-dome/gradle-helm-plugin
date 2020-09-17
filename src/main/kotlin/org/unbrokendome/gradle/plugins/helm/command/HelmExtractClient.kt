@@ -8,8 +8,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmDownloadClient
@@ -71,7 +69,7 @@ open class HelmExtractClient : DefaultTask() {
     /**
      * Path of the extracted Helm client executable.
      */
-    @get:[OutputFile PathSensitive(PathSensitivity.RELATIVE)]
+    @get:OutputFile
     val executable: Provider<RegularFile> =
         destinationDir.file(
             osClassifier.map { osClassifier ->
