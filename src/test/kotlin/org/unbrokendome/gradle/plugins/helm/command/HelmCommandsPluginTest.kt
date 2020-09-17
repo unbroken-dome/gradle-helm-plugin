@@ -46,11 +46,13 @@ object HelmCommandsPluginTest : Spek({
     }
 
 
-    describe("plugin should not create any tasks automatically") {
+    describe("plugin should not create any tasks automatically except helmExtractClient") {
 
         beforeEachTest {
-            project.tasks.whenObjectAdded {
-                fail("plugin should not add any tasks")
+            project.tasks.whenObjectAdded { task ->
+                if (task !is HelmExtractClient) {
+                    fail("plugin should not add any tasks except helmExtractClient")
+                }
             }
         }
 
