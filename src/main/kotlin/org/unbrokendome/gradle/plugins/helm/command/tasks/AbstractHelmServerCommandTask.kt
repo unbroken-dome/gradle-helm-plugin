@@ -3,6 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
@@ -22,7 +23,7 @@ abstract class AbstractHelmServerCommandTask : AbstractHelmCommandTask(), Config
      * If this property is set, its value will be used to set the `KUBECONFIG` environment variable for each
      * Helm invocation.
      */
-    @get:[Input Optional]
+    @get:[InputFile Optional]
     final override val kubeConfig: RegularFileProperty =
         project.objects.fileProperty()
 
