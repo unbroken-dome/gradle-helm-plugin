@@ -47,6 +47,15 @@ The following properties can be set on the `helm` extension in the Gradle build 
 | `--timeout` (on certain commands like `install`, `upgrade` or `uninstall`)
 |===
 
+[NOTE]
+====
+The environment variable `KUBECONFIG` is also honored by the plugin, but it has lower precedence than setting
+`kubeConfig` in the build script or with the `helm.kubeConfig` project property.
+
+In general, Gradle builds should avoid depending on environment variables because it makes the build less predictable
+and reproducible, and may behave unexpectedly when the Gradle daemon is used.
+====
+
 
 == Helm Directories
 
