@@ -4,6 +4,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
@@ -38,7 +39,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      *
      * Corresponds to the `--ca-file` CLI parameter.
      */
-    @get:[Input Optional]
+    @get:[InputFile Optional]
     val caFile: RegularFileProperty =
         project.objects.fileProperty()
 
@@ -68,7 +69,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      *
      * Corresponds to the `--cert-file` CLI parameter.
      */
-    @get:[Input Optional]
+    @get:[InputFile Optional]
     val certificateFile: RegularFileProperty =
         project.objects.fileProperty()
 
@@ -78,7 +79,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      *
      * Corresponds to the `--key-file` CLI parameter.
      */
-    @get:[Input Optional]
+    @get:[InputFile Optional]
     val keyFile: RegularFileProperty =
         project.objects.fileProperty()
 
