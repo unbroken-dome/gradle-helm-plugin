@@ -9,7 +9,7 @@ sense for a build script, like `helm search` or `helm inspect`).
 NOTE: In most cases it is more convenient to use the high-level DSL provided by the other plugins to manage your
 charts in a declarative way.
 
-Check the link:/dokka/gradle-helm-plugin/org.unbrokendome.gradle.plugins.helm.command.tasks/[API Reference]
+Check the link:https://unbroken-dome.github.io/projects/gradle-helm-plugin/[API Reference]
 for a full list of available tasks.
 
 
