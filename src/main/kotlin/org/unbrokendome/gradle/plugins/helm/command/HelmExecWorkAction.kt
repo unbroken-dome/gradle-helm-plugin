@@ -29,12 +29,14 @@ internal abstract class HelmExecWorkAction
 
                 parameters.environment.ifPresent { environment.putAll(it) }
 
-                // kubectl (and the k8s go client library, which helm uses) depend on the KUBECONFIG environment variable
-                // when determining the default kubeconfig location ($HOME/.kube/config). For some reason this isn't
-                // inherited from Gradle when the process is launched from a worker, even if no isolation is used.
+                // For convenience, pass the KUBECONFIG environment variable to the worker. In general, having a
+                // Gradle build depend on environment is bad practice, but in this case it might be what many users
+                // will expect. Since KUBECONFIG env.var. is also set from the HelmServerOptions.kubeConfig property,
+                // this is a fallback before defaulting to $HOME/.kube/config.
                 environment.computeIfAbsent("KUBECONFIG") {
                     System.getenv("KUBECONFIG")
                 }
+
                 // kubectl (and the k8s go client library, which helm uses) depend on the HOME environment variable
                 // when determining the default kubeconfig location ($HOME/.kube/config). For some reason this isn't
                 // inherited from Gradle when the process is launched from a worker, even if no isolation is used.
