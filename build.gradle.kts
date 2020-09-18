@@ -38,10 +38,10 @@ dependencies {
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.22")
-    testImplementation("io.mockk:mockk:1.9.3")
+    testImplementation("io.mockk:mockk:1.10.0")
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
-    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
-    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2")
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
 
