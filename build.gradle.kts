@@ -25,11 +25,11 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.25")
     implementation("org.json:json:20190722")
 
-    implementation("com.squareup.okhttp3:okhttp:4.7.2") {
+    implementation("com.squareup.okhttp3:okhttp:4.9.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
-    implementation("com.squareup.okhttp3:okhttp-tls:4.7.2") {
+    implementation("com.squareup.okhttp3:okhttp-tls:4.9.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
@@ -43,7 +43,7 @@ dependencies {
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
 
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.5.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
 
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))
