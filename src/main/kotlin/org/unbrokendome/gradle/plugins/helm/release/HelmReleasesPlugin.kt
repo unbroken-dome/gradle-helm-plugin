@@ -23,6 +23,8 @@ import org.unbrokendome.gradle.plugins.helm.release.rules.DefaultReleaseTargetRu
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseToTargetTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallToTargetTaskRule
+import org.unbrokendome.gradle.plugins.helm.release.rules.HelmStatusReleaseOnTargetTaskRule
+import org.unbrokendome.gradle.plugins.helm.release.rules.HelmStatusReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestOnTargetTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestReleaseOnTargetTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestReleaseTaskRule
@@ -83,6 +85,9 @@ class HelmReleasesPlugin : Plugin<Project> {
                 addRule(HelmTestReleaseOnTargetTaskRule(this, releases, releaseTargets))
                 addRule(HelmTestOnTargetTaskRule(this, releases, releaseTargets))
                 addRule(HelmTestReleaseTaskRule(this, releases, validatedActiveReleaseTarget))
+
+                addRule(HelmStatusReleaseOnTargetTaskRule(this, releases, releaseTargets))
+                addRule(HelmStatusReleaseTaskRule(this, releases, validatedActiveReleaseTarget))
             }
 
             createInstallAllReleasesTask(validatedActiveReleaseTarget)

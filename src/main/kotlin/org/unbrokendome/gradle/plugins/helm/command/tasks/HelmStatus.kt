@@ -8,7 +8,10 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
+import org.unbrokendome.gradle.plugins.helm.util.coalesceProvider
+import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 
 
 /**
@@ -42,6 +45,9 @@ open class HelmStatus : AbstractHelmServerCommandTask() {
     @get:[OutputFile Optional]
     val outputFile: RegularFileProperty =
         project.objects.fileProperty()
+            .convention(
+                project.fileProviderFromProjectProperty("helm.status.outputFile", evaluateGString = true)
+            )
 
 
     /**
@@ -70,7 +76,12 @@ open class HelmStatus : AbstractHelmServerCommandTask() {
     @get:[Input Optional]
     val outputFormat: Property<String> =
         project.objects.property<String>()
-            .convention(formatBasedOnOutputFile)
+            .convention(
+                project.coalesceProvider(
+                    project.providerFromProjectProperty("helm.status.outputFormat"),
+                    formatBasedOnOutputFile
+                )
+            )
 
 
     @TaskAction
