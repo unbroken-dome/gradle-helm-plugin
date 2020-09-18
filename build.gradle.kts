@@ -22,7 +22,7 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
-    implementation("org.yaml:snakeyaml:1.25")
+    implementation("org.yaml:snakeyaml:1.27")
     implementation("org.json:json:20190722")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.0") {
