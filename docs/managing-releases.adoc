@@ -801,3 +801,135 @@ INFO: If both `helm.release.tags` and the active release target contain a select
 both combined using "and". This means that a release will only be installed if it matches _both_ the `helm.release.tags`
 expression and the `selectTags` expression of the release target.
 
+
+== Testing Releases
+
+Helm includes a facility for testing charts after they have been installed on a remote cluster. Tests are Kubernetes
+`Job` resources with an annotation `helm.sh/hook: test`. See the
+link:https://docs.helm.sh/docs/topics/chart_tests/[Chart Tests] section in the Helm documentation for details.
+
+The `helm-releases` plugin integrates chart testing by exposing a `HelmTest` task for every release that is declared
+in the build script. Like other release options, tests can be configured (or even completely disabled) for a release,
+a release target, or a specific combination of the two.
+
+=== Release Testing Tasks
+
+For each release defined in the `releases` block, the following Gradle task will be generated:
+
+Task `helmTest<X>`::
+Tests the release named X on the active release target (as indicated by `-Phelm.release.target`)
+by calling `helm test <X>`.
+
+
+In addition, there will be the following tasks to test _all_ releases in the project at once:
+
+Task `helmTest`::
+Test all releases (except those that have the `enabled` property set to `false`).
+
+TIP: If your chart does not contain any tests, `helm test` (and therefore the `HelmTest` task) will simply do nothing.
+
+
+A `helmTest<X>` task created for a release will _not_ automatically have a task dependency on the corresponding
+`helmInstall<X>` task. (It does have a `mustRunAfter` relationship, however.) This means that simply calling
+`gradle helmTest<X>` will not automatically install the release. This allows you to use the `helmTest` or `helmTest<X>`
+tasks even for testing releases that are already deployed.
+
+If you want to install and test releases in the same Gradle build, then you need to include both `helmInstall` and
+`helmTest` in the Gradle invocation, e.g.
+
+[source,bash]
+----
+gradle helmInstall helmTest
+----
+
+In this case, you should also set the `wait` property to `true` on the release, to ensure that the release
+is up and running before the test starts.
+
+
+=== Release Testing Configuration
+
+You can fine-tune testing options using the `test` DSL block inside a release or release target.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    releases {
+        foo {
+            from 'my-repo/foo'
+            test {
+                // dump test logs
+                showLogs = true
+            }
+        }
+        bar {
+            from 'my-repo/bar'
+            test {
+                // disable testing for this release (enabled by default)
+                enabled = false
+            }
+        }
+    }
+
+    releaseTargets {
+        local {
+            test {
+                // always dump test logs for this target
+                showLogs = true
+            }
+        }
+        remote {
+            test {
+                // configure a different timeout for this target
+                timeout = Duration.ofSeconds(10)
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    releases {
+        create("foo") {
+            from("my-repo/foo")
+            test {
+                // dump test logs
+                showLogs.set(true)
+            }
+        }
+        create("bar") {
+            from("my-repo/bar")
+            test {
+                // disable testing for this release (enabled by default)
+                enabled.set(false)
+            }
+        }
+    }
+
+    releaseTargets {
+        create("local") {
+            test {
+                // always dump test logs for this target
+                showLogs.set(true)
+            }
+        }
+        create("remote") {
+            test {
+                // configure a different timeout for this target
+                timeout.set(Duration.ofSeconds(10))
+            }
+        }
+    }
+}
+----
+
+The `showLogs` property (which corresponds to the `--logs` flag to the `helm test` CLI command) can also be configured
+globally on a per-invocation basis by setting the `helm.test.logs` property:
+
+[source,bash]
+----
+gradle helmTest -Phelm.test.logs=true
+----
