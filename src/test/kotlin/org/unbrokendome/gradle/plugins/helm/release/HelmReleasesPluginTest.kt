@@ -11,6 +11,7 @@ import org.gradle.api.provider.Property
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTest
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
@@ -49,7 +50,6 @@ object HelmReleasesPluginTest : Spek({
                 project.evaluate()
             }.isSuccess()
         }
-
     }
 
 
@@ -144,6 +144,7 @@ object HelmReleasesPluginTest : Spek({
 
 
         it("should create a task to uninstall the release from the active target") {
+
             assertThat(project, name = "project")
                 .containsTask<Task>("helmUninstallAwesome")
                 .hasOnlyTaskDependency("helmUninstallAwesomeFromDefault")
@@ -151,9 +152,36 @@ object HelmReleasesPluginTest : Spek({
 
 
         it("uninstall-all-from-target task should depend on the uninstall-release-from-target task") {
+
             assertThat(project, name = "project")
                 .containsTask<Task>("helmUninstallFromDefault")
                 .hasOnlyTaskDependency("helmUninstallAwesomeFromDefault")
+        }
+
+
+        it("should create a task to test the release on each target") {
+
+            assertThat(project, name = "project")
+                .containsTask<HelmTest>("helmTestAwesomeOnDefault")
+                .all {
+                    prop(HelmTest::releaseName).hasValueEqualTo("awesome-release")
+                }
+        }
+
+
+        it("should create a task to test the release on the active target") {
+
+            assertThat(project, name = "project")
+                .containsTask<Task>("helmTestAwesome")
+                .hasOnlyTaskDependency("helmTestAwesomeOnDefault")
+        }
+
+
+        it("test-all-on-target task should depend on the test-release-on-target task") {
+
+            assertThat(project, name = "project")
+                .containsTask<Task>("helmTestOnDefault")
+                .hasOnlyTaskDependency("helmTestAwesomeOnDefault")
         }
 
 
@@ -173,6 +201,9 @@ object HelmReleasesPluginTest : Spek({
                 ),
                 propertyMappingInfo(
                     HelmRelease::kubeContext, HelmInstallOrUpgrade::kubeContext, "local-kubecontext"
+                ),
+                propertyMappingInfo(
+                    HelmRelease::namespace, HelmInstallOrUpgrade::namespace, "custom-namespace"
                 ),
                 propertyMappingInfo(HelmRelease::dryRun, HelmInstallOrUpgrade::dryRun, true),
                 propertyMappingInfo(HelmRelease::noHooks, HelmInstallOrUpgrade::noHooks, true),
@@ -208,6 +239,9 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmRelease::kubeContext, HelmUninstall::kubeContext, "local-kubecontext"
                 ),
+                propertyMappingInfo(
+                    HelmRelease::namespace, HelmUninstall::namespace, "custom-namespace"
+                ),
                 propertyMappingInfo(HelmRelease::dryRun, HelmUninstall::dryRun, true),
                 propertyMappingInfo(HelmRelease::noHooks, HelmUninstall::noHooks, true),
                 propertyMappingInfo(
@@ -215,6 +249,33 @@ object HelmReleasesPluginTest : Spek({
                 ),
                 propertyMappingInfo(
                     HelmRelease::keepHistoryOnUninstall, HelmUninstall::keepHistory, true
+                )
+            )
+        }
+
+
+        describe("test task should use properties from the release") {
+
+            propertyMappingTests<HelmRelease, HelmTest>(
+                { release },
+                "helmTestAwesomeOnDefault",
+                propertyMappingInfo(
+                    HelmRelease::releaseName, HelmTest::releaseName, "awesome-release"
+                ),
+                propertyMappingInfo(
+                    HelmRelease::kubeConfig, HelmTest::kubeConfig, "local.kubeconfig"
+                ),
+                propertyMappingInfo(
+                    HelmRelease::kubeContext, HelmTest::kubeContext, "local-kubecontext"
+                ),
+                propertyMappingInfo(
+                    HelmRelease::namespace, HelmTest::namespace, "custom-namespace"
+                ),
+                propertyMappingInfo(
+                    { test.showLogs.set(it) }, HelmTest::showLogs, true
+                ),
+                propertyMappingInfo(
+                    { test.timeout.set(it) }, HelmTest::remoteTimeout, Duration.ofSeconds(42)
                 )
             )
         }
@@ -249,6 +310,20 @@ object HelmReleasesPluginTest : Spek({
         }
 
 
+        it("should create a task to uninstall all releases from the target") {
+
+            assertThat(project, name = "project")
+                .containsTask<Task>("helmUninstallFromLocal")
+        }
+
+
+        it("should create a task to test all releases on the target") {
+
+            assertThat(project, name = "project")
+                .containsTask<Task>("helmTestOnLocal")
+        }
+
+
         it("should not create a default target automatically") {
 
             assertThat(helm.releaseTargets, name = "releaseTargets")
@@ -268,6 +343,22 @@ object HelmReleasesPluginTest : Spek({
                 assertThat(project, name = "project")
                     .containsTask<Task>("helmInstall")
                     .hasOnlyTaskDependency("helmInstallToLocal")
+            }
+
+
+            it("uninstall-all task should depend on the uninstall-all-from-target task") {
+
+                assertThat(project, name = "project")
+                    .containsTask<Task>("helmUninstall")
+                    .hasOnlyTaskDependency("helmUninstallFromLocal")
+            }
+
+
+            it("test-all task should depend on the test-all-on-target task") {
+
+                assertThat(project, name = "project")
+                    .containsTask<Task>("helmTest")
+                    .hasOnlyTaskDependency("helmTestOnLocal")
             }
         }
     }
@@ -302,6 +393,9 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmReleaseTarget::kubeContext, HelmInstallOrUpgrade::kubeContext, "local-kubecontext"
                 ),
+                propertyMappingInfo(
+                    HelmReleaseTarget::namespace, HelmInstallOrUpgrade::namespace, "custom-namespace"
+                ),
                 propertyMappingInfo(HelmReleaseTarget::dryRun, HelmInstallOrUpgrade::dryRun, true),
                 propertyMappingInfo(HelmReleaseTarget::noHooks, HelmInstallOrUpgrade::noHooks, true),
                 propertyMappingInfo(
@@ -326,10 +420,37 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmReleaseTarget::kubeContext, HelmUninstall::kubeContext, "local-kubecontext"
                 ),
+                propertyMappingInfo(
+                    HelmReleaseTarget::namespace, HelmUninstall::namespace, "custom-namespace"
+                ),
                 propertyMappingInfo(HelmReleaseTarget::dryRun, HelmUninstall::dryRun, true),
                 propertyMappingInfo(HelmReleaseTarget::noHooks, HelmUninstall::noHooks, true),
                 propertyMappingInfo(
                     HelmReleaseTarget::remoteTimeout, HelmUninstall::remoteTimeout, Duration.ofSeconds(42)
+                )
+            )
+        }
+
+
+        describe("test task should use properties from the release target") {
+
+            propertyMappingTests<HelmReleaseTarget, HelmTest>(
+                { releaseTarget },
+                "helmTestAwesomeOnLocal",
+                propertyMappingInfo(
+                    HelmReleaseTarget::kubeConfig, HelmTest::kubeConfig, "local.kubeconfig"
+                ),
+                propertyMappingInfo(
+                    HelmReleaseTarget::kubeContext, HelmTest::kubeContext, "local-kubecontext"
+                ),
+                propertyMappingInfo(
+                    HelmReleaseTarget::namespace, HelmTest::namespace, "custom-namespace"
+                ),
+                propertyMappingInfo(
+                    { test.showLogs.set(it) }, HelmTest::showLogs, true
+                ),
+                propertyMappingInfo(
+                    { test.timeout.set(it) }, HelmTest::remoteTimeout, Duration.ofSeconds(42)
                 )
             )
         }

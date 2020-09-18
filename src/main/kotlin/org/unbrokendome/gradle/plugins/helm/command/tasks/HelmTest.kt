@@ -5,6 +5,7 @@ import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.toHelmString
 import java.time.Duration
@@ -24,14 +25,16 @@ open class HelmTest : AbstractHelmServerCommandTask() {
 
 
     /**
-     * Dump the logs from test pods (this runs after all tests are complete, but before any cleanup).
+     * If `true`, dump the logs from test pods (this runs after all tests are complete, but before any cleanup).
      *
      * Corresponds to the `--logs` command line option in the Helm CLI.
      */
     @get:Console
     val showLogs: Property<Boolean> =
         project.objects.property<Boolean>()
-            .convention(false)
+            .convention(
+                project.booleanProviderFromProjectProperty("helm.test.logs", false)
+            )
 
 
     /**

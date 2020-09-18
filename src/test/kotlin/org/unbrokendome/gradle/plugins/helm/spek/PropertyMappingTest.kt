@@ -57,12 +57,22 @@ fun <D : Any, T : Task, V : Any> propertyMappingInfo(
 
 
 fun <D : Any, T : Task, V : Any> propertyMappingInfo(
+    domainObjectValueSetter: D.(V) -> Unit,
+    taskProperty: KProperty1<T, Provider<V>>,
+    sampleValue: V
+): PropertyMappingInfo<D, T, V> =
+    propertyMappingInfo(
+        taskProperty.name, domainObjectValueSetter, { taskProperty.get(this) }, sampleValue
+    )
+
+
+fun <D : Any, T : Task, V : Any> propertyMappingInfo(
     domainObjectProperty: KProperty1<D, Property<V>>,
     taskProperty: KProperty1<T, Provider<V>>,
     sampleValue: V
-) =
-    propertyMappingInfo<D, T, V>(
-        taskProperty.name, { domainObjectProperty.get(this).set(it) }, { taskProperty.get(this) }, sampleValue
+): PropertyMappingInfo<D, T, V> =
+    propertyMappingInfo(
+        { domainObjectProperty.get(this).set(it) }, taskProperty, sampleValue
     )
 
 

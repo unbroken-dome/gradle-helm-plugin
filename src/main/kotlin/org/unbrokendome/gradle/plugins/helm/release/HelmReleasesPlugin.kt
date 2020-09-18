@@ -23,10 +23,14 @@ import org.unbrokendome.gradle.plugins.helm.release.rules.DefaultReleaseTargetRu
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseToTargetTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallToTargetTaskRule
+import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestOnTargetTaskRule
+import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestReleaseOnTargetTaskRule
+import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallFromTargetTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallReleaseFromTargetTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallReleaseTaskRule
 import org.unbrokendome.gradle.plugins.helm.release.rules.installAllToTargetTaskName
+import org.unbrokendome.gradle.plugins.helm.release.rules.testAllOnTargetTaskName
 import org.unbrokendome.gradle.plugins.helm.release.rules.uninstallAllFromTargetTaskName
 import org.unbrokendome.gradle.plugins.helm.release.tags.TagExpression
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
@@ -40,6 +44,7 @@ class HelmReleasesPlugin : Plugin<Project> {
     internal companion object {
         const val installAllTaskName = "helmInstall"
         const val uninstallAllTaskName = "helmUninstall"
+        const val testAllTaskName = "helmTest"
     }
 
 
@@ -74,10 +79,15 @@ class HelmReleasesPlugin : Plugin<Project> {
                 addRule(HelmUninstallReleaseFromTargetTaskRule(this, releases, releaseTargets))
                 addRule(HelmUninstallFromTargetTaskRule(this, releases, releaseTargets))
                 addRule(HelmUninstallReleaseTaskRule(this, releases, validatedActiveReleaseTarget))
+
+                addRule(HelmTestReleaseOnTargetTaskRule(this, releases, releaseTargets))
+                addRule(HelmTestOnTargetTaskRule(this, releases, releaseTargets))
+                addRule(HelmTestReleaseTaskRule(this, releases, validatedActiveReleaseTarget))
             }
 
             createInstallAllReleasesTask(validatedActiveReleaseTarget)
             createUninstallAllReleasesTask(validatedActiveReleaseTarget)
+            createTestAllReleasesTask(validatedActiveReleaseTarget)
         }
     }
 
@@ -174,10 +184,24 @@ class HelmReleasesPlugin : Plugin<Project> {
     ) {
         tasks.register(uninstallAllTaskName) { task ->
             task.group = HELM_GROUP
-            task.description = "Uninstalls all Helm releases."
+            task.description = "Uninstalls all Helm releases from the active target."
 
             task.dependsOn(
                 activeReleaseTarget.map(::uninstallAllFromTargetTaskName)
+            )
+        }
+    }
+
+
+    private fun Project.createTestAllReleasesTask(
+        activeReleaseTarget: Provider<String>
+    ) {
+        tasks.register(testAllTaskName) { task ->
+            task.group = HELM_GROUP
+            task.description = "Tests all Helm releases on the active target."
+
+            task.dependsOn(
+                activeReleaseTarget.map(::testAllOnTargetTaskName)
             )
         }
     }
