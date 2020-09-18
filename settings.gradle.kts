@@ -1,4 +1,10 @@
 pluginManagement {
+
+    repositories {
+        gradlePluginPortal()
+        jcenter()
+    }
+
     val kotlinVersion: String by settings
     resolutionStrategy.eachPlugin {
         if (requested.id.namespace == "org.jetbrains.kotlin" ||

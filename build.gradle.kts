@@ -1,5 +1,4 @@
 import org.asciidoctor.gradle.AsciidoctorTask
-import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URL
@@ -8,8 +7,8 @@ import java.net.URL
 plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
-    id("com.gradle.plugin-publish") version "0.11.0"
-    id("org.jetbrains.dokka") version "0.9.17"
+    id("com.gradle.plugin-publish") version "0.12.0"
+    id("org.jetbrains.dokka") version "1.4.0"
     id("maven-publish")
     id("org.asciidoctor.convert") version "1.5.9.2"
 }
@@ -23,14 +22,14 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
-    implementation("org.yaml:snakeyaml:1.25")
-    implementation("org.json:json:20190722")
+    implementation("org.yaml:snakeyaml:1.27")
+    implementation("org.json:json:20200518")
 
-    implementation("com.squareup.okhttp3:okhttp:4.7.2") {
+    implementation("com.squareup.okhttp3:okhttp:4.9.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
-    implementation("com.squareup.okhttp3:okhttp-tls:4.7.2") {
+    implementation("com.squareup.okhttp3:okhttp-tls:4.9.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
@@ -39,12 +38,12 @@ dependencies {
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.22")
-    testImplementation("io.mockk:mockk:1.9.3")
+    testImplementation("io.mockk:mockk:1.10.0")
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
-    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
-    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.10")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2")
 
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.5.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
 
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))
@@ -130,12 +129,13 @@ pluginBundle {
 }
 
 
-tasks.named("dokka", DokkaTask::class) {
-    outputFormat = "html"
-    externalDocumentationLink(delegateClosureOf<DokkaConfiguration.ExternalDocumentationLink.Builder> {
-        url = URL("https://docs.gradle.org/current/javadoc/")
-    })
-    reportUndocumented = false
+tasks.named("dokkaHtml", DokkaTask::class) {
+    dokkaSourceSets.named("main") {
+        externalDocumentationLink {
+            url.set(URL("https://docs.gradle.org/current/javadoc/"))
+        }
+        reportUndocumented.set(true)
+    }
 }
 
 
