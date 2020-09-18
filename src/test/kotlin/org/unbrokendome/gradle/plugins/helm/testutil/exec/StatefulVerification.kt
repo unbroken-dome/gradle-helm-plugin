@@ -196,8 +196,9 @@ private class GradleExecMockWithStatefulVerification(
     private val delegate: GradleExecMock
 ) : GradleExecMock by delegate {
 
-    private val statefulInvocations =
+    private val statefulInvocations by lazy {
         delegate.invocations.associateWith { StatefulInvocation(it) }
+    }
 
 
     override fun forCommand(argsPrefix: List<String>): GradleExecMock =
