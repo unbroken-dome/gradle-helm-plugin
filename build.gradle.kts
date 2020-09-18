@@ -23,7 +23,7 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
     implementation("org.yaml:snakeyaml:1.27")
-    implementation("org.json:json:20190722")
+    implementation("org.json:json:20200518")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
