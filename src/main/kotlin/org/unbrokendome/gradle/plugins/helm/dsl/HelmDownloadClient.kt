@@ -12,6 +12,7 @@ import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_6_2
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
+import javax.inject.Inject
 
 
 /**
@@ -72,8 +73,8 @@ internal interface HelmDownloadClientInternal : HelmDownloadClient {
 }
 
 
-internal class DefaultHelmDownloadClient
-constructor(
+internal open class DefaultHelmDownloadClient
+@Inject constructor(
     private val project: Project
 ) : HelmDownloadClient, HelmDownloadClientInternal {
 
