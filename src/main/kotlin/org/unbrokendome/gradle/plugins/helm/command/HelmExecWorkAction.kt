@@ -29,6 +29,13 @@ internal abstract class HelmExecWorkAction
 
                 parameters.environment.ifPresent { environment.putAll(it) }
 
+                // A kubeconfig file can reference external programs.  This is often used to do custom authorizations
+                // like when deploying to EKS.  In order to correctly run those programs the PATH environmental variable
+                // must be forwarded. For some reason this isn't
+                // inherited from Gradle when the process is launched from a worker, even if no isolation is used.
+                environment.computeIfAbsent("PATH") {
+                    System.getenv("PATH")
+                }
                 // For convenience, pass the KUBECONFIG environment variable to the worker. In general, having a
                 // Gradle build depend on environment is bad practice, but in this case it might be what many users
                 // will expect. Since KUBECONFIG env.var. is also set from the HelmServerOptions.kubeConfig property,
