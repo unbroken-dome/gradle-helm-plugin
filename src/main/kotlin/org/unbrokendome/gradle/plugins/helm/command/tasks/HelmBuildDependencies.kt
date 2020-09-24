@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction
  *
  * Corresponds to the `helm dependency build` CLI command.
  */
-open class HelmBuildDependencies : AbstractHelmDependenciesTask() {
+abstract class HelmBuildDependencies : AbstractHelmDependenciesTask() {
 
     init {
         inputs.file(lockFile)

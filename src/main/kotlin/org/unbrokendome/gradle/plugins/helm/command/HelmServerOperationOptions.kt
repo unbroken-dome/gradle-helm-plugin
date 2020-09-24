@@ -4,6 +4,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.Internal
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.toHelmString
@@ -45,6 +46,7 @@ interface ConfigurableHelmServerOperationOptions : ConfigurableHelmServerOptions
      *
      * Corresponds to the `--dry-run` CLI parameter.
      */
+    @get:Internal
     override val dryRun: Property<Boolean>
 
 
@@ -53,6 +55,7 @@ interface ConfigurableHelmServerOperationOptions : ConfigurableHelmServerOptions
      *
      * Corresponds to the `--no-hooks` CLI parameter.
      */
+    @get:Internal
     override val noHooks: Property<Boolean>
 
 
@@ -61,6 +64,7 @@ interface ConfigurableHelmServerOperationOptions : ConfigurableHelmServerOptions
      *
      * Corresponds to the `--timeout` command line option in the Helm CLI.
      */
+    @get:Internal
     override val remoteTimeout: Property<Duration>
 }
 

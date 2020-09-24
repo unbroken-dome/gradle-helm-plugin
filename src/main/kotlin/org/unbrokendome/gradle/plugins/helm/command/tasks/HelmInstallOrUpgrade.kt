@@ -5,7 +5,6 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.helmCommandSupport
 import org.unbrokendome.gradle.plugins.helm.model.ReleaseStatus
-import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
@@ -14,7 +13,8 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * This task will call `helm upgrade --install` by default, or `helm install --replace` if the release does
  * not exist or has previously failed.
  */
-open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
+@Suppress("LeakingThis")
+abstract class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
 
     /**
      * If `true`, re-use the given release name, even if that name is already used.
@@ -23,9 +23,7 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
      * it will perform a `helm upgrade --install` command instead.
      */
     @get:Internal
-    val replace: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(false)
+    abstract val replace: Property<Boolean>
 
 
     /**
@@ -36,8 +34,7 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
      * If [replace] is set to `true`, this property will be ignored.
      */
     @get:Internal
-    val resetValues: Property<Boolean> =
-        project.objects.property()
+    abstract val resetValues: Property<Boolean>
 
 
     /**
@@ -49,8 +46,12 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
      * If [replace] is set to `true`, this property will be ignored.
      */
     @get:Internal
-    val reuseValues: Property<Boolean> =
-        project.objects.property()
+    abstract val reuseValues: Property<Boolean>
+
+
+    init {
+        replace.convention(false)
+    }
 
 
     @TaskAction

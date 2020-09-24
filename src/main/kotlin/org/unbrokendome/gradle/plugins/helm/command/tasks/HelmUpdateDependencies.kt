@@ -3,7 +3,6 @@ package org.unbrokendome.gradle.plugins.helm.command.tasks
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
@@ -12,16 +11,15 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  *
  * Corresponds to the `helm dependency update` CLI command.
  */
-open class HelmUpdateDependencies : AbstractHelmDependenciesTask() {
+abstract class HelmUpdateDependencies : AbstractHelmDependenciesTask() {
 
     /**
      * If set to `true`, do not refresh the local repository cache.
      *
      * Corresponds to the `--skip-refresh` CLI option.
      */
-    @Internal
-    val skipRefresh: Property<Boolean> =
-        project.objects.property()
+    @get:Internal
+    abstract val skipRefresh: Property<Boolean>
 
 
     init {

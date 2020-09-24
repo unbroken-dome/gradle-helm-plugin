@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.toHelmString
 import java.time.Duration
 
@@ -14,14 +13,14 @@ import java.time.Duration
 /**
  * Runs the tests for a release. Corresponds to the `helm test` CLI command.
  */
-open class HelmTest : AbstractHelmServerCommandTask() {
+@Suppress("LeakingThis")
+abstract class HelmTest : AbstractHelmServerCommandTask() {
 
     /**
      * Name of the release to test.
      */
     @get:Input
-    val releaseName: Property<String> =
-        project.objects.property()
+    abstract val releaseName: Property<String>
 
 
     /**
@@ -30,11 +29,7 @@ open class HelmTest : AbstractHelmServerCommandTask() {
      * Corresponds to the `--logs` command line option in the Helm CLI.
      */
     @get:Console
-    val showLogs: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(
-                project.booleanProviderFromProjectProperty("helm.test.logs", false)
-            )
+    abstract val showLogs: Property<Boolean>
 
 
     /**
@@ -43,8 +38,14 @@ open class HelmTest : AbstractHelmServerCommandTask() {
      * Corresponds to the `--timeout` command line option in the Helm CLI.
      */
     @get:Internal
-    val remoteTimeout: Property<Duration> =
-        project.objects.property()
+    abstract val remoteTimeout: Property<Duration>
+
+
+    init {
+        showLogs.convention(
+            project.booleanProviderFromProjectProperty("helm.test.logs", false)
+        )
+    }
 
 
     @TaskAction

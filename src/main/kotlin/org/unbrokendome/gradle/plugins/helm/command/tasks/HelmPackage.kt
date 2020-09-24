@@ -12,7 +12,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
-import org.unbrokendome.gradle.plugins.helm.util.property
 
 
 /**
@@ -22,7 +21,8 @@ import org.unbrokendome.gradle.plugins.helm.util.property
  * specified explicitly using the [chartName] and [chartVersion] properties, the task will parse the `Chart.yaml`
  * file and extract the missing information from there.
  */
-open class HelmPackage : AbstractHelmCommandTask() {
+@Suppress("LeakingThis")
+abstract class HelmPackage : AbstractHelmCommandTask() {
 
     internal companion object {
 
@@ -42,8 +42,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * Corresponds to the `--app-version` CLI option.
      */
     @get:[Input Optional]
-    val appVersion: Property<String> =
-        project.objects.property()
+    abstract val appVersion: Property<String>
 
 
     /**
@@ -52,16 +51,14 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * Corresponds to the `--dependency-update` CLI option.
      */
     @get:Input
-    val updateDependencies: Property<Boolean> =
-        project.objects.property()
+    abstract val updateDependencies: Property<Boolean>
 
 
     /**
      * The directory that contains the sources for the Helm chart.
      */
     @get:InputDirectory
-    val sourceDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    abstract val sourceDir: DirectoryProperty
 
 
     /**
@@ -78,11 +75,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * If not set, the chart name will be read from the _Chart.yaml_ file in the source directory.
      */
     @get:Input
-    val chartName: Property<String> =
-        project.objects.property<String>()
-            .convention(chartDescriptor.map {
-                requireNotNull(it.name) { "Chart name must either be present in Chart.yaml, or specified explicitly" }
-            })
+    abstract val chartName: Property<String>
 
 
     /**
@@ -91,11 +84,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * If not set, the chart version will be read from the _Chart.yaml_ file in the source directory.
      */
     @get:Input
-    val chartVersion: Property<String> =
-        project.objects.property<String>()
-            .convention(chartDescriptor.map {
-                requireNotNull(it.version) { "Chart version must either be present in Chart.yaml, or specified explicitly" }
-            })
+    abstract val chartVersion: Property<String>
 
 
     /**
@@ -104,9 +93,7 @@ open class HelmPackage : AbstractHelmCommandTask() {
      * Default destination is `helm/charts/` under the project's build directory.
      */
     @get:Internal("Represented as part of packageFile")
-    val destinationDir: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(project.layout.buildDirectory.dir("helm/charts"))
+    abstract val destinationDir: DirectoryProperty
 
 
     /**
@@ -135,6 +122,19 @@ open class HelmPackage : AbstractHelmCommandTask() {
     @get:Internal("replaced by packageFile property")
     val chartOutputPath: Provider<RegularFile>
         get() = packageFile
+
+
+    init {
+        chartName.convention(chartDescriptor.map {
+            requireNotNull(it.name) { "Chart name must either be present in Chart.yaml, or specified explicitly" }
+        })
+
+        chartVersion.convention(chartDescriptor.map {
+            requireNotNull(it.version) { "Chart version must either be present in Chart.yaml, or specified explicitly" }
+        })
+
+        destinationDir.convention(project.layout.buildDirectory.dir("helm/charts"))
+    }
 
 
     @TaskAction

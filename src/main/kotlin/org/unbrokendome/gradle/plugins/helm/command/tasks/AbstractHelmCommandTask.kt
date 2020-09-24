@@ -32,8 +32,7 @@ abstract class AbstractHelmCommandTask
 
 
     @get:Inject
-    internal open val workerExecutor: WorkerExecutor
-        get() = throw UnsupportedOperationException()
+    internal abstract val workerExecutor: WorkerExecutor
 
 
     @get:Internal("represented by other properties")
@@ -43,9 +42,9 @@ abstract class AbstractHelmCommandTask
 
     @get:Input
     final override val executable: Provider<String>
-            get() = localExecutable
-                .withDefault(downloadedExecutable, project.providers)
-                .withDefault("helm", project.providers)
+        get() = localExecutable
+            .withDefault(downloadedExecutable, project.providers)
+            .withDefault("helm", project.providers)
 
 
     @get:Internal
@@ -54,8 +53,7 @@ abstract class AbstractHelmCommandTask
 
 
     @get:Internal
-    internal val downloadedExecutable: Property<String> =
-        project.objects.property()
+    internal abstract val downloadedExecutable: Property<String>
 
 
     @get:Console

@@ -4,6 +4,9 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
@@ -58,6 +61,7 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      *
      * Corresponds to the `--atomic` Helm CLI parameter.
      */
+    @get:Internal
     override val atomic: Property<Boolean>
 
 
@@ -66,6 +70,7 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      *
      * Corresponds to the `--devel` CLI parameter.
      */
+    @get:[Input Optional]
     override val devel: Property<Boolean>
 
 
@@ -74,6 +79,7 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      *
      * Corresponds to the `--verify` CLI parameter.
      */
+    @get:Internal
     override val verify: Property<Boolean>
 
 
@@ -81,6 +87,7 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
      * state before marking the release as successful. It will wait for as long as [remoteTimeout].
      */
+    @get:Internal
     override val wait: Property<Boolean>
 
 
@@ -89,6 +96,7 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      *
      * Corresponds to the `--version` CLI parameter.
      */
+    @get:[Input Optional]
     override val version: Property<String>
 
 
@@ -97,6 +105,7 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      *
      * Corresponds to the `--create-namespace` CLI parameter.
      */
+    @get:Internal
     override val createNamespace: Property<Boolean>
 }
 

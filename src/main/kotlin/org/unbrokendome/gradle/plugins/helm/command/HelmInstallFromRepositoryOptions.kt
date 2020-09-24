@@ -5,6 +5,9 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
@@ -34,6 +37,7 @@ interface ConfigurableHelmInstallFromRepositoryOptions
      *
      * Corresponds to the `--repo` Helm CLI parameter.
      */
+    @get:[Input Optional]
     override val repository: Property<URI>
 
 
@@ -42,6 +46,7 @@ interface ConfigurableHelmInstallFromRepositoryOptions
      *
      * Corresponds to the `--username` CLI parameter.
      */
+    @get:Internal
     override val username: Property<String>
 
 
@@ -50,6 +55,7 @@ interface ConfigurableHelmInstallFromRepositoryOptions
      *
      * Corresponds to the `--password` CLI parameter.
      */
+    @get:Internal
     override val password: Property<String>
 
 
@@ -58,6 +64,7 @@ interface ConfigurableHelmInstallFromRepositoryOptions
      *
      * Corresponds to the `--ca-file` CLI parameter.
      */
+    @get:Internal
     override val caFile: RegularFileProperty
 
 
@@ -66,6 +73,7 @@ interface ConfigurableHelmInstallFromRepositoryOptions
      *
      * Corresponds to the `--cert-file` CLI parameter.
      */
+    @get:Internal
     override val certFile: RegularFileProperty
 
 
@@ -74,6 +82,7 @@ interface ConfigurableHelmInstallFromRepositoryOptions
      *
      * Corresponds to the `--key-file` CLI parameter.
      */
+    @get:Internal
     override val keyFile: RegularFileProperty
 }
 

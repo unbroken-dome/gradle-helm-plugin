@@ -19,8 +19,7 @@ abstract class AbstractHelmDependenciesTask : AbstractHelmCommandTask() {
      * The chart directory.
      */
     @get:Internal("Represented as part of other properties")
-    val chartDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    abstract val chartDir: DirectoryProperty
 
 
     /**
@@ -98,7 +97,7 @@ abstract class AbstractHelmDependenciesTask : AbstractHelmCommandTask() {
      * The _charts_ sub-directory; this is where sub-charts will be placed by the command (read-only).
      */
     @get:OutputDirectory
-    @Suppress("unused")
+    @Suppress("unused", "LeakingThis")
     val subchartsDir: Provider<Directory> =
         chartDir.dir("charts")
 }

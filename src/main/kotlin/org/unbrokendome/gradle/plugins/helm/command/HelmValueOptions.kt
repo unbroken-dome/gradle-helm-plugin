@@ -8,6 +8,8 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import java.util.concurrent.Callable
@@ -31,6 +33,7 @@ interface ConfigurableHelmValueOptions : HelmValueOptions, ConfigurableHelmOptio
      * Entries in the map will be sent to the CLI using either the `--set-string` option (for strings) or the
      * `--set` option (for all other types).
      */
+    @get:Input
     override val values: MapProperty<String, Any>
 
 
@@ -45,6 +48,7 @@ interface ConfigurableHelmValueOptions : HelmValueOptions, ConfigurableHelmOptio
      *
      * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
      */
+    @get:Input
     override val fileValues: MapProperty<String, Any>
 
 
@@ -55,6 +59,7 @@ interface ConfigurableHelmValueOptions : HelmValueOptions, ConfigurableHelmOptio
      *
      * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
+    @get:InputFiles
     override val valueFiles: ConfigurableFileCollection
 }
 

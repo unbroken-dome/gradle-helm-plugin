@@ -8,7 +8,6 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.yaml.snakeyaml.Yaml
 import java.net.URI
 
@@ -16,22 +15,20 @@ import java.net.URI
 /**
  * Registers a known repository with Helm. Corresponds to the `helm repo add` CLI command.
  */
-open class HelmAddRepository : AbstractHelmCommandTask() {
+abstract class HelmAddRepository : AbstractHelmCommandTask() {
 
     /**
      * Name of the repository.
      */
     @get:Input
-    val repositoryName: Property<String> =
-        project.objects.property()
+    abstract val repositoryName: Property<String>
 
 
     /**
      * URL of the repository.
      */
     @get:Input
-    val url: Property<URI> =
-        project.objects.property()
+    abstract val url: Property<URI>
 
 
     /**
@@ -40,8 +37,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--ca-file` CLI parameter.
      */
     @get:[InputFile Optional]
-    val caFile: RegularFileProperty =
-        project.objects.fileProperty()
+    abstract val caFile: RegularFileProperty
 
 
     /**
@@ -50,8 +46,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--username` CLI parameter.
      */
     @get:[Input Optional]
-    val username: Property<String> =
-        project.objects.property()
+    abstract val username: Property<String>
 
 
     /**
@@ -60,8 +55,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--password` CLI parameter.
      */
     @get:[Input Optional]
-    val password: Property<String> =
-        project.objects.property()
+    abstract val password: Property<String>
 
 
     /**
@@ -70,8 +64,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--cert-file` CLI parameter.
      */
     @get:[InputFile Optional]
-    val certificateFile: RegularFileProperty =
-        project.objects.fileProperty()
+    abstract val certificateFile: RegularFileProperty
 
 
     /**
@@ -80,8 +73,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--key-file` CLI parameter.
      */
     @get:[InputFile Optional]
-    val keyFile: RegularFileProperty =
-        project.objects.fileProperty()
+    abstract val keyFile: RegularFileProperty
 
 
     /**
@@ -90,8 +82,7 @@ open class HelmAddRepository : AbstractHelmCommandTask() {
      * Corresponds to the `--no-update` command line flag.
      */
     @get:Internal
-    val failIfExists: Property<Boolean> =
-        project.objects.property()
+    abstract val failIfExists: Property<Boolean>
 
 
     @TaskAction

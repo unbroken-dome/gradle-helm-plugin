@@ -6,6 +6,10 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
@@ -44,6 +48,7 @@ interface ConfigurableHelmServerOptions : HelmServerOptions, ConfigurableHelmOpt
      * If this property is set, its value will be used to set the `KUBECONFIG` environment variable for each
      * Helm invocation.
      */
+    @get:[InputFile Optional]
     override val kubeConfig: RegularFileProperty
 
 
@@ -52,6 +57,7 @@ interface ConfigurableHelmServerOptions : HelmServerOptions, ConfigurableHelmOpt
      *
      * Corresponds to the `--kube-context` command line option in the Helm CLI.
      */
+    @get:[Input Optional]
     override val kubeContext: Property<String>
 
 
@@ -60,6 +66,7 @@ interface ConfigurableHelmServerOptions : HelmServerOptions, ConfigurableHelmOpt
      *
      * Corresponds to the `--namespace` CLI parameter.
      */
+    @get:Internal
     override val namespace: Property<String>
 }
 

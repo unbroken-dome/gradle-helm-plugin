@@ -7,8 +7,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withLockFile
 import java.time.Duration
 
@@ -18,14 +16,14 @@ import java.time.Duration
  *
  * Corresponds to the `helm repo update` CLI command.
  */
-open class HelmUpdateRepositories : AbstractHelmCommandTask() {
+@Suppress("LeakingThis")
+abstract class HelmUpdateRepositories : AbstractHelmCommandTask() {
 
     /**
      * The names of configured repositories.
      */
     @get:Internal
-    val repositoryNames: ListProperty<String> =
-        project.objects.listProperty()
+    abstract val repositoryNames: ListProperty<String>
 
 
     /**
@@ -44,14 +42,14 @@ open class HelmUpdateRepositories : AbstractHelmCommandTask() {
      * Defaults to one hour. Set the property to [Duration.ZERO] to effectively disable the cache-TTL behavior.
      */
     @get:Internal
-    val repositoryCacheTtl: Property<Duration> =
-        project.objects.property<Duration>()
-            .convention(Duration.ofHours(1))
+    abstract val repositoryCacheTtl: Property<Duration>
 
 
     init {
         // skip the task if we don't have any repositories configured in the project
         onlyIf { !repositoryNames.orNull.isNullOrEmpty() }
+
+        repositoryCacheTtl.convention(Duration.ofHours(1))
 
         // declare the repositories.yaml file as a skip-when-empty input, so we get a
         // "no source" result if it doesn't exist (better than "up to date")
