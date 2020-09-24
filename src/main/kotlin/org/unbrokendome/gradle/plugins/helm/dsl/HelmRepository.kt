@@ -9,7 +9,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainerSupport
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsFactory
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.DefaultCredentialsFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
 import javax.inject.Inject
 
@@ -45,7 +44,7 @@ interface HelmRepository : Named, CredentialsContainer {
 }
 
 
-private open class DefaultHelmRepository
+private abstract class DefaultHelmRepository
 private constructor(
     private val project: Project,
     private val name: String,
@@ -66,17 +65,9 @@ private constructor(
         name
 
 
-    final override val url: Property<URI> =
-        project.objects.property()
-
-
     override fun url(path: Any) {
         this.url.set(project.uri(path))
     }
-
-
-    final override val caFile: RegularFileProperty =
-        project.objects.fileProperty()
 }
 
 

@@ -10,7 +10,6 @@ import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.HelmExtractClient
 import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_6_2
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import javax.inject.Inject
 
@@ -73,40 +72,17 @@ internal interface HelmDownloadClientInternal : HelmDownloadClient {
 }
 
 
-internal open class DefaultHelmDownloadClient
+internal abstract class DefaultHelmDownloadClient
 @Inject constructor(
     private val project: Project
 ) : HelmDownloadClient, HelmDownloadClientInternal {
-
-    override val enabled: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(
-                project.booleanProviderFromProjectProperty("helm.client.download.enabled", false)
-            )
-
-
-    override val version: Property<String> =
-        project.objects.property<String>()
-            .convention(
-                project.providerFromProjectProperty(
-                    "helm.client.download.version", HelmDownloadClient.DEFAULT_HELM_CLIENT_VERSION
-                )
-            )
-
-
-    override val destinationDir: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(
-                project.rootProject.layout.projectDirectory.dir(".gradle/helm/client")
-            )
-
 
     private val extractClientTask: TaskProvider<HelmExtractClient> =
         project.tasks.register(
             HelmDownloadClient.HELM_EXTRACT_CLIENT_TASK_NAME,
             HelmExtractClient::class.java
         ) { task ->
-            task.onlyIf { enabled.get() }
+            task.onlyIf { enabled.getOrElse(false) }
             task.version.set(version)
             task.baseDestinationDir.set(destinationDir)
         }
@@ -134,7 +110,23 @@ internal open class DefaultHelmDownloadClient
 
 
     init {
+        applyConventions()
         project.createHelmClientRepository()
+    }
+
+
+    private fun applyConventions() {
+        enabled.convention(
+            project.booleanProviderFromProjectProperty("helm.client.download.enabled", false)
+        )
+        version.convention(
+            project.providerFromProjectProperty(
+                "helm.client.download.version", HelmDownloadClient.DEFAULT_HELM_CLIENT_VERSION
+            )
+        )
+        destinationDir.convention(
+            project.rootProject.layout.projectDirectory.dir(".gradle/helm/client")
+        )
     }
 
 

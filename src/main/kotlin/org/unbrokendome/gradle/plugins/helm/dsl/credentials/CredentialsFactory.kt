@@ -33,8 +33,8 @@ internal interface CredentialsFactory {
 internal class DefaultCredentialsFactory(private val objectFactory: ObjectFactory) : CredentialsFactory {
 
     private val knownTypes: Map<Class<out Credentials>, Class<out Credentials>> = mapOf(
-        PasswordCredentials::class.java to DefaultPasswordCredentials::class.java,
-        CertificateCredentials::class.java to DefaultCertificateCredentials::class.java
+        PasswordCredentials::class.java to PasswordCredentials::class.java,
+        CertificateCredentials::class.java to CertificateCredentials::class.java
     )
 
 

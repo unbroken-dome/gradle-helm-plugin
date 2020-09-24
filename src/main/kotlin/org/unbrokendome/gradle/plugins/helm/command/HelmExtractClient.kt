@@ -12,7 +12,6 @@ import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmDownloadClient
 import org.unbrokendome.gradle.plugins.helm.util.SystemUtils
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.withLockFile
 
@@ -20,7 +19,7 @@ import org.unbrokendome.gradle.plugins.helm.util.withLockFile
 /**
  * Downloads and extracts a Helm client executable package.
  */
-open class HelmExtractClient : DefaultTask() {
+abstract class HelmExtractClient : DefaultTask() {
 
     init {
         group = HELM_GROUP
@@ -43,8 +42,7 @@ open class HelmExtractClient : DefaultTask() {
      * The version of the Helm client to be downloaded.
      */
     @get:Input
-    val version: Property<String> =
-        project.objects.property()
+    abstract val version: Property<String>
 
 
     @get:Input
@@ -56,14 +54,11 @@ open class HelmExtractClient : DefaultTask() {
 
 
     @get:Internal("Represented as part of executable")
-    val baseDestinationDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    abstract val baseDestinationDir: DirectoryProperty
 
 
     @get:Internal("Represented as part of executable")
-    val destinationDir: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(baseDestinationDir.dir(version))
+    abstract val destinationDir: DirectoryProperty
 
 
     /**
@@ -77,6 +72,11 @@ open class HelmExtractClient : DefaultTask() {
                 "$osClassifier/helm${extension}"
             }
         )
+
+
+    init {
+        destinationDir.convention(baseDestinationDir.dir(version))
+    }
 
 
     @TaskAction

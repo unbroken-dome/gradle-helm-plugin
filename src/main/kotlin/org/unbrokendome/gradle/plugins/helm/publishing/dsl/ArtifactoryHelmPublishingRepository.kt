@@ -15,7 +15,7 @@ import javax.inject.Inject
 interface ArtifactoryHelmPublishingRepository : HelmPublishingRepository
 
 
-private open class DefaultArtifactoryHelmPublishingRepository
+private abstract class DefaultArtifactoryHelmPublishingRepository
 @Inject constructor(
     name: String,
     objects: ObjectFactory

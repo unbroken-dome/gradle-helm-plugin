@@ -80,39 +80,6 @@ interface ConfigurableGlobalHelmOptions : GlobalHelmOptions, ConfigurableHelmOpt
 }
 
 
-internal fun ConfigurableGlobalHelmOptions.conventionsFrom(source: GlobalHelmOptions) = apply {
-    executable.convention(source.executable)
-    extraArgs.addAll(source.extraArgs)
-    xdgDataHome.convention(source.xdgDataHome)
-    xdgConfigHome.convention(source.xdgConfigHome)
-    xdgCacheHome.convention(source.xdgCacheHome)
-}
-
-
-internal class DelegateGlobalHelmOptions(
-    private val provider: Provider<GlobalHelmOptions>
-) : GlobalHelmOptions {
-
-    override val executable: Provider<String>
-        get() = provider.flatMap { it.executable }
-
-    override val debug: Provider<Boolean>
-        get() = provider.flatMap { it.debug }
-
-    override val extraArgs: Provider<List<String>>
-        get() = provider.flatMap { it.extraArgs }
-
-    override val xdgDataHome: Provider<Directory>
-        get() = provider.flatMap { it.xdgDataHome }
-
-    override val xdgConfigHome: Provider<Directory>
-        get() = provider.flatMap { it.xdgConfigHome }
-
-    override val xdgCacheHome: Provider<Directory>
-        get() = provider.flatMap { it.xdgCacheHome }
-}
-
-
 internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
 
     private val logger = LoggerFactory.getLogger(javaClass)

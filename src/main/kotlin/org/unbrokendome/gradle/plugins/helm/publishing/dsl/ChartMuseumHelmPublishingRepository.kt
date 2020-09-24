@@ -13,7 +13,7 @@ import javax.inject.Inject
 interface ChartMuseumHelmPublishingRepository : HelmPublishingRepository
 
 
-private open class DefaultChartMuseumHelmPublishingRepository
+private abstract class DefaultChartMuseumHelmPublishingRepository
 @Inject constructor(
     name: String,
     objects: ObjectFactory

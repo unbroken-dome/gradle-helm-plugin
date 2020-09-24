@@ -20,8 +20,7 @@ import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectPrope
 import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
 
 
-class HelmCommandsPlugin
-    : Plugin<Project> {
+class HelmCommandsPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
 

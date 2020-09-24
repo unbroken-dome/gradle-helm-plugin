@@ -6,9 +6,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import javax.inject.Inject
 
 
 /**
@@ -60,41 +57,12 @@ interface Linting {
 }
 
 
-/**
- * Extension of [Linting] that supports setting values from a parent `Linting` instance.
- */
-private interface LintingInternal : Linting, Hierarchical<Linting>
-
-
-/**
- * Default implementation of [Linting].
- */
-private open class DefaultLinting
-@Inject constructor(objectFactory: ObjectFactory) : LintingInternal {
-
-    final override val enabled: Property<Boolean> =
-        objectFactory.property<Boolean>()
-            .convention(true)
-
-    final override val strict: Property<Boolean> =
-        objectFactory.property()
-
-    final override val values: MapProperty<String, Any> =
-        objectFactory.mapProperty()
-
-    override val fileValues: MapProperty<String, Any> =
-        objectFactory.mapProperty()
-
-    final override val valueFiles: ConfigurableFileCollection =
-        objectFactory.fileCollection()
-
-    final override fun setParent(parent: Linting) {
-        enabled.set(parent.enabled)
-        strict.set(parent.strict)
-        values.putAll(parent.values)
-        fileValues.putAll(parent.fileValues)
-        valueFiles.from(parent.valueFiles)
-    }
+internal fun Linting.setParent(parent: Linting) {
+    enabled.set(parent.enabled)
+    strict.set(parent.strict)
+    values.putAll(parent.values)
+    fileValues.putAll(parent.fileValues)
+    valueFiles.from(parent.valueFiles)
 }
 
 
@@ -106,7 +74,8 @@ private open class DefaultLinting
  * @return the created [Linting] object
  */
 internal fun ObjectFactory.createLinting(parent: Linting? = null): Linting =
-    newInstance(DefaultLinting::class.java)
+    newInstance(Linting::class.java)
         .apply {
+            enabled.convention(true)
             parent?.let(this::setParent)
         }

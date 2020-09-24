@@ -9,7 +9,6 @@ import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskDependency
@@ -20,7 +19,6 @@ import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
 import org.unbrokendome.gradle.plugins.helm.model.ChartModelDependencies
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
 import javax.inject.Inject
 
@@ -154,14 +152,14 @@ internal interface HelmChartInternal : HelmChart {
 }
 
 
-private open class DefaultHelmChart
+@Suppress("LeakingThis")
+private abstract class DefaultHelmChart
 @Inject constructor(
     private val name: String,
     project: Project,
     baseOutputDir: Provider<Directory>,
     filteredSourcesBaseDir: Provider<Directory>,
-    dependenciesBaseDir: Provider<Directory>,
-    objects: ObjectFactory
+    dependenciesBaseDir: Provider<Directory>
 ) : HelmChart, HelmChartInternal {
 
     private val tasks = project.tasks
@@ -169,25 +167,6 @@ private open class DefaultHelmChart
 
     final override fun getName(): String =
         name
-
-
-    final override val chartName: Property<String> =
-        objects.property<String>()
-            .convention(name)
-
-
-    final override val chartVersion: Property<String> =
-        objects.property<String>()
-            .convention(project.versionProvider)
-
-
-    final override val sourceDir: DirectoryProperty =
-        objects.directoryProperty()
-
-
-    final override val baseOutputDir: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(baseOutputDir)
 
 
     final override val packageFile: Provider<RegularFile>
@@ -210,7 +189,7 @@ private open class DefaultHelmChart
         filteredSourcesBaseDir.flatMap { it.dir(chartName) }
 
 
-    override val dependenciesDir: Provider<Directory> =
+    final override val dependenciesDir: Provider<Directory> =
         dependenciesBaseDir.flatMap { it.dir(chartName) }
 
 
@@ -229,6 +208,13 @@ private open class DefaultHelmChart
 
 
     override val extraFiles: CopySpec = project.copySpec()
+
+
+    init {
+        this.baseOutputDir.convention(baseOutputDir)
+        chartName.convention(name)
+        chartVersion.convention(project.versionProvider)
+    }
 }
 
 

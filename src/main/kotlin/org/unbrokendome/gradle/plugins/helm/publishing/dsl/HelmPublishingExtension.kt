@@ -4,17 +4,12 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.internal.reflect.Instantiator
 import org.unbrokendome.gradle.plugins.helm.publishing.HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME
-import javax.inject.Inject
 
 
 /**
  * Configures the publishing of Helm charts to remote repositories.
  */
 interface HelmPublishingExtension
-
-
-private open class DefaultHelmPublishingExtension
-@Inject constructor() : HelmPublishingExtension
 
 
 /**
@@ -24,7 +19,7 @@ private open class DefaultHelmPublishingExtension
  * @return the created [HelmPublishingExtension] object
  */
 internal fun ObjectFactory.createHelmPublishingExtension(instantiator: Instantiator): HelmPublishingExtension =
-    newInstance(DefaultHelmPublishingExtension::class.java)
+    newInstance(HelmPublishingExtension::class.java)
         .apply {
             (this as ExtensionAware).extensions
                 .add(

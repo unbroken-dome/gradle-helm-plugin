@@ -7,7 +7,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.toSerializable
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
-import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
 import javax.inject.Inject
 
@@ -36,21 +35,11 @@ interface CustomHelmPublishingRepository : HelmPublishingRepository {
 }
 
 
-private open class DefaultCustomHelmPublishingRepository
+private abstract class DefaultCustomHelmPublishingRepository
 @Inject constructor(
     name: String,
     objects: ObjectFactory
 ) : AbstractHelmPublishingRepository(objects, name), CustomHelmPublishingRepository {
-
-    override val uploadMethod: Property<String> =
-        objects.property<String>()
-            .convention("POST")
-
-
-    override val uploadPath: Property<String> =
-        objects.property<String>()
-            .convention("")
-
 
     override val publisherParams: PublisherParams
         get() = CustomPublisherParams(
@@ -85,6 +74,12 @@ private open class DefaultCustomHelmPublishingRepository
                 .replace("{name}", chartName)
                 .replace("{version}", chartVersion)
                 .replace("{filename}", "$chartName-$chartVersion.tgz")
+    }
+
+
+    init {
+        uploadMethod.convention("POST")
+        uploadPath.convention("")
     }
 }
 

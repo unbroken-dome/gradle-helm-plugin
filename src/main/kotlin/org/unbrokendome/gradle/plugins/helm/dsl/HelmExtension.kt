@@ -4,20 +4,16 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Nested
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableGlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsHolder
 import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.dirProviderFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import javax.inject.Inject
 
@@ -30,6 +26,7 @@ interface HelmExtension : HelmExecProvider, ConfigurableGlobalHelmOptions, Confi
     /**
      * Configures the download of the Helm client executable.
      */
+    @get:Nested
     val downloadClient: HelmDownloadClient
 
 
@@ -64,81 +61,14 @@ internal interface HelmExtensionInternal : HelmExtension {
 }
 
 
-private open class DefaultHelmExtension
+private abstract class DefaultHelmExtension
 @Inject constructor(
     private val project: Project,
     objects: ObjectFactory
-) : HelmExtension, HelmExtensionInternal,
-    ConfigurableHelmServerOptions by HelmServerOptionsHolder(objects).applyConventions(project) {
+) : HelmExtension, HelmExtensionInternal {
 
     final override val downloadClient: HelmDownloadClient =
         objects.newInstance(DefaultHelmDownloadClient::class.java, project)
-
-
-    final override val executable: Property<String> =
-        objects.property<String>()
-            .convention(
-                project.providerFromProjectProperty("helm.executable", evaluateGString = true)
-            )
-
-
-    final override val debug: Property<Boolean> =
-        objects.property<Boolean>()
-            .convention(project.booleanProviderFromProjectProperty("helm.debug"))
-
-
-    final override val extraArgs: ListProperty<String> =
-        objects.listProperty<String>().empty()
-
-
-    final override val outputDir: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.outputDir",
-                    defaultPath = "\$buildDir/helm/charts", evaluateGString = true
-                )
-            )
-
-
-    final override val tmpDir: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.tmpDir",
-                    defaultPath = "\$buildDir/tmp/helm", evaluateGString = true
-                )
-            )
-
-
-    final override val xdgDataHome: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.xdgDataHome",
-                    defaultPath = "\$buildDir/helm/data", evaluateGString = true
-                )
-            )
-
-
-    final override val xdgConfigHome: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.xdgConfigHome",
-                    defaultPath = "\$buildDir/helm/config", evaluateGString = true
-                )
-            )
-
-
-    final override val xdgCacheHome: DirectoryProperty =
-        objects.directoryProperty()
-            .convention(
-                project.dirProviderFromProjectProperty(
-                    "helm.xdgCacheHome",
-                    defaultPath = "\$rootDir/.gradle/helm/cache", evaluateGString = true
-                )
-            )
 
 
     final override fun execHelm(command: String, subcommand: String?, action: Action<HelmExecSpec>?) =
@@ -155,7 +85,7 @@ private open class DefaultHelmExtension
 }
 
 
-private fun ConfigurableHelmServerOptions.applyConventions(project: Project) = apply {
+private fun HelmExtensionInternal.applyConventions(project: Project) = apply {
     kubeContext.convention(
         project.providerFromProjectProperty("helm.kubeContext")
     )
@@ -164,6 +94,38 @@ private fun ConfigurableHelmServerOptions.applyConventions(project: Project) = a
     )
     namespace.convention(
         project.providerFromProjectProperty("helm.namespace")
+    )
+    debug.convention(
+        project.booleanProviderFromProjectProperty("helm.debug")
+    )
+    executable.convention(
+        project.providerFromProjectProperty("helm.executable", evaluateGString = true)
+    )
+    extraArgs.empty()
+    outputDir.convention(
+        project.dirProviderFromProjectProperty(
+            "helm.outputDir", defaultPath = "\$buildDir/helm/charts", evaluateGString = true
+        )
+    )
+    tmpDir.convention(
+        project.dirProviderFromProjectProperty(
+            "helm.tmpDir", defaultPath = "\$buildDir/tmp/helm", evaluateGString = true
+        )
+    )
+    xdgDataHome.convention(
+        project.dirProviderFromProjectProperty(
+            "helm.xdgDataHome", defaultPath = "\$buildDir/helm/data", evaluateGString = true
+        )
+    )
+    xdgConfigHome.convention(
+        project.dirProviderFromProjectProperty(
+            "helm.xdgConfigHome", defaultPath = "\$buildDir/helm/config", evaluateGString = true
+        )
+    )
+    xdgCacheHome.convention(
+        project.dirProviderFromProjectProperty(
+            "helm.xdgCacheHome", defaultPath = "\$rootDir/.gradle/helm/cache", evaluateGString = true
+        )
     )
 }
 
@@ -176,3 +138,4 @@ private fun ConfigurableHelmServerOptions.applyConventions(project: Project) = a
  */
 internal fun Project.createHelmExtension(): HelmExtension =
     objects.newInstance(DefaultHelmExtension::class.java, this)
+        .applyConventions(this)
