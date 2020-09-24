@@ -159,3 +159,89 @@ helm {
     }
 }
 ----
+
+
+== Using Multiple Lint Configurations
+
+Many charts use conditional expressions like `{{ if }} ... {{ else }}` to include parts of a template based on the
+supplied values. This can make it difficult to completely lint the chart in one go, because often there is
+no combination of values that can be supplied to the linter that would really render everything in the chart.
+
+The plugin addresses this by supporting multiple linter configurations: Inside the `lint` block for a chart,
+you have a container for `configurations`, and each configuration can have its own `values`, `fileValues` and
+`valueFiles`. Each lint configuration will give rise to a separate `HelmLint` task that will run the linter with
+the specified input.
+
+The `values`, `fileValues` and `valueFiles` for each lint configuration are merged with (and can selectively
+override) the corresponding properties from the chart's `lint` block and the global `lint` block, allowing you to
+have a hierarchy of common and more specialized values.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    lint {
+        // This values file will be used for ALL lint configurations in ALL charts
+        valueFiles.from 'src/test/helm/helm-lint-all.yaml'
+    }
+
+    charts {
+        main {
+            lint {
+                // This values file will be used for ALL lint configurations in this chart
+                valueFiles.from 'src/test/helm/helm-lint-main-common.yaml'
+
+                configurations {
+                    basic {
+                        // This values file will be used for the basic configuration only
+                        valueFiles.from 'src/test/helm/helm-lint-main-basic.yaml'
+                    }
+                    advanced {
+                        // This value file will be used for the advanced configuration only
+                        valueFiles.from 'src/test/helm/helm-lint-main-advanced.yaml'
+                    }
+                }
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    lint {
+        // This value file will be used for ALL lint configurations in ALL charts
+        valueFiles.from("src/test/helm/helm-lint-all.yaml")
+    }
+
+    charts {
+        "main" {
+            lint {
+                // This value file will be used for ALL lint configurations in this chart
+                valueFiles.from("src/test/helm/helm-lint-main-common.yaml")
+
+                configurations {
+                    register("basic") {
+                        // This value file will be used for the basic configuration only
+                        valueFiles.from("src/test/helm/helm-lint-main-basic.yaml")
+                    }
+                    register("advanced") {
+                        // This value file will be used for the advanced configuration only
+                        valueFiles.from("src/test/helm/helm-lint-main-advanced.yaml")
+                    }
+                }
+            }
+        }
+    }
+}
+----
+
+Now, running `helmLint<Chart>Chart` (or other tasks that depend on it, such as `helmPackage`) will invoke `helm lint`
+for each configuration, by way of a separate `HelmLint` task per configuration that it depends on.
+
+You can also run the linter for a single configuration using the `helmLint<Chart>Chart<Configuration>`.
+
+NOTE: If you do not add any lint configurations, the plugin automatically creates a single configuration named
+"default" with no additional values.
