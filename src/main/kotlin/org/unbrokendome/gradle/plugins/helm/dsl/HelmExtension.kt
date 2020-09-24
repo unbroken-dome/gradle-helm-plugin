@@ -72,7 +72,7 @@ private open class DefaultHelmExtension
     ConfigurableHelmServerOptions by HelmServerOptionsHolder(objects).applyConventions(project) {
 
     final override val downloadClient: HelmDownloadClient =
-        DefaultHelmDownloadClient(project)
+        objects.newInstance(DefaultHelmDownloadClient::class.java, project)
 
 
     final override val executable: Property<String> =
