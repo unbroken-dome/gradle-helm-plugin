@@ -3,6 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.rules
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.lint
+import org.unbrokendome.gradle.plugins.helm.command.mergeValues
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 
@@ -37,9 +38,7 @@ internal class LintTaskRule(
         chart.lint.let { chartLint ->
             onlyIf { chartLint.enabled.get() }
             strict.set(chartLint.strict)
-            values.putAll(chartLint.values)
-            fileValues.putAll(chartLint.fileValues)
-            valueFiles.from(chartLint.valueFiles)
+            mergeValues(chartLint)
         }
 
         dependsOn(

@@ -3,9 +3,9 @@ package org.unbrokendome.gradle.plugins.helm.rules
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.FilteringInternal
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChartInternal
+import org.unbrokendome.gradle.plugins.helm.dsl.setParent
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
 
 
@@ -36,6 +36,6 @@ internal class FilterChartSourcesTaskRule(
         sourceDir.set(chart.sourceDir)
         targetDir.set((chart as HelmChartInternal).filteredSourcesDir)
 
-        (filtering as FilteringInternal).setParent(chart.filtering)
+        filtering.setParent(chart.filtering)
     }
 }

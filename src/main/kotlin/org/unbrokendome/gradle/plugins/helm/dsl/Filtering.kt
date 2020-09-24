@@ -7,9 +7,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import javax.inject.Inject
 
 
 /**
@@ -45,37 +42,10 @@ interface Filtering {
 }
 
 
-/**
- * Extension of [Filtering] that supports setting values from a parent `Filtering` instance.
- */
-internal interface FilteringInternal : Filtering, Hierarchical<Filtering>
-
-
-/**
- * Default implementation of [Filtering].
- */
-private open class DefaultFiltering
-@Inject constructor(
-    objects: ObjectFactory
-) : FilteringInternal {
-
-    final override val enabled: Property<Boolean> =
-        objects.property()
-
-
-    final override val values: MapProperty<String, Any> =
-        objects.mapProperty<String, Any>().empty()
-
-
-    final override val fileValues: MapProperty<String, Any> =
-        objects.mapProperty<String, Any>().empty()
-
-
-    final override fun setParent(parent: Filtering) {
-        enabled.convention(parent.enabled)
-        values.putAll(parent.values)
-        fileValues.putAll(parent.fileValues)
-    }
+internal fun Filtering.setParent(parent: Filtering) {
+    enabled.convention(parent.enabled)
+    values.putAll(parent.values)
+    fileValues.putAll(parent.fileValues)
 }
 
 
@@ -87,7 +57,9 @@ private open class DefaultFiltering
  * @return the created [Filtering] object
  */
 internal fun ObjectFactory.createFiltering(parent: Filtering? = null): Filtering =
-    newInstance(DefaultFiltering::class.java)
+    newInstance(Filtering::class.java)
         .apply {
+            values.empty()
+            fileValues.empty()
             parent?.let(this::setParent)
         }
