@@ -29,7 +29,7 @@ internal fun calculateDigest(
 
     while (true) {
 
-        buffer.clear()
+        buffer.safeClear()
 
         val bytesRead = channel.read(buffer)
         if (bytesRead == -1) {
@@ -41,6 +41,16 @@ internal fun calculateDigest(
     }
 
     return digest.digest()
+}
+
+
+/**
+ * Avoid using ByteBuffer.clear because of a JDK incompatibility that might lead to a NoSuchMethodError
+ * when compiling with JDK > 8 and running with JDK 8.
+ */
+private fun ByteBuffer.safeClear() {
+    position(0)
+    limit(capacity())
 }
 
 
