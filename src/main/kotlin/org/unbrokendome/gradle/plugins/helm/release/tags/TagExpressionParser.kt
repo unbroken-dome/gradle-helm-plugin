@@ -157,7 +157,7 @@ internal object TagExpressionParser {
         val expression = (nextToken as? ExpressionToken)?.expression
             ?: throw ParseException("unexpected token $nextToken, expected expression", 0)
         return tokens.subList(0, notIndex) +
-                ExpressionToken(expression.not()) +
+                ExpressionToken(!expression) +
                 tokens.subList(notIndex + 2, tokens.size)
     }
 

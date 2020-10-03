@@ -23,7 +23,7 @@ internal interface TagExpression {
      * @param other another [TagExpression]
      * @return a [TagExpression] that is the AND-combination of this expression and [other]
      */
-    fun and(other: TagExpression): TagExpression =
+    infix fun and(other: TagExpression): TagExpression =
         when (other) {
             is AlwaysMatchTagExpression -> this
             else -> AndTagExpression(listOf(this, other))
@@ -36,7 +36,7 @@ internal interface TagExpression {
      * @param other another [TagExpression]
      * @return a [TagExpression] that is the OR-combination of this expression and [other]
      */
-    fun or(other: TagExpression): TagExpression =
+    infix fun or(other: TagExpression): TagExpression =
         when (other) {
             is AlwaysMatchTagExpression -> other
             else -> OrTagExpression(listOf(this, other))
@@ -49,7 +49,7 @@ internal interface TagExpression {
      *
      * @return a negated tag expression
      */
-    fun not(): TagExpression =
+    operator fun not(): TagExpression =
         NotTagExpression(this)
 
 
