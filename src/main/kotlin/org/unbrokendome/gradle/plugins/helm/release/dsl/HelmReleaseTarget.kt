@@ -5,14 +5,12 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Nested
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallationOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsHolder
 import org.unbrokendome.gradle.plugins.helm.release.tags.TagExpression
 import javax.inject.Inject
 
@@ -22,8 +20,12 @@ import javax.inject.Inject
  *
  * A release target can specify its own server options to coordinate to a specific remote Kubernetes cluster.
  * Additionally, it can specify values that should be applied to all releases when installing to this target.
+ *
+ * This interface also exposes [ExtensionAware], so that build scripts can access the `ext` (Groovy) / `extra`
+ * (Kotlin) properties of the release.
  */
-interface HelmReleaseTargetObject : Named, ConfigurableHelmInstallationOptions, ConfigurableHelmValueOptions {
+interface HelmReleaseTarget :
+    Named, ConfigurableHelmInstallationOptions, ConfigurableHelmValueOptions, ExtensionAware {
 
     /**
      * Values to be passed directly.
@@ -70,6 +72,7 @@ interface HelmReleaseTargetObject : Named, ConfigurableHelmInstallationOptions, 
     /**
      * Access testing configuration options for this release target.
      */
+    @get:Nested
     val test: ConfigurableHelmReleaseTestOptions
 
 
@@ -85,7 +88,7 @@ interface HelmReleaseTargetObject : Named, ConfigurableHelmInstallationOptions, 
 }
 
 
-internal interface HelmReleaseTargetInternal : HelmReleaseTargetObject {
+internal interface HelmReleaseTargetInternal : HelmReleaseTarget {
 
     /**
      * Tag expression to select releases for this target.
@@ -94,14 +97,11 @@ internal interface HelmReleaseTargetInternal : HelmReleaseTargetObject {
 }
 
 
-private open class DefaultHelmReleaseTargetObject
+private abstract class DefaultHelmReleaseTarget
 @Inject constructor(
     private val name: String,
-    private val globalSelectTagsExpression: TagExpression,
-    objects: ObjectFactory
-) : HelmReleaseTargetObject, HelmReleaseTargetInternal,
-    ConfigurableHelmInstallationOptions by HelmInstallationOptionsHolder(objects),
-    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
+    private val globalSelectTagsExpression: TagExpression
+) : HelmReleaseTarget, HelmReleaseTargetInternal {
 
     private var localSelectTagsExpression: TagExpression =
         TagExpression.alwaysMatch()
@@ -119,39 +119,18 @@ private open class DefaultHelmReleaseTargetObject
 
 
     final override val selectTagsExpression: TagExpression
-        get() = localSelectTagsExpression.and(globalSelectTagsExpression)
-
-
-    final override val test =
-        DefaultHelmReleaseTestOptions(objects)
+        get() = localSelectTagsExpression and globalSelectTagsExpression
 }
 
-
-/**
- * Defines a target configuration for installing and uninstalling releases.
- *
- * A release target can specify its own server options to coordinate to a specific remote Kubernetes cluster.
- * Additionally, it can specify values that should be applied to all releases when installing to this target.
- *
- * This interface also exposes [ExtensionAware], so that build scripts can access the `ext` (Groovy) / `extra`
- * (Kotlin) properties of the release.
- */
-interface HelmReleaseTarget : HelmReleaseTargetObject, ExtensionAware
-
-
-private class HelmReleaseTargetDecorator(
-        private val delegate: HelmReleaseTargetInternal
-) : HelmReleaseTarget, HelmReleaseTargetInternal by delegate, ExtensionAware by delegate as ExtensionAware
 
 
 internal fun Project.helmReleaseTargetContainer(
     globalSelectTagsExpression: TagExpression
 ): NamedDomainObjectContainer<HelmReleaseTarget> =
     container(HelmReleaseTarget::class.java) { name ->
-        val delegate = objects.newInstance(DefaultHelmReleaseTargetObject::class.java, name, globalSelectTagsExpression)
-        HelmReleaseTargetDecorator(delegate)
+        objects.newInstance(DefaultHelmReleaseTarget::class.java, name, globalSelectTagsExpression)
     }
 
 
-internal fun HelmReleaseTarget.shouldInclude(release: HelmCoreRelease): Boolean =
+internal fun HelmReleaseTarget.shouldInclude(release: HelmRelease): Boolean =
     (this as HelmReleaseTargetInternal).selectTagsExpression.matches(release.tags)

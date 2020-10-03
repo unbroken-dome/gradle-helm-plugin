@@ -5,7 +5,6 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
-import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmCoreRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseInternal
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
@@ -20,10 +19,10 @@ private val namePattern =
 /**
  * The name of the [HelmUninstall] task that uninstalls this release from a given target.
  *
- * @receiver the [HelmCoreRelease]
+ * @receiver the [HelmRelease]
  * @param targetName the name of the release target
  */
-internal fun HelmCoreRelease.uninstallFromTargetTaskName(targetName: String): String =
+internal fun HelmRelease.uninstallFromTargetTaskName(targetName: String): String =
     namePattern.mapName(name, targetName)
 
 

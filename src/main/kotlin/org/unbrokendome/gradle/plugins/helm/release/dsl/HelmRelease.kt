@@ -3,22 +3,23 @@ package org.unbrokendome.gradle.plugins.helm.release.dsl
 import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.NonExtensible
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
-import org.slf4j.LoggerFactory
+import org.gradle.api.tasks.Nested
+import org.slf4j.Logger
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsHolder
 import org.unbrokendome.gradle.plugins.helm.command.mergeValues
 import org.unbrokendome.gradle.plugins.helm.command.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.withDefaults
@@ -28,9 +29,6 @@ import org.unbrokendome.gradle.plugins.helm.util.andThen
 import org.unbrokendome.gradle.plugins.helm.util.asFile
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
 import org.unbrokendome.gradle.plugins.helm.util.combine
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.setProperty
 import java.io.File
 import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
@@ -272,6 +270,7 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
     /**
      * Access testing configuration options for this release.
      */
+    @get:Nested
     val test: ConfigurableHelmReleaseTestOptions
 
 
@@ -291,8 +290,11 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
  * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
  *
  * Provides methods for target-specific configuration of the release.
+ *
+ * This interface also exposes [ExtensionAware], so that build scripts can access the `ext` (Groovy) / `extra`
+ * (Kotlin) properties of the release.
  */
-interface HelmCoreRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFromRepositoryOptions {
+interface HelmRelease : HelmReleaseProperties, ExtensionAware {
 
     /**
      * Tags for this release.
@@ -425,7 +427,7 @@ interface HelmCoreRelease : Named, HelmReleaseProperties, ConfigurableHelmInstal
 
 
     /**
-     * Used to configure a [HelmCoreRelease] for a specific release target.
+     * Used to configure a [HelmRelease] for a specific release target.
      */
     interface TargetSpecific : HelmReleaseProperties {
 
@@ -449,25 +451,21 @@ internal interface HelmReleaseInternal {
 }
 
 
+@Suppress("LeakingThis")
 private abstract class AbstractHelmRelease(
-    objects: ObjectFactory,
     private val name: String,
     protected val project: Project
-) : Named, HelmReleaseProperties,
-    ConfigurableHelmInstallFromRepositoryOptions by HelmInstallFromRepositoryOptionsHolder(objects),
-    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
+) : Named, HelmReleaseProperties {
 
     override fun getName(): String =
         name
 
 
-    final override val releaseName: Property<String> =
-        objects.property<String>()
-            .convention(name)
-
-
-    final override val chart: Property<ChartReference> =
-        objects.property()
+    init {
+        releaseName.convention(name)
+        replace.convention(false)
+        keepHistoryOnUninstall.convention(false)
+    }
 
 
     final override fun from(notation: Any) {
@@ -512,21 +510,6 @@ private abstract class AbstractHelmRelease(
         }
 
 
-    final override val replace: Property<Boolean> =
-        objects.property<Boolean>()
-            .convention(false)
-
-
-    final override val keepHistoryOnUninstall: Property<Boolean> =
-        objects.property<Boolean>()
-            .convention(false)
-
-
-    @Suppress("OverridingDeprecatedMember")
-    final override val dependsOn: SetProperty<String> =
-        objects.setProperty()
-
-
     final override val installDependsOn: MutableSet<Any> = mutableSetOf()
 
 
@@ -534,29 +517,25 @@ private abstract class AbstractHelmRelease(
 
 
     final override val mustUninstallAfter: MutableSet<String> = mutableSetOf()
-
-
-    final override val test =
-        DefaultHelmReleaseTestOptions(objects)
 }
 
 
-private open class DefaultHelmCoreRelease
+private abstract class DefaultHelmRelease
 @Inject constructor(
-    objects: ObjectFactory,
     name: String,
-    project: Project
-) : AbstractHelmRelease(objects, name, project), HelmCoreRelease, HelmReleaseInternal {
+    project: Project,
+    private val objects: ObjectFactory
+) : AbstractHelmRelease(name, project), HelmRelease, HelmReleaseInternal {
 
-    private val targetSpecificActions = mutableMapOf<String, Action<HelmCoreRelease.TargetSpecific>>()
+    private companion object {
+        val logger: Logger = Logging.getLogger(DefaultHelmRelease::class.java)
+    }
+
+    private val targetSpecificActions = mutableMapOf<String, Action<HelmRelease.TargetSpecific>>()
     private val targetSpecificCache: MutableMap<String, HelmReleaseProperties> = ConcurrentHashMap()
 
 
     override val tags = mutableSetOf<String>()
-
-
-    override val valuesDirs: ListProperty<File> =
-        objects.listProperty()
 
 
     override fun valuesDirs(directories: Iterable<Any>) {
@@ -594,7 +573,7 @@ private open class DefaultHelmCoreRelease
     }
 
 
-    override fun forTargets(targets: Iterable<String>, action: Action<HelmCoreRelease.TargetSpecific>) {
+    override fun forTargets(targets: Iterable<String>, action: Action<HelmRelease.TargetSpecific>) {
         for (target in targets) {
             targetSpecificActions.merge(target, action) { action1, action2 -> action1.andThen(action2) }
         }
@@ -607,14 +586,11 @@ private open class DefaultHelmCoreRelease
         }
 
 
-
     private fun doResolveForTarget(target: HelmReleaseTarget): HelmReleaseProperties {
-
-        val logger = LoggerFactory.getLogger(DefaultHelmCoreRelease::class.java)
 
         logger.info("Constructing target-specific release \"{}\" for target \"{}\"", this.name, target.name)
 
-        return TargetSpecific(project.objects, name, project, target).also { targetSpecific ->
+        return objects.newInstance(TargetSpecific::class.java, name, project, target).also { targetSpecific ->
 
             // Call setFrom(HelmInstallFromRepositoryOptions) to assign all the options properties that only exist
             // on HelmRelease, but not on HelmReleaseTarget
@@ -667,34 +643,15 @@ private open class DefaultHelmCoreRelease
     }
 
 
-    private class TargetSpecific(
-        objects: ObjectFactory,
+    @NonExtensible
+    protected abstract class TargetSpecific
+    @Inject constructor(
         name: String,
         project: Project,
         override val target: HelmReleaseTarget
-    ) : AbstractHelmRelease(objects, name, project), HelmCoreRelease.TargetSpecific
+    ) : AbstractHelmRelease(name, project), HelmRelease.TargetSpecific
 }
 
-
-/**
- * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
- *
- * This interface also exposes [ExtensionAware], so that build scripts can access the `ext` (Groovy) / `extra`
- * (Kotlin) properties of the release.
- */
-interface HelmRelease : Named, HelmCoreRelease, ExtensionAware
-
-
-/**
- * Decorator around [HelmCoreRelease] and [HelmReleaseInternal] to expose the [ExtensionAware]ness of the
- * domain object to the build script.
- */
-private class HelmReleaseDecorator(
-    private val delegate: HelmCoreRelease
-) : HelmRelease,
-    HelmCoreRelease by delegate,
-    HelmReleaseInternal by delegate as HelmReleaseInternal,
-    ExtensionAware by delegate as ExtensionAware
 
 
 /**
@@ -705,6 +662,5 @@ private class HelmReleaseDecorator(
  */
 internal fun Project.helmReleaseContainer(): NamedDomainObjectContainer<HelmRelease> =
     container(HelmRelease::class.java) { name ->
-        val delegate = objects.newInstance(DefaultHelmCoreRelease::class.java, name, this)
-        HelmReleaseDecorator(delegate)
+        objects.newInstance(DefaultHelmRelease::class.java, name, this)
     }

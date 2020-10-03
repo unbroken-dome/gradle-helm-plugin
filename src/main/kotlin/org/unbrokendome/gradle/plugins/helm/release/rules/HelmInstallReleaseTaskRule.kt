@@ -6,7 +6,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
-import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmCoreRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.rules.RuleNamePattern
 
@@ -18,7 +17,7 @@ private val namePattern =
 /**
  * The name of the [HelmInstallOrUpgrade] task associated with this release.
  */
-val HelmCoreRelease.installTaskName: String
+val HelmRelease.installTaskName: String
     get() = namePattern.mapName(name)
 
 

@@ -1,10 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.release.dsl
 
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
 import java.time.Duration
 
@@ -47,23 +45,6 @@ interface ConfigurableHelmReleaseTestOptions : HelmReleaseTestOptions {
     override val showLogs: Property<Boolean>
 
     override val timeout: Property<Duration>
-}
-
-
-internal class DefaultHelmReleaseTestOptions(
-    objects: ObjectFactory
-) : ConfigurableHelmReleaseTestOptions {
-
-    override val enabled: Property<Boolean> =
-        objects.property()
-
-
-    override val showLogs: Property<Boolean> =
-        objects.property()
-
-
-    override val timeout: Property<Duration> =
-        objects.property()
 }
 
 
