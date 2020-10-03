@@ -1,14 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.testutil.exec
 
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
-import org.json.JSONObject
 import org.unbrokendome.gradle.plugins.helm.testutil.startsWith
 import java.io.File
 import java.io.PrintWriter
-import java.io.StringWriter
 
 
 /**
@@ -43,19 +37,6 @@ interface ExecutableGradleExecMock : GradleExecMock, AutoCloseable {
 
 class DefaultExecutableGradleExecMock : ExecutableGradleExecMock {
 
-    private companion object {
-
-        fun shellScript(portNumber: Int) = """
-        |#!/bin/bash 
-        |PAYLOAD="{\
-        |\"executable\":\"$0\",\
-        |\"args\":[$(for arg in "$@"; do echo "\"$(echo ${'$'}arg | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')\""; done | paste -sd ',' -)],\
-        |\"env\":{$(env | awk -F '=' '{print "\"" $1 "\":\"" $2 "\""}' | paste -sd',' -)}}"
-        |
-        |exec curl -fqs http://localhost:${portNumber} --data-ascii "${'$'}PAYLOAD"
-        """.trimMargin()
-    }
-
     private class Behavior(
         val argsPrefix: List<String>,
         val block: GradleExecBehaviorBuilder.() -> Unit
@@ -63,48 +44,32 @@ class DefaultExecutableGradleExecMock : ExecutableGradleExecMock {
 
     private val behaviors = mutableListOf<Behavior>()
     private val allInvocations = mutableListOf<Invocation>()
+    private var registration: ExecMockServer.MockRegistration? = null
 
-    private val dispatcher = object : Dispatcher() {
-        override fun dispatch(request: RecordedRequest): MockResponse {
-            val response = MockResponse()
-            try {
-                val input = request.body.readString(Charsets.UTF_8)
-                val body = JSONObject(input)
-                val invocation = DefaultInvocation(
-                    executable = body.getString("executable"),
-                    args = body.getJSONArray("args").toList().map { it.toString() },
-                    environment = body.getJSONObject("env").toMap().mapValues { (_, v) -> v.toString() }
-                )
-                allInvocations.add(invocation)
 
-                val execBehaviorBuilder = DefaultGradleExecBehaviorBuilder()
+    private val callback = object : ExecMockServer.Callback {
 
-                for (behavior in behaviors) {
-                    if (invocation.args.startsWith(behavior.argsPrefix)) {
-                        behavior.block(execBehaviorBuilder)
-                        break
-                    }
+        override fun invocation(invocation: Invocation, stdoutWriter: PrintWriter) {
+            allInvocations.add(invocation)
+
+            val behaviorBuilder = object : GradleExecBehaviorBuilder {
+                override fun printsOnStdout(block: (PrintWriter) -> Unit) {
+                    block(stdoutWriter)
                 }
-
-                with(response) {
-                    setResponseCode(200)
-                    setHeader("Content-Type", "text/plain")
-                    setBody(execBehaviorBuilder.stdout)
-                }
-            } catch (e: Exception) {
-                response.setResponseCode(500)
-                response.setBody(e.toString())
             }
-            return response
+
+            for (behavior in behaviors) {
+                if (invocation.args.startsWith(behavior.argsPrefix)) {
+                    behavior.block(behaviorBuilder)
+                    break
+                }
+            }
         }
     }
 
-    private val mockServer = MockWebServer()
-
 
     override fun start() {
-        mockServer.dispatcher = dispatcher
-        mockServer.start()
+        registration = execMockServer.registerMock(callback)
     }
 
 
@@ -115,14 +80,18 @@ class DefaultExecutableGradleExecMock : ExecutableGradleExecMock {
 
 
     override fun createScriptFile(scriptLocation: File) {
+        val reg = checkNotNull(registration) { "ExecMock must be started before the script file is available." }
+
         scriptLocation.parentFile.mkdirs()
-        scriptLocation.writeText(shellScript(mockServer.port))
+        scriptLocation.writeText(reg.getShellScript())
         scriptLocation.setExecutable(true)
     }
 
 
     override fun close() {
-        mockServer.close()
+        val reg = registration
+        registration = null
+        reg?.unregister()
     }
 
 
@@ -177,22 +146,4 @@ class DefaultExecutableGradleExecMock : ExecutableGradleExecMock {
 
     private fun formatInvocations(invocations: List<Invocation>) =
         invocations.joinToString(separator = "\n") { "    - ${it.args}"}
-}
-
-
-
-private class DefaultGradleExecBehaviorBuilder : GradleExecBehaviorBuilder {
-
-    private val stdoutWriter = StringWriter()
-
-
-    override fun printsOnStdout(block: (PrintWriter) -> Unit) {
-        PrintWriter(stdoutWriter, true).use { pw ->
-            block(pw)
-        }
-    }
-
-
-    val stdout: String
-        get() = stdoutWriter.toString()
 }
