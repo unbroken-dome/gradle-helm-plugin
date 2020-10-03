@@ -1,6 +1,5 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -8,7 +7,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
 
 
@@ -129,30 +127,6 @@ internal fun ConfigurableHelmInstallationOptions.setFrom(source: HelmInstallatio
     wait.set(source.wait)
     version.set(source.version)
     createNamespace.set(source.createNamespace)
-}
-
-
-internal data class HelmInstallationOptionsHolder(
-    private val serverOperationOptions: ConfigurableHelmServerOperationOptions,
-    override val atomic: Property<Boolean>,
-    override val devel: Property<Boolean>,
-    override val verify: Property<Boolean>,
-    override val wait: Property<Boolean>,
-    override val version: Property<String>,
-    override val createNamespace: Property<Boolean>
-) : ConfigurableHelmInstallationOptions,
-    ConfigurableHelmServerOperationOptions by serverOperationOptions {
-
-    constructor(objects: ObjectFactory)
-    : this(
-        serverOperationOptions = HelmServerOperationOptionsHolder(objects),
-        atomic = objects.property(),
-        devel = objects.property(),
-        verify = objects.property(),
-        wait = objects.property(),
-        version = objects.property(),
-        createNamespace = objects.property()
-    )
 }
 
 

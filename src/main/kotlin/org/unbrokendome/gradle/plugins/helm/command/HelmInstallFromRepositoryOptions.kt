@@ -2,14 +2,12 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
 import java.net.URI
 
 
@@ -95,30 +93,6 @@ internal fun ConfigurableHelmInstallFromRepositoryOptions.setFrom(source: HelmIn
     caFile.set(source.caFile)
     certFile.set(source.certFile)
     keyFile.set(source.keyFile)
-}
-
-
-internal data class HelmInstallFromRepositoryOptionsHolder(
-    private val installationOptions: ConfigurableHelmInstallationOptions,
-    override val repository: Property<URI>,
-    override val username: Property<String>,
-    override val password: Property<String>,
-    override val caFile: RegularFileProperty,
-    override val certFile: RegularFileProperty,
-    override val keyFile: RegularFileProperty
-) : ConfigurableHelmInstallFromRepositoryOptions,
-    ConfigurableHelmInstallationOptions by installationOptions {
-
-    constructor(objects: ObjectFactory)
-    : this(
-        installationOptions = HelmInstallationOptionsHolder(objects),
-        repository = objects.property(),
-        username = objects.property(),
-        password = objects.property(),
-        caFile = objects.fileProperty(),
-        certFile = objects.fileProperty(),
-        keyFile = objects.fileProperty()
-    )
 }
 
 

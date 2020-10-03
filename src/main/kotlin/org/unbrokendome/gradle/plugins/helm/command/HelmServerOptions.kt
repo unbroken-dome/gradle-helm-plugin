@@ -2,7 +2,6 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -11,7 +10,6 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
 
 
@@ -82,21 +80,6 @@ internal fun ConfigurableHelmServerOptions.setFrom(source: HelmServerOptions) = 
     kubeConfig.set(source.kubeConfig)
     kubeContext.set(source.kubeContext)
     namespace.set(source.namespace)
-}
-
-
-internal data class HelmServerOptionsHolder(
-    override val kubeContext: Property<String>,
-    override val kubeConfig: RegularFileProperty,
-    override val namespace: Property<String>
-) : ConfigurableHelmServerOptions {
-
-    constructor(objects: ObjectFactory)
-    : this(
-        kubeContext = objects.property(),
-        kubeConfig = objects.fileProperty(),
-        namespace = objects.property()
-    )
 }
 
 
