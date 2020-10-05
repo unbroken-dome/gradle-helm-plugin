@@ -14,10 +14,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.putFrom
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
 import org.unbrokendome.gradle.plugins.helm.util.expand
 import org.unbrokendome.gradle.plugins.helm.util.filterYaml
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
 
 
@@ -35,7 +33,8 @@ private val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirem
  * - copy the chart source files into an intermediate directory that has the same name as
  *   the chart, as is required by the `helm package` command.
  */
-open class HelmFilterSources : DefaultTask() {
+@Suppress("LeakingThis")
+abstract class HelmFilterSources : DefaultTask() {
 
     init {
         group = HELM_GROUP
@@ -46,40 +45,35 @@ open class HelmFilterSources : DefaultTask() {
      * The name of the chart within the `helm.charts` DSL container.
      */
     @get:[Input Optional]
-    val configuredChartName: Property<String> =
-        project.objects.property()
+    abstract val configuredChartName: Property<String>
 
 
     /**
      * The chart name.
      */
     @get:Input
-    val chartName: Property<String> =
-        project.objects.property()
+    abstract val chartName: Property<String>
 
 
     /**
      * The chart version.
      */
     @get:Input
-    val chartVersion: Property<String> =
-        project.objects.property()
+    abstract val chartVersion: Property<String>
 
 
     /**
      * The directory that contains the chart sources.
      */
     @get:InputDirectory
-    val sourceDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    abstract val sourceDir: DirectoryProperty
 
 
     /**
      * The target directory, where the task will place the filtered sources.
      */
     @get:OutputDirectory
-    val targetDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    abstract val targetDir: DirectoryProperty
 
 
     /**
@@ -87,24 +81,25 @@ open class HelmFilterSources : DefaultTask() {
      * with the actual values of [chartName] and [chartVersion], respectively.
      */
     @get:Input
-    val overrideChartInfo: Property<Boolean> =
-        project.objects.property<Boolean>()
-            .convention(true)
+    abstract val overrideChartInfo: Property<Boolean>
 
 
     /**
      * Settings that control filtering of the chart sources.
      */
     @get:Nested
-    val filtering: Filtering = project.objects.createFiltering()
-        .apply {
-            values.putFrom("chartName", chartName)
-            values.putFrom("chartVersion", chartVersion)
-            values.putFrom("projectVersion", project.versionProvider)
-        }
+    abstract val filtering: Filtering
 
 
     init {
+        overrideChartInfo.convention(true)
+
+        with(filtering.values) {
+            putFrom("chartName", chartName)
+            putFrom("chartVersion", chartVersion)
+            putFrom("projectVersion", project.versionProvider)
+        }
+
         val fileValues = filtering.fileValues
         inputs.files(
             fileValues.keySet().map { keys ->

@@ -1,23 +1,21 @@
 package org.unbrokendome.gradle.plugins.helm.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 
-open class HelmCollectChartDependencies : DefaultTask() {
+abstract class HelmCollectChartDependencies : DefaultTask() {
 
     @get:InputFiles
-    var dependencies: FileCollection =
-        project.layout.files()
+    abstract val dependencies: ConfigurableFileCollection
 
 
     @get:OutputDirectory
-    val outputDir: DirectoryProperty =
-        project.objects.directoryProperty()
+    abstract val outputDir: DirectoryProperty
 
 
     @TaskAction

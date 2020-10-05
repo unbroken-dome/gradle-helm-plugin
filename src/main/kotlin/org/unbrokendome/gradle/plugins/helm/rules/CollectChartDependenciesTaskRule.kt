@@ -24,7 +24,9 @@ internal class CollectChartDependenciesTaskRule(
 ) {
 
     override fun HelmCollectChartDependencies.configureFrom(chart: HelmChart) {
-        dependencies = project.configurations.getByName(chartDependenciesConfigurationName(chart.name))
+        dependencies.from(
+            project.configurations.getByName(chartDependenciesConfigurationName(chart.name))
+        )
         outputDir.set(
             (chart as HelmChartInternal).dependenciesDir
         )
