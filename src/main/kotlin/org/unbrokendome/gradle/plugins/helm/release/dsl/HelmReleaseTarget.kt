@@ -5,6 +5,7 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
@@ -12,6 +13,7 @@ import org.gradle.api.tasks.Nested
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallationOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.release.tags.TagExpression
+import org.unbrokendome.gradle.plugins.helm.util.GradleCompatibility
 import javax.inject.Inject
 
 
@@ -100,7 +102,8 @@ internal interface HelmReleaseTargetInternal : HelmReleaseTarget {
 private abstract class DefaultHelmReleaseTarget
 @Inject constructor(
     private val name: String,
-    private val globalSelectTagsExpression: TagExpression
+    private val globalSelectTagsExpression: TagExpression,
+    objects: ObjectFactory
 ) : HelmReleaseTarget, HelmReleaseTargetInternal {
 
     private var localSelectTagsExpression: TagExpression =
@@ -120,6 +123,11 @@ private abstract class DefaultHelmReleaseTarget
 
     final override val selectTagsExpression: TagExpression
         get() = localSelectTagsExpression and globalSelectTagsExpression
+
+
+    @GradleCompatibility("< 5.6", reason = "managed nested property")
+    final override val test: ConfigurableHelmReleaseTestOptions =
+        objects.newInstance(ConfigurableHelmReleaseTestOptions::class.java)
 }
 
 

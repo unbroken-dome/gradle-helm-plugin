@@ -14,6 +14,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.putFrom
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
+import org.unbrokendome.gradle.plugins.helm.util.GradleCompatibility
 import org.unbrokendome.gradle.plugins.helm.util.expand
 import org.unbrokendome.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.plugins.helm.util.versionProvider
@@ -88,7 +90,9 @@ abstract class HelmFilterSources : DefaultTask() {
      * Settings that control filtering of the chart sources.
      */
     @get:Nested
-    abstract val filtering: Filtering
+    @GradleCompatibility("< 5.6", reason = "managed nested property")
+    val filtering: Filtering =
+        project.objects.createFiltering()
 
 
     init {

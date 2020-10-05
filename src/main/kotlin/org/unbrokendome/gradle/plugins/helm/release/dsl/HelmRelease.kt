@@ -25,6 +25,7 @@ import org.unbrokendome.gradle.plugins.helm.command.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.withDefaults
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
+import org.unbrokendome.gradle.plugins.helm.util.GradleCompatibility
 import org.unbrokendome.gradle.plugins.helm.util.andThen
 import org.unbrokendome.gradle.plugins.helm.util.asFile
 import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
@@ -517,6 +518,11 @@ private abstract class AbstractHelmRelease(
 
 
     final override val mustUninstallAfter: MutableSet<String> = mutableSetOf()
+
+
+    @GradleCompatibility("< 5.6", reason = "managed nested property")
+    final override val test: ConfigurableHelmReleaseTestOptions =
+        project.objects.newInstance(ConfigurableHelmReleaseTestOptions::class.java)
 }
 
 
