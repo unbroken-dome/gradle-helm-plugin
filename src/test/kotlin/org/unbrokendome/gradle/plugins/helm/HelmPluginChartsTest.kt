@@ -5,10 +5,13 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.each
 import assertk.assertions.extracting
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import org.gradle.api.Task
+import org.gradle.kotlin.dsl.lint
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
@@ -29,8 +32,11 @@ import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.dirValue
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.doesNotContainItem
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasOnlyTaskDependency
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasTaskDependencies
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasValueEqualTo
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
+import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresentAndEmptyMap
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.taskDependencies
 import org.unbrokendome.gradle.plugins.helm.testutil.directory
 
@@ -182,17 +188,6 @@ object HelmPluginChartsTest : Spek({
             }
 
 
-            it("should create a HelmLint task for each chart") {
-
-                assertThat(project, name = "project")
-                    .containsTask<HelmLint>("helmLintMyChartChart")
-                    .all {
-                        prop(HelmLint::chartDir).dirValue()
-                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
-                    }
-            }
-
-
             it("should create a HelmPackage task for each chart") {
 
                 assertThat(project, name = "project")
@@ -203,6 +198,91 @@ object HelmPluginChartsTest : Spek({
                         prop(HelmPackage::sourceDir).dirValue()
                             .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
                     }
+            }
+        }
+
+
+        describe("linting tasks") {
+
+            describe("without any linting configurations") {
+
+                it("should have a default linting configuration for the chart") {
+
+                    val chart = project.helm.charts.getByName("myChart")
+
+                    assertThat(chart, name = "chart")
+                        .prop("lint") { it.lint }
+                        .prop("configurations") { it.configurations }.all {
+                            containsItem("default")
+                            hasSize(1)
+                        }
+                }
+
+
+                it("should create a HelmLint task for the chart and default lint configuration") {
+                    assertThat(project, name = "project")
+                        .containsTask<HelmLint>("helmLintMyChartChartDefault")
+                        .all {
+                            prop(HelmLint::chartDir).dirValue()
+                                .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                            prop(HelmLint::values).isPresentAndEmptyMap()
+                            prop(HelmLint::fileValues).isPresentAndEmptyMap()
+                            prop(HelmLint::valueFiles).isEmpty()
+                        }
+                }
+
+
+                it("should create a HelmLint task for the chart") {
+
+                    assertThat(project, name = "project")
+                        .containsTask<Task>("helmLintMyChartChart")
+                        .hasOnlyTaskDependency("helmLintMyChartChartDefault")
+                }
+            }
+
+
+            describe("with custom linting configurations") {
+
+                beforeEachTest {
+                    val chart = project.helm.charts.getByName("myChart")
+                    with(chart.lint) {
+                        configurations.register("config1")
+                        configurations.register("config2")
+                    }
+                }
+
+                it("should not have a default linting configuration for the chart") {
+
+                    val chart = project.helm.charts.getByName("myChart")
+
+                    assertThat(chart, name = "chart")
+                        .prop("lint") { it.lint }
+                        .prop("configurations") { it.configurations }
+                        .doesNotContainItem("default")
+                }
+
+
+                it("should create a HelmLint task for the chart and each lint configuration") {
+                    assertThat(project, name = "project").all {
+                        containsTask<HelmLint>("helmLintMyChartChartConfig1")
+                            .prop(HelmLint::chartDir).dirValue()
+                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                        containsTask<HelmLint>("helmLintMyChartChartConfig2")
+                            .prop(HelmLint::chartDir).dirValue()
+                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                    }
+                }
+
+
+                it("should create a HelmLint task for the chart") {
+
+                    assertThat(project, name = "project")
+                        .containsTask<Task>("helmLintMyChartChart")
+                        .hasTaskDependencies(
+                            "helmLintMyChartChartConfig1", "helmLintMyChartChartConfig2",
+                            exactly = true
+                        )
+                }
             }
         }
     }

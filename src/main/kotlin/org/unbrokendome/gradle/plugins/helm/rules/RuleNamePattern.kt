@@ -148,19 +148,6 @@ internal class RuleNamePattern2(
 
 
     /**
-     * Finds the most likely source names for the given target name.
-     *
-     * @param targetName the target name
-     * @return the [Pair] of source name candidates, or `null` if the given [targetName] does not match the pattern
-     */
-    fun sourceNames(targetName: String): Pair<String, String>? =
-        regex.matchEntire(targetName)?.let { result ->
-            val (varPart1, varPart2) = result.destructured
-            varPart1.decapitalize() to varPart2.decapitalize()
-        }
-
-
-    /**
      * Finds a pair of source objects that would map to the given target name according to this pattern.
      *
      * @param targetName the target name
@@ -199,8 +186,8 @@ internal class RuleNamePattern2(
 
             } else {
                 if (source2Candidate != null) {
-                    // We only found a match for the first item.
-                    // Try to "reverse"-find the second item by looking through all
+                    // We only found a match for the second item.
+                    // Try to "reverse"-find the first item by looking through all
                     val source2Name = source2Candidate.name
                     sourceContainer1.find { mapName(it.name, source2Name) == targetName }
                         ?.let { it to source2Candidate }
@@ -208,7 +195,7 @@ internal class RuleNamePattern2(
                 } else {
                     // We found neither the first nor the second item.
                     // Try to "reverse"-find on both containers
-                    sourceContainer1.cartesianProductWith(sourceContainer2)
+                    sourceContainer1.combineWith(sourceContainer2)
                         .firstOrNull { (source1, source2) ->
                             mapName(source1.name, source2.name) == targetName
                         }
@@ -217,14 +204,74 @@ internal class RuleNamePattern2(
         }
 
 
+    /**
+     * Finds a pair of source objects that would map to the given target name according to this pattern,
+     * where the container for the second type of sources is derived from the first item.
+     *
+     * @param targetName the target name
+     * @param sourceContainer1 a [NamedDomainObjectCollection] containing all known source objects of the first type
+     * @param sourceContainer2Function a function that returns the [NamedDomainObjectCollection] containing the
+     *        source objects of the second type, based on the item of the first type
+     * @param <S1> the first type of source object
+     * @param <S2> the second type of source object
+     * @return a [Pair] containing the matching source objects, or `null` if no match was found
+     */
+    fun <S1 : Named, S2 : Named> findSources(
+        targetName: String,
+        sourceContainer1: NamedDomainObjectCollection<S1>,
+        sourceContainer2Function: (S1) -> NamedDomainObjectCollection<S2>
+    ): Pair<S1, S2>? =
+        regex.matchEntire(targetName)?.let { result ->
+            val (varPart1, varPart2) = result.destructured
+
+            val source1Candidate = sourceContainer1.findByName(varPart1.decapitalize())
+                ?: sourceContainer1.findByName(varPart1)
+
+            if (source1Candidate != null) {
+
+                val sourceContainer2 = sourceContainer2Function(source1Candidate)
+
+                val source2Candidate = sourceContainer2.findByName(varPart2.decapitalize())
+                    ?: sourceContainer2.findByName(varPart2)
+                if (source2Candidate != null) {
+                    // found both items directly, we can return the pair
+                    source1Candidate to source2Candidate
+
+                } else {
+                    // Try to "reverse"-find the second item by looking through all
+                    val source1Name = source1Candidate.name
+                    sourceContainer2.find { mapName(source1Name, it.name) == targetName }
+                        ?.let { source1Candidate to it }
+                }
+
+            } else {
+                // No match for the first candidate. Look through all combinations and check the name
+                sourceContainer1.combineWithInner(sourceContainer2Function)
+                    .firstOrNull { (source1, source2) ->
+                        mapName(source1.name, source2.name) == targetName
+                    }
+            }
+        }
+
+
     override fun toString(): String =
         "$prefix<$firstPlaceholder>$middlePart<$secondPlaceholder>$suffix"
 
 
-    private fun <T, U> Iterable<T>.cartesianProductWith(other: Iterable<U>) =
+    private fun <T, U> Iterable<T>.combineWith(other: Iterable<U>) =
         sequence {
-            for (item1 in this@cartesianProductWith) {
+            for (item1 in this@combineWith) {
                 for (item2 in other) {
+                    yield(item1 to item2)
+                }
+            }
+        }
+
+
+    private fun <T, U> Iterable<T>.combineWithInner(innerFunction: (T) -> Iterable<U>) =
+        sequence {
+            for (item1 in this@combineWithInner) {
+                for (item2 in innerFunction(item1)) {
                     yield(item1 to item2)
                 }
             }

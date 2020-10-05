@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.testutil.assertions
 
 import assertk.Assert
 import assertk.assertions.contains
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
@@ -13,7 +14,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
 
-fun <T : Any?> Assert<Provider<T>>.isPresent() = transform { actual ->
+fun <T : Any?> Assert<Provider<out T>>.isPresent() = transform { actual ->
     actual.orNull ?: expected("${show(actual)} to have a value", actual = actual)
 }
 
@@ -42,3 +43,11 @@ fun Assert<Provider<Directory>>.dirValue() =
 
 fun <K : Any, V : Any> Assert<Provider<Map<K, V>>>.contains(key: K, value: V) =
     isPresent().contains(key, value)
+
+
+fun Assert<Provider<out Iterable<*>>>.isPresentAndEmpty() =
+    isPresent().isEmpty()
+
+
+fun Assert<Provider<out Map<*, *>>>.isPresentAndEmptyMap() =
+    isPresent().isEmpty()

@@ -35,6 +35,7 @@ import org.unbrokendome.gradle.plugins.helm.rules.CollectChartDependenciesTaskRu
 import org.unbrokendome.gradle.plugins.helm.rules.CollectChartSourcesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.FilterChartSourcesTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
+import org.unbrokendome.gradle.plugins.helm.rules.LintWithConfigurationTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.MainChartRule
 import org.unbrokendome.gradle.plugins.helm.rules.PackageTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.UpdateDependenciesTaskRule
@@ -122,7 +123,7 @@ class HelmPlugin
 
         listOf(
             ::FilterChartSourcesTaskRule, ::CollectChartDependenciesTaskRule, ::CollectChartSourcesTaskRule,
-            ::UpdateDependenciesTaskRule, ::LintTaskRule, ::PackageTaskRule
+            ::UpdateDependenciesTaskRule, ::LintTaskRule, ::LintWithConfigurationTaskRule, ::PackageTaskRule
         ).forEach { ruleCreator ->
             tasks.addRule(ruleCreator(tasks, charts))
         }
