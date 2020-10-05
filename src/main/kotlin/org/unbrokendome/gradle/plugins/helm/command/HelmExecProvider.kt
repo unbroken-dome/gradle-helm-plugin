@@ -66,8 +66,8 @@ fun HelmExecProvider.execHelm(
  * @return a [String] containing the captured standard output
  */
 internal fun HelmExecProvider.execHelmCaptureOutput(
-    command: String, subcommand: String? = null, action: HelmExecSpec.() -> Unit
-) = execHelmCaptureOutput(command, subcommand, Action(action))
+    command: String, subcommand: String? = null, action: (HelmExecSpec.() -> Unit)? = null
+) = execHelmCaptureOutput(command, subcommand, action?.let { Action(it) })
 
 
 internal class HelmExecProviderSupport(

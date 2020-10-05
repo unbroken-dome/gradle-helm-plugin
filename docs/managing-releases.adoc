@@ -933,3 +933,55 @@ globally on a per-invocation basis by setting the `helm.test.logs` property:
 ----
 gradle helmTest -Phelm.test.logs=true
 ----
+
+
+== Checking the Status of a Release
+
+For each release/target combination, the `helm-releases` plugin will provide a task named
+`helmStatus<Release>On<Target>` to check the status of the release. Internally, this will map to a call of
+`helm status <release-name>`.
+
+For example, to check the status of the "awesome" release on the "local" target:
+
+[source,bash]
+----
+gradle helmStatusAwesomeOnLocal
+----
+
+In addition, you can also check the status of a release on the active target (as indicated by the `helm.release.target`
+project property) using the `helmStatus<Release>` task:
+
+[source,bash]
+----
+gradle helmStatusAwesome -Phelm.release.target=local
+----
+
+=== Controlling the output file and format
+
+`helm status` offers an `--output` option that allows you to select the desired output format for the status report.
+With the `helm-releases` plugin, this can be achieved by setting the `helm.status.outputFormat` property:
+
+[source,bash]
+----
+gradle helmStatusAwesome -Phelm.status.outputFormat=yaml
+----
+
+You can also output the status report to a file instead of stdout, by setting the `helm.status.outputFile` property:
+
+[source,bash]
+----
+gradle helmStatusAwesome -Phelm.status.outputFile='helm-status.json'
+----
+
+Relative paths are resolved from the project directory of the `HelmStatus` task, which might not be the root directory.
+You can use Groovy GString expansion in the property value to force it to the root directory (but remember to
+properly quote "`$`" characters when calling from a shell):
+
+[source,bash]
+----
+gradle helmStatusAwesome -Phelm.status.outputFile='$rootDir/build/helm-status.json'
+----
+
+TIP: If an output file is used, and the output format is not explicitly set, the correct format is automatically
+guessed based on the file extension. For example, for an output file with the `.json` extension, the output format
+defaults to `json` (instead of `table`, which is Helm's default).
