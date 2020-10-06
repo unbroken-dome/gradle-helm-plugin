@@ -152,7 +152,7 @@ tasks.named("dokka", DokkaTask::class) {
 val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
-    asciidoctorExt("com.bmuschko:asciidoctorj-tabbed-code-extension:0.2")
+    asciidoctorExt("com.bmuschko:asciidoctorj-tabbed-code-extension:0.3")
 }
 
 
