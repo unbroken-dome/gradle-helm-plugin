@@ -8,7 +8,6 @@ import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
-import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.provider.ListProperty
@@ -434,24 +433,23 @@ internal interface HelmReleaseInternal {
 
 
 private abstract class AbstractHelmRelease(
-    objects: ObjectFactory,
     private val name: String,
     protected val project: Project
 ) : Named, HelmReleaseProperties,
-    ConfigurableHelmInstallFromRepositoryOptions by HelmInstallFromRepositoryOptionsHolder(objects),
-    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
+    ConfigurableHelmInstallFromRepositoryOptions by HelmInstallFromRepositoryOptionsHolder(project.objects),
+    ConfigurableHelmValueOptions by HelmValueOptionsHolder(project.objects, project.layout) {
 
     override fun getName(): String =
         name
 
 
     final override val releaseName: Property<String> =
-        objects.property<String>()
+        project.objects.property<String>()
             .convention(name)
 
 
     final override val chart: Property<ChartReference> =
-        objects.property()
+        project.objects.property()
 
 
     final override fun from(notation: Any) {
@@ -497,18 +495,18 @@ private abstract class AbstractHelmRelease(
 
 
     final override val replace: Property<Boolean> =
-        objects.property<Boolean>()
+        project.objects.property<Boolean>()
             .convention(false)
 
 
     final override val keepHistoryOnUninstall: Property<Boolean> =
-        objects.property<Boolean>()
+        project.objects.property<Boolean>()
             .convention(false)
 
 
     @Suppress("OverridingDeprecatedMember")
     final override val dependsOn: SetProperty<String> =
-        objects.setProperty()
+        project.objects.setProperty()
 
 
     final override val installDependsOn: MutableSet<Any> = mutableSetOf()
@@ -521,10 +519,9 @@ private abstract class AbstractHelmRelease(
 
 private open class DefaultHelmRelease
 @Inject constructor(
-    objects: ObjectFactory,
     name: String,
     project: Project
-) : AbstractHelmRelease(objects, name, project), HelmRelease, HelmReleaseInternal {
+) : AbstractHelmRelease(name, project), HelmRelease, HelmReleaseInternal {
 
     private val targetSpecificActions = mutableMapOf<String, Action<HelmRelease.TargetSpecific>>()
     private val targetSpecificCache: MutableMap<String, HelmReleaseProperties> = ConcurrentHashMap()
@@ -534,7 +531,7 @@ private open class DefaultHelmRelease
 
 
     override val valuesDirs: ListProperty<File> =
-        objects.listProperty()
+        project.objects.listProperty()
 
 
     override fun valuesDirs(directories: Iterable<Any>) {
@@ -592,7 +589,7 @@ private open class DefaultHelmRelease
 
         logger.info("Constructing target-specific release \"{}\" for target \"{}\"", this.name, target.name)
 
-        return TargetSpecific(project.objects, name, project, target).also { targetSpecific ->
+        return TargetSpecific(name, project, target).also { targetSpecific ->
 
             // Call setFrom(HelmInstallFromRepositoryOptions) to assign all the options properties that only exist
             // on HelmRelease, but not on HelmReleaseTarget
@@ -646,11 +643,10 @@ private open class DefaultHelmRelease
 
 
     private class TargetSpecific(
-        objects: ObjectFactory,
         name: String,
         project: Project,
         override val target: HelmReleaseTarget
-    ) : AbstractHelmRelease(objects, name, project), HelmRelease.TargetSpecific
+    ) : AbstractHelmRelease(name, project), HelmRelease.TargetSpecific
 }
 
 
