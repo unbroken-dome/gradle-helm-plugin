@@ -24,7 +24,7 @@ NOTE: Starting with version 1.0.0, the plugins require Helm 3.+.
 
 == Requirements
 
-* Gradle 5.1 or higher
+* Gradle 5.2 or higher
 * JDK 1.8 or higher (for running Gradle)
 * Helm command-line client 3.+
 
@@ -37,7 +37,7 @@ Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
 [source,groovy]
 ----
 plugins {
-  id 'org.unbroken-dome.helm' version '1.2.2'
+  id 'org.unbroken-dome.helm' version '1.2.3'
 }
 ----
 

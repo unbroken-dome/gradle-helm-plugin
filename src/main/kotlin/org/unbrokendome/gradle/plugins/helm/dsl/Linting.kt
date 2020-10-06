@@ -3,8 +3,13 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 import org.gradle.api.Action
 import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.gradle.util.GradleVersion
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.mergeValues
 import javax.inject.Inject
