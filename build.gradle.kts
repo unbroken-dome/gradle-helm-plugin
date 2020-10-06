@@ -1,4 +1,3 @@
-import org.asciidoctor.gradle.AsciidoctorTask
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -9,7 +8,7 @@ plugins {
     id("com.gradle.plugin-publish") version "0.12.0"
     id("org.jetbrains.dokka") version "0.10.1"
     id("maven-publish")
-    id("org.asciidoctor.convert") version "1.5.9.2"
+    id("org.asciidoctor.jvm.convert") version "3.2.0"
 }
 
 
@@ -150,24 +149,32 @@ tasks.named("dokka", DokkaTask::class) {
 }
 
 
-asciidoctorj {
-    version = "1.6.0"
-}
+val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
-    "asciidoctor"("com.bmuschko:asciidoctorj-tabbed-code-extension:0.2")
+    asciidoctorExt("com.bmuschko:asciidoctorj-tabbed-code-extension:0.2")
 }
 
 
-tasks.named("asciidoctor", AsciidoctorTask::class) {
-    sourceDir("docs")
-    sources(delegateClosureOf<PatternSet> { include("index.adoc") })
+tasks.named("asciidoctor", org.asciidoctor.gradle.jvm.AsciidoctorTask::class) {
 
-    options(mapOf(
+    sourceDir("docs")
+    baseDirFollowsSourceDir()
+    sources {
+        include("index.adoc")
+    }
+
+    configurations(asciidoctorExt.name)
+
+    options(
+        mapOf(
             "doctype" to "book"
-    ))
-    attributes(mapOf(
+        )
+    )
+    attributes(
+        mapOf(
             "project-version" to project.version,
             "source-highlighter" to "prettify"
-    ))
+        )
+    )
 }
