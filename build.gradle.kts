@@ -1,14 +1,13 @@
 import org.asciidoctor.gradle.AsciidoctorTask
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.net.URL
 
 
 plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish") version "0.12.0"
-    id("org.jetbrains.dokka") version "1.4.0"
+    id("org.jetbrains.dokka") version "0.10.1"
     id("maven-publish")
     id("org.asciidoctor.convert") version "1.5.9.2"
 }
@@ -129,12 +128,24 @@ pluginBundle {
 }
 
 
-tasks.named("dokkaHtml", DokkaTask::class) {
-    dokkaSourceSets.named("main") {
+tasks.named("dokka", DokkaTask::class) {
+    outputFormat = "html"
+    configuration {
         externalDocumentationLink {
-            url.set(URL("https://docs.gradle.org/current/javadoc/"))
+            url = uri("https://docs.oracle.com/javase/8/docs/api/").toURL()
         }
-        reportUndocumented.set(true)
+        externalDocumentationLink {
+            url = uri("https://docs.gradle.org/current/javadoc/").toURL()
+        }
+        externalDocumentationLink {
+            url = uri("https://docs.groovy-lang.org/latest/html/groovy-jdk/").toURL()
+        }
+        reportUndocumented = false
+        sourceLink {
+            path = "src/main/kotlin"
+            url = "https://github.com/unbroken-dome/gradle-helm-plugin/blob/v${project.version}/src/main/kotlin"
+            lineSuffix = "#L"
+        }
     }
 }
 

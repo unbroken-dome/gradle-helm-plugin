@@ -4,6 +4,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.unbrokendome.gradle.plugins.helm.command.HelmServerOperationOptions
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
 import java.time.Duration
@@ -28,7 +29,7 @@ interface HelmReleaseTestOptions {
 
     /**
      * The timeout to use when testing this release using `helm test`. If not set, defaults to the
-     * same value as [HelmRelease.remoteTimeout].
+     * same value as [remoteTimeout][HelmServerOperationOptions.remoteTimeout] for the release.
      *
      * Corresponds to the `--timeout` CLI option for the `helm test` command.
      */
