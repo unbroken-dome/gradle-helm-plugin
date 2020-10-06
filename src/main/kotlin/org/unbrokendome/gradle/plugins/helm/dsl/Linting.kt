@@ -2,10 +2,13 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.util.GradleVersion
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import javax.inject.Inject
@@ -70,7 +73,10 @@ private interface LintingInternal : Linting, Hierarchical<Linting>
  * Default implementation of [Linting].
  */
 private open class DefaultLinting
-@Inject constructor(objectFactory: ObjectFactory) : LintingInternal {
+@Inject constructor(
+    objectFactory: ObjectFactory,
+    projectLayout: ProjectLayout
+) : LintingInternal {
 
     final override val enabled: Property<Boolean> =
         objectFactory.property<Boolean>()
@@ -86,7 +92,13 @@ private open class DefaultLinting
         objectFactory.mapProperty()
 
     final override val valueFiles: ConfigurableFileCollection =
-        objectFactory.fileCollection()
+        if (GradleVersion.current() >= GRADLE_VERSION_5_3) {
+            objectFactory.fileCollection()
+        } else {
+            @Suppress("DEPRECATION")
+            projectLayout.configurableFiles()
+        }
+
 
     final override fun setParent(parent: Linting) {
         enabled.set(parent.enabled)

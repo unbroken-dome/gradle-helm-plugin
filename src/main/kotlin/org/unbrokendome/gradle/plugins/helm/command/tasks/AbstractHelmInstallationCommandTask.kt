@@ -12,12 +12,14 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
 import java.io.File
@@ -206,7 +208,12 @@ abstract class AbstractHelmInstallationCommandTask :
      */
     @get:InputFiles
     final override val valueFiles: ConfigurableFileCollection =
-        project.objects.fileCollection()
+        if (GradleVersion.current() >= GRADLE_VERSION_5_3) {
+            project.objects.fileCollection()
+        } else {
+            @Suppress("DEPRECATION")
+            project.layout.configurableFiles()
+        }
 
 
     /**

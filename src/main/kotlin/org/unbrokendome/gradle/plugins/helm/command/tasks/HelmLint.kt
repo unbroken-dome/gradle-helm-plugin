@@ -15,9 +15,11 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.util.GFileUtils
+import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
 import org.unbrokendome.gradle.plugins.helm.util.ifPresent
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import org.unbrokendome.gradle.plugins.helm.util.property
@@ -81,7 +83,12 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
      */
     @get:InputFiles
     final override val valueFiles: ConfigurableFileCollection =
-        project.objects.fileCollection()
+        if (GradleVersion.current() >= GRADLE_VERSION_5_3) {
+            project.objects.fileCollection()
+        } else {
+            @Suppress("DEPRECATION")
+            project.layout.configurableFiles()
+        }
 
 
     /**
