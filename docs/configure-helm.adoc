@@ -21,7 +21,7 @@ The following properties can be set on the `helm` extension in the Gradle build 
 | Property | Description | `helm` CLI option
 
 | `executable`
-| Path to the `helm` executable. The `PATH` environment variable is taken into account, so this can just be `helm`
+| Path to the `helm` executable. The `PATH` environment variable is taken into account, so this can just be `helm`
  (which is the default) if the Helm client is installed in a suitable location.
 |
 
@@ -36,14 +36,14 @@ The following properties can be set on the `helm` extension in the Gradle build 
 
 | `kubeContext`
 | Name of the kubeconfig context to use.
-| `--kube-context`
+| `--kube-context`
 
-| `namespace`
+| `namespace`
 | Kubernetes namespace scope.
-| `--namespace`
+| `--namespace`
 
 | `remoteTimeout`
-| Time to wait for any individual Kubernetes operation (like Jobs for hooks).
+| Time to wait for any individual Kubernetes operation (like Jobs for hooks).
 | `--timeout` (on certain commands like `install`, `upgrade` or `uninstall`)
 |===
 
@@ -135,7 +135,7 @@ The following example shows how the download can be configured in the build scri
 helm {
     downloadClient {
         enabled = true
-        version = '3.2.0'
+        version = '3.3.4'
     }
 }
 ----
@@ -146,7 +146,7 @@ helm {
 helm {
     downloadClient {
         enabled.set(true)
-        version.set("3.2.0")
+        version.set("3.3.4")
     }
 }
 ----
@@ -158,7 +158,7 @@ The following example shows how the download can be configured using the gradle.
 .gradle.properties
 ----
 helm.client.download.enabled=true
-helm.client.download.version=3.2.0
+helm.client.download.version=3.3.4
 ----
 
 
@@ -174,17 +174,17 @@ The following properties control the download of the Helm client:
 | `false`
 
 | `version`
-| `helm.client.download.version`
+| `helm.client.download.version`
 | The version of the Helm client to be downloaded.
-| The latest version of Helm available at the time the plugin is published (currently `3.2.0`)
+| The latest version of Helm available at the time the plugin is published (currently `3.3.4`)
 
-| `destinationDir`
+| `destinationDir`
 |
 | The base directory where Helm client executables are extracted. By default, this is a directory under
  `(rootDir)/.gradle`, so the client will only be downloaded and extracted once in a multi-module build, and is not
  removed by a `clean` task. You can set this to a different directory (e.g. under the `build` directory) if you
  prefer different behavior.
-| `.gradle/helm/client` under the _root_ project dir
+| `.gradle/helm/client` under the _root_ project dir
 
 |
 | `helm.client.download.baseUrl`
