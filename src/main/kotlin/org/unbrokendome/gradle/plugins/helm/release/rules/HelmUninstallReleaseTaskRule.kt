@@ -6,7 +6,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
-import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmCoreRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.rules.RuleNamePattern
 
@@ -18,7 +17,7 @@ private val namePattern =
 /**
  * The name of the [HelmUninstall] task associated with this release.
  */
-val HelmCoreRelease.uninstallTaskName: String
+val HelmRelease.uninstallTaskName: String
     get() = namePattern.mapName(name)
 
 

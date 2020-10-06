@@ -2,11 +2,7 @@
 
 You need at least the following:
 
-* Gradle 5.1 or higher
-+
-Since the plugin makes extensive use of Gradle's provider/property API, including the new `MapProperty` added
-in Gradle 5.1, earlier versions of Gradle are unfortunately not supported.
-
+* Gradle 5.2 or higher
 * JDK 8 or higher (for running Gradle)
 
 * Helm CLI (3.+)

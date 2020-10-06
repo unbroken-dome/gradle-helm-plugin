@@ -4,11 +4,14 @@ import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
+import org.gradle.util.GradleVersion
 import org.slf4j.LoggerFactory
+import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
 import org.unbrokendome.gradle.plugins.helm.util.mapProperty
 import java.util.concurrent.Callable
 
@@ -72,11 +75,15 @@ internal data class HelmValueOptionsHolder(
     override val valueFiles: ConfigurableFileCollection
 ) : ConfigurableHelmValueOptions {
 
-    constructor(objects: ObjectFactory)
-            : this(
+    constructor(objects: ObjectFactory, layout: ProjectLayout) : this(
         values = objects.mapProperty(),
         fileValues = objects.mapProperty(),
-        valueFiles = objects.fileCollection()
+        valueFiles = if (GradleVersion.current() >= GRADLE_VERSION_5_3) {
+            objects.fileCollection()
+        } else {
+            @Suppress("DEPRECATION")
+            layout.configurableFiles()
+        }
     )
 }
 
@@ -120,16 +127,16 @@ internal object HelmValueOptionsApplier : HelmOptionsApplier {
 
     private fun buildFileValuesArg(options: HelmValueOptions): String =
         options.fileValues.getOrElse(emptyMap())
-                .entries
-                .joinToString(separator = ",") { (key, value) ->
-                    val valueRepresentation = when (val resolvedValue = resolveValue(value)) {
-                        is FileCollection -> resolvedValue.singleFile
-                        is TextResource -> resolvedValue.asFile()
-                        else -> resolvedValue
-                    }
-
-                    "$key=$valueRepresentation"
+            .entries
+            .joinToString(separator = ",") { (key, value) ->
+                val valueRepresentation = when (val resolvedValue = resolveValue(value)) {
+                    is FileCollection -> resolvedValue.singleFile
+                    is TextResource -> resolvedValue.asFile()
+                    else -> resolvedValue
                 }
+
+                "$key=$valueRepresentation"
+            }
 
     private fun resolveValue(value: Any?): Any? =
         when (value) {
