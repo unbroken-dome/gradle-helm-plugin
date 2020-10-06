@@ -10,6 +10,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -275,7 +276,7 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
  *
  * Provides methods for target-specific configuration of the release.
  */
-interface HelmCoreRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFromRepositoryOptions {
+interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFromRepositoryOptions, ExtensionAware {
 
     /**
      * Tags for this release.
@@ -408,7 +409,7 @@ interface HelmCoreRelease : Named, HelmReleaseProperties, ConfigurableHelmInstal
 
 
     /**
-     * Used to configure a [HelmCoreRelease] for a specific release target.
+     * Used to configure a [HelmRelease] for a specific release target.
      */
     interface TargetSpecific : HelmReleaseProperties {
 
@@ -518,14 +519,14 @@ private abstract class AbstractHelmRelease(
 }
 
 
-private open class DefaultHelmCoreRelease
+private open class DefaultHelmRelease
 @Inject constructor(
     objects: ObjectFactory,
     name: String,
     project: Project
-) : AbstractHelmRelease(objects, name, project), HelmCoreRelease, HelmReleaseInternal {
+) : AbstractHelmRelease(objects, name, project), HelmRelease, HelmReleaseInternal {
 
-    private val targetSpecificActions = mutableMapOf<String, Action<HelmCoreRelease.TargetSpecific>>()
+    private val targetSpecificActions = mutableMapOf<String, Action<HelmRelease.TargetSpecific>>()
     private val targetSpecificCache: MutableMap<String, HelmReleaseProperties> = ConcurrentHashMap()
 
 
@@ -571,7 +572,7 @@ private open class DefaultHelmCoreRelease
     }
 
 
-    override fun forTargets(targets: Iterable<String>, action: Action<HelmCoreRelease.TargetSpecific>) {
+    override fun forTargets(targets: Iterable<String>, action: Action<HelmRelease.TargetSpecific>) {
         for (target in targets) {
             targetSpecificActions.merge(target, action) { action1, action2 -> action1.andThen(action2) }
         }
@@ -587,7 +588,7 @@ private open class DefaultHelmCoreRelease
 
     private fun doResolveForTarget(target: HelmReleaseTarget): HelmReleaseProperties {
 
-        val logger = LoggerFactory.getLogger(DefaultHelmCoreRelease::class.java)
+        val logger = LoggerFactory.getLogger(DefaultHelmRelease::class.java)
 
         logger.info("Constructing target-specific release \"{}\" for target \"{}\"", this.name, target.name)
 
@@ -638,34 +639,19 @@ private open class DefaultHelmCoreRelease
     }
 
 
+    override fun getExtensions(): ExtensionContainer {
+        // this will be overridden by the Gradle class generator
+        throw UnsupportedOperationException()
+    }
+
+
     private class TargetSpecific(
         objects: ObjectFactory,
         name: String,
         project: Project,
         override val target: HelmReleaseTarget
-    ) : AbstractHelmRelease(objects, name, project), HelmCoreRelease.TargetSpecific
+    ) : AbstractHelmRelease(objects, name, project), HelmRelease.TargetSpecific
 }
-
-
-/**
- * Represents a release to be installed into or uninstalled from a Kubernetes cluster.
- *
- * This interface also exposes [ExtensionAware], so that build scripts can access the `ext` (Groovy) / `extra`
- * (Kotlin) properties of the release.
- */
-interface HelmRelease : Named, HelmCoreRelease, ExtensionAware
-
-
-/**
- * Decorator around [HelmCoreRelease] and [HelmReleaseInternal] to expose the [ExtensionAware]ness of the
- * domain object to the build script.
- */
-private class HelmReleaseDecorator(
-    private val delegate: HelmCoreRelease
-) : HelmRelease,
-    HelmCoreRelease by delegate,
-    HelmReleaseInternal by delegate as HelmReleaseInternal,
-    ExtensionAware by delegate as ExtensionAware
 
 
 /**
@@ -676,6 +662,5 @@ private class HelmReleaseDecorator(
  */
 internal fun Project.helmReleaseContainer(): NamedDomainObjectContainer<HelmRelease> =
     container(HelmRelease::class.java) { name ->
-        val delegate = objects.newInstance(DefaultHelmCoreRelease::class.java, name, this)
-        HelmReleaseDecorator(delegate)
+        objects.newInstance(DefaultHelmRelease::class.java, name, this)
     }
