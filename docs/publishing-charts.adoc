@@ -246,11 +246,50 @@ ChartMuseum server with two levels of depth (where the first-level tenant ID alw
 the second-level tenant ID is the project name).
 
 
+=== Nexus Repositories
+The plugin provides direct support for Nexus repositories. The repository name can be set in the
+repository configuration block, and defaults not using if not set.
+Nexus API version can be specified by property `apiVersion` default `v1` if not set.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            nexus {
+                url = uri('http://nexus.example.com')
+                repository = 'helm-repository'
+                apiVersion = 'v1'
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            nexus {
+                url.set(uri('http://nexus.example.com'))
+                repository.set("helm-repository")
+                apiVersion.set("v1")
+            }
+        }
+    }
+}
+----
+TIP: Nexus API
+https://help.sonatype.com/repomanager3/rest-and-integration-api/components-api#ComponentsAPI-UploadComponent[documentation].
+
 === Custom Repositories
 
 If your target repository is not directly supported but involves some sort of HTTP upload, you can try the `custom`
 type which offers some (limited) possibilities to configure a freestyle upload.
-Use the `uploadMethod` and/or `uploadPath` properties to customize the upload request:
+Use the `uploadMethod`, `multipartForm` and/or `uploadPath` properties to customize the upload request:
 
 [source,groovy,role="primary"]
 .Groovy
@@ -261,6 +300,7 @@ helm {
             custom {
                 url = uri('http://helm-repo.example.com')
                 uploadMethod = 'PUT'
+                multipartForm = true
                 uploadPath = '/charts/{name}/{version}/{filename}'
             }
         }
@@ -277,6 +317,7 @@ helm {
             custom {
                 url.set(uri("http://helm-repo.example.com"))
                 uploadMethod.set("PUT")
+                multipartForm.set(true)
                 uploadPath.set("/charts/{name}/{version}/{filename}")
             }
         }
