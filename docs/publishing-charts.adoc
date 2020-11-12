@@ -5,8 +5,8 @@ The `helm-publish` plugin allows you to publish your charts to remote repositori
 [NOTE]
 ====
 There is currently no "official" API to publish Helm charts; Helm defines only how charts should be
-served from a repository. https://chartmuseum.com/[ChartMuseum] and https://jfrog.com/artifactory/[Artifactory]
-are two widespread Helm repository servers, and both are supported by this plugin.
+served from a repository. The plugin directly supports several types of popular repository servers, including
+https://chartmuseum.com/[ChartMuseum], https://jfrog.com/artifactory/[Artifactory] and https://goharbor.io/[Harbor].
 
 For other repository types that are not directly supported, you could try using the `custom` repository type,
 or consider creating a PR to add support for it.
@@ -120,14 +120,133 @@ helm {
 }
 ----
 
+== Repository Types
+
 The following repository types are supported:
 
 - `artifactory`
 - `chartMuseum`
-- `custom` (see next section)
+- `harbor`
+- `custom`
 
 
-== Custom repositories
+=== ChartMuseum Repositories
+
+For ChartMuseum, simply use the `chartMuseum` repository type and configure the URL:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url = uri('https://chartmuseum.example.com')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url.set(uri("http://chartmuseum.example.com"))
+            }
+        }
+    }
+}
+----
+
+==== ChartMuseum Multitenancy Support
+
+ChartMuseum supports a https://chartmuseum.com/docs/#multitenancy[multitenancy] mode that lets you organize repositories
+into a hierarchy. The depth of the hierarchy is specified in the server configuration, with zero (single-tenant server)
+being the default.
+
+To publish charts to a multitenancy-enabled ChartMuseum server, add one or more tenant identifiers to the `tenantIds`
+list property in the repository configuration block. The number of tenant identifiers should match the depth configured
+on the server.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url = uri('https://chartmuseum.example.com')
+                // For a multitenancy-enabled server with depth 2, use 2 tenant IDs
+                tenantIds.addAll('org1', 'repo2')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url.set(uri("https://chartmuseum.example.com"))
+                // For a multitenancy-enabled server with depth 2, use 2 tenant IDs
+                tenantIds.addAll("org1", "repo2")
+            }
+        }
+    }
+}
+----
+
+
+=== Harbor Repositories
+
+The plugin provides direct support for Harbor repositories. The project name can be set in the
+repository configuration block, and defaults to `library` if not set:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            harbor {
+                url = uri('https://harbor.example.com')
+                projectName.set("my-project")
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            harbor {
+                url.set(uri("https://harbor.example.com"))
+                // For a multitenancy-enabled server with depth 2, use 2 tenant IDs
+                projectName.set("my-project")
+            }
+        }
+    }
+}
+----
+
+TIP: Harbor uses ChartMuseum internally for its chart repositories, and it behaves like a multi-tenant
+ChartMuseum server with two levels of depth (where the first-level tenant ID always seems to be `chartrepo`, and
+the second-level tenant ID is the project name).
+
+
+=== Custom Repositories
 
 If your target repository is not directly supported but involves some sort of HTTP upload, you can try the `custom`
 type which offers some (limited) possibilities to configure a freestyle upload.
@@ -140,7 +259,7 @@ helm {
     publishing {
         repositories {
             custom {
-                url = uri('http://artifactory.example.com/helm-local')
+                url = uri('http://helm-repo.example.com')
                 uploadMethod = 'PUT'
                 uploadPath = '/charts/{name}/{version}/{filename}'
             }

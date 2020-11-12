@@ -39,6 +39,21 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         configuration: Action<ChartMuseumHelmPublishingRepository>
     ): ChartMuseumHelmPublishingRepository =
         chartMuseum("default", configuration)
+
+
+    @JvmDefault
+    fun harbor(
+        name: String,
+        configuration: Action<HarborHelmPublishingRepository>
+    ): HarborHelmPublishingRepository =
+        create(name, HarborHelmPublishingRepository::class.java, configuration)
+
+
+    @JvmDefault
+    fun harbor(
+        configuration: Action<HarborHelmPublishingRepository>
+    ): HarborHelmPublishingRepository =
+        harbor("default", configuration)
 }
 
 
@@ -59,6 +74,10 @@ private open class DefaultHelmPublishingRepositoryContainer
         registerFactory(
             ChartMuseumHelmPublishingRepository::class.java,
             objects::newChartMuseumHelmPublishingRepository
+        )
+        registerFactory(
+            HarborHelmPublishingRepository::class.java,
+            objects::newHarborHelmPublishingRepository
         )
         registerFactory(
             CustomHelmPublishingRepository::class.java,
