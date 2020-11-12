@@ -120,14 +120,92 @@ helm {
 }
 ----
 
+== Repository Types
+
 The following repository types are supported:
 
 - `artifactory`
 - `chartMuseum`
-- `custom` (see next section)
+- `custom`
 
 
-== Custom repositories
+=== ChartMuseum Repositories
+
+For ChartMuseum, simply use the `chartMuseum` repository type and configure the URL:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url = uri('https://chartmuseum.example.com')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url.set(uri("http://chartmuseum.example.com"))
+            }
+        }
+    }
+}
+----
+
+==== ChartMuseum Multitenancy Support
+
+ChartMuseum supports a https://chartmuseum.com/docs/#multitenancy[multitenancy] mode that lets you organize repositories
+into a hierarchy. The depth of the hierarchy is specified in the server configuration, with zero (single-tenant server)
+being the default.
+
+To publish charts to a multitenancy-enabled ChartMuseum server, add one or more tenant identifiers to the `tenantIds`
+list property in the repository configuration block. The number of tenant identifiers should match the depth configured
+on the server.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url = uri('https://chartmuseum.example.com')
+                // For a multitenancy-enabled server with depth 2, use 2 tenant IDs
+                tenantIds.addAll('org1', 'repo2')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            chartMuseum {
+                url.set(uri("http://chartmuseum.example.com"))
+                // For a multitenancy-enabled server with depth 2, use 2 tenant IDs
+                tenantIds.addAll("org1", "repo2")
+            }
+        }
+    }
+}
+----
+
+
+
+=== Custom Repositories
 
 If your target repository is not directly supported but involves some sort of HTTP upload, you can try the `custom`
 type which offers some (limited) possibilities to configure a freestyle upload.
