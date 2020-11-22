@@ -1,6 +1,5 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -72,7 +71,7 @@ private open class DefaultHarborHelmPublishingRepository
         override fun requestBody(chartFile: File): RequestBody =
             MultipartBody.Builder().run {
                 setType(MultipartBody.FORM)
-                addFormDataPart("chart", chartFile.name, chartFile.asRequestBody("application/x-gzip".toMediaType()))
+                addFormDataPart("chart", chartFile.name, chartFile.asRequestBody(MEDIA_TYPE_GZIP))
                 build()
             }
     }

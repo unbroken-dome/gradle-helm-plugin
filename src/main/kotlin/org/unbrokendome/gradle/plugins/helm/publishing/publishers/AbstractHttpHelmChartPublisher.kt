@@ -41,7 +41,7 @@ internal abstract class AbstractHttpHelmChartPublisher(
     protected open fun requestBody(chartFile: File): RequestBody = chartFile.asRequestBody(MEDIA_TYPE_GZIP)
 
 
-    private companion object {
+    protected companion object {
         val MEDIA_TYPE_GZIP: MediaType = "application/x-gzip".toMediaType()
     }
 
