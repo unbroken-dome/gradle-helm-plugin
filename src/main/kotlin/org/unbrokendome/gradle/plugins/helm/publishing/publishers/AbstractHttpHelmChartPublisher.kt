@@ -1,12 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.publishers
 
-import okhttp3.Credentials
+import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.Interceptor
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.tls.HandshakeCertificates
 import okhttp3.tls.HeldCertificate
@@ -42,8 +38,10 @@ internal abstract class AbstractHttpHelmChartPublisher(
     ): Map<String, String> =
         emptyMap()
 
+    protected open fun requestBody(chartFile: File): RequestBody = chartFile.asRequestBody(MEDIA_TYPE_GZIP)
 
-    private companion object {
+
+    protected companion object {
         val MEDIA_TYPE_GZIP: MediaType = "application/x-gzip".toMediaType()
     }
 
@@ -73,7 +71,7 @@ internal abstract class AbstractHttpHelmChartPublisher(
 
         val request = Request.Builder().run {
             url(uploadUrl.toHttpUrl())
-            method(uploadMethod, chartFile.asRequestBody(MEDIA_TYPE_GZIP))
+            method(uploadMethod, requestBody(chartFile))
             build()
         }
 

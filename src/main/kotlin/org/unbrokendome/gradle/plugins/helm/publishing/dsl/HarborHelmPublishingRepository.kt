@@ -1,5 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCredentials
@@ -8,6 +11,7 @@ import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHe
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
 import org.unbrokendome.gradle.plugins.helm.util.property
+import java.io.File
 import java.net.URI
 import javax.inject.Inject
 
@@ -63,6 +67,13 @@ private open class DefaultHarborHelmPublishingRepository
 
         override fun uploadPath(chartName: String, chartVersion: String): String =
             "/api/chartrepo/$projectName/charts"
+
+        override fun requestBody(chartFile: File): RequestBody =
+            MultipartBody.Builder().run {
+                setType(MultipartBody.FORM)
+                addFormDataPart("chart", chartFile.name, chartFile.asRequestBody(MEDIA_TYPE_GZIP))
+                build()
+            }
     }
 }
 
