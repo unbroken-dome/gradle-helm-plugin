@@ -31,7 +31,7 @@ interface HelmDownloadClient {
          * the plugin is released.
          */
         @JvmStatic
-        val DEFAULT_HELM_CLIENT_VERSION = "3.3.4"
+        val DEFAULT_HELM_CLIENT_VERSION = "3.4.1"
 
 
         internal const val DEFAULT_HELM_CLIENT_GROUP = "sh.helm"
@@ -48,7 +48,7 @@ interface HelmDownloadClient {
     /**
      * The version of the client to be downloaded.
      *
-     * Defaults to the latest version available at the time of the plugin release (currently `3.3.4`).
+     * Defaults to the latest version available at the time of the plugin release (currently `3.4.1`).
      *
      * @see DEFAULT_HELM_CLIENT_VERSION
      */

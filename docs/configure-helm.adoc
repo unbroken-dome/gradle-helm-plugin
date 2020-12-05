@@ -135,7 +135,7 @@ The following example shows how the download can be configured in the build scri
 helm {
     downloadClient {
         enabled = true
-        version = '3.3.4'
+        version = '3.4.1'
     }
 }
 ----
@@ -146,7 +146,7 @@ helm {
 helm {
     downloadClient {
         enabled.set(true)
-        version.set("3.3.4")
+        version.set("3.4.1")
     }
 }
 ----
@@ -158,7 +158,7 @@ The following example shows how the download can be configured using the gradle.
 .gradle.properties
 ----
 helm.client.download.enabled=true
-helm.client.download.version=3.3.4
+helm.client.download.version=3.4.1
 ----
 
 
@@ -176,7 +176,7 @@ The following properties control the download of the Helm client:
 | `version`
 | `helm.client.download.version`
 | The version of the Helm client to be downloaded.
-| The latest version of Helm available at the time the plugin is published (currently `3.3.4`)
+| The latest version of Helm available at the time the plugin is published (currently `3.4.1`)
 
 | `destinationDir`
 |
