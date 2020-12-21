@@ -8,13 +8,13 @@ import org.gradle.api.Project
 private const val HELM_STABLE_REPOSITORY_NAME = "stable"
 
 /** URL of the Helm "stable" repository. */
-private const val HELM_STABLE_REPOSITORY_URL = "https://kubernetes-charts.storage.googleapis.com/"
+private const val HELM_STABLE_REPOSITORY_URL = "https://charts.helm.sh/stable/"
 
 /** The name under which the "incubator" repository will be registered. */
 private const val HELM_INCUBATOR_REPOSITORY_NAME = "incubator"
 
 /** URL of the Helm "incubator" repository. */
-private const val HELM_INCUBATOR_REPOSITORY_URL = "https://kubernetes-charts-incubator.storage.googleapis.com/"
+private const val HELM_INCUBATOR_REPOSITORY_URL = "https://charts.helm.sh/incubator/"
 
 /** The name under which the Bitnami repository will be registered. */
 private const val BITNAMI_REPOSITORY_NAME = "bitnami"
