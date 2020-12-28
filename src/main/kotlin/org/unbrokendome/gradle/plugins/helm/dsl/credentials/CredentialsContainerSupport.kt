@@ -5,7 +5,7 @@ import org.gradle.api.credentials.Credentials
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.pluginutils.property
 
 
 /**

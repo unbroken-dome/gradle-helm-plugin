@@ -3,7 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 import org.gradle.api.NamedDomainObjectContainer
 import org.unbrokendome.gradle.plugins.helm.HELM_DEFAULT_RELEASE_TARGET
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
-import org.unbrokendome.gradle.plugins.helm.rules.AbstractRule
+import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
 
 
 /**

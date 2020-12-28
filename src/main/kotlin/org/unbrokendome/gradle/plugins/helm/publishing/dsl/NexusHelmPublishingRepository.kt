@@ -7,14 +7,15 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.toSerializable
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.toMultipartBody
+import org.unbrokendome.gradle.pluginutils.property
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
 
 
 interface NexusHelmPublishingRepository : HelmPublishingRepository {
+
     /**
      * Helm repository name.
      *

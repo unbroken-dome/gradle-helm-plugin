@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Optional
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.pluginutils.property
 
 
 /**

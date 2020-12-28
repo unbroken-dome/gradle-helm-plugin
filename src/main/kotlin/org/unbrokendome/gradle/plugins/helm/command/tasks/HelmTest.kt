@@ -5,9 +5,9 @@ import org.gradle.api.tasks.Console
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.toHelmString
+import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.toSimpleString
 import java.time.Duration
 
 
@@ -52,7 +52,7 @@ open class HelmTest : AbstractHelmServerCommandTask() {
         execHelm("test") {
             args(releaseName)
             flag("--logs", showLogs)
-            option("--timeout", remoteTimeout.map { it.toHelmString() })
+            option("--timeout", remoteTimeout.map { it.toSimpleString() })
         }
     }
 }

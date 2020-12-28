@@ -5,6 +5,10 @@ import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.pluginutils.rules.AbstractPatternRuleOuterInner
+import org.unbrokendome.gradle.pluginutils.rules.AbstractTaskRule
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern2
 
 
 internal abstract class AbstractHelmChartTaskRule<T : Task>(

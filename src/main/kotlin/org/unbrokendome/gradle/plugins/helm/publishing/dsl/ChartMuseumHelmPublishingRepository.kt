@@ -7,7 +7,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.toSerializable
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
+import org.unbrokendome.gradle.pluginutils.listProperty
 import java.net.URI
 import javax.inject.Inject
 

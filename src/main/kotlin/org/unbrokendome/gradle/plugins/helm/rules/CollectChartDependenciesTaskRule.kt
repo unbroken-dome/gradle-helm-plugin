@@ -6,6 +6,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChartInternal
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmCollectChartDependencies
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 
 private val namePattern =

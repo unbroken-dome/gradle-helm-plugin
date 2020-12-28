@@ -11,7 +11,7 @@ import org.gradle.api.provider.Provider
 import org.spekframework.spek2.style.specification.Suite
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
 import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.util.asFile
+import org.unbrokendome.gradle.pluginutils.asFile
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1

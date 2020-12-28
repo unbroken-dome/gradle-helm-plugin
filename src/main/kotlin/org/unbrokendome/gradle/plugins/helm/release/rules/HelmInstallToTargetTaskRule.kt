@@ -8,8 +8,8 @@ import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
 import org.unbrokendome.gradle.plugins.helm.release.dsl.shouldInclude
-import org.unbrokendome.gradle.plugins.helm.rules.AbstractTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.RuleNamePattern
+import org.unbrokendome.gradle.pluginutils.rules.AbstractTaskRule
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 
 private val namePattern =

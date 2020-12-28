@@ -11,10 +11,10 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmDownloadClient
-import org.unbrokendome.gradle.plugins.helm.util.SystemUtils
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
 import org.unbrokendome.gradle.plugins.helm.util.withLockFile
+import org.unbrokendome.gradle.pluginutils.SystemUtils
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
 
 
 /**

@@ -16,8 +16,8 @@ import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepositoryInternal
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
-import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_6
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.pluginutils.GradleVersions
+import org.unbrokendome.gradle.pluginutils.property
 import java.io.File
 import java.io.Serializable
 import java.util.concurrent.ExecutionException
@@ -34,7 +34,7 @@ open class HelmPublishChart
 
     private companion object {
 
-        val NEW_WORKER_API_GRADLE_VERSION: GradleVersion = GRADLE_VERSION_5_6
+        val NEW_WORKER_API_GRADLE_VERSION: GradleVersion = GradleVersions.Version_5_6
     }
 
 

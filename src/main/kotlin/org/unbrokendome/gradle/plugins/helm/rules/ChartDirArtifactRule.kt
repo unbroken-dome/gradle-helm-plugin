@@ -5,6 +5,8 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.pluginutils.rules.AbstractPatternRule
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 
 private val namePattern =

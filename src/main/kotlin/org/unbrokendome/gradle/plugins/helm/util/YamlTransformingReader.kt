@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.util
 
+import org.unbrokendome.gradle.pluginutils.io.DelegateReader
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.error.Mark
 import org.yaml.snakeyaml.error.YAMLException
@@ -46,7 +47,6 @@ internal class YamlPath(val elements: List<Element>) {
 internal abstract class AbstractYamlTransformingReader(
     input: Reader
 ) : DelegateReader(input) {
-
 
     /**
      * Transform a scalar value.

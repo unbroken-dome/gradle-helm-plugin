@@ -4,6 +4,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.unbrokendome.gradle.plugins.helm.HELM_MAIN_CHART_NAME
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
+import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
 
 
 /**

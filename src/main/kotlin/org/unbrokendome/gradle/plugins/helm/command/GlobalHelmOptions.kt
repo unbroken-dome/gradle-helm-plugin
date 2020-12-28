@@ -6,7 +6,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.ifPresent
+import org.unbrokendome.gradle.pluginutils.ifPresent
 
 
 interface GlobalHelmOptions : HelmOptions {

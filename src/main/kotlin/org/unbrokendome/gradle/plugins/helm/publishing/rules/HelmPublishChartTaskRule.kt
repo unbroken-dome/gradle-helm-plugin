@@ -9,7 +9,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
 import org.unbrokendome.gradle.plugins.helm.rules.AbstractHelmChartTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.RuleNamePattern
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 
 private val namePattern =

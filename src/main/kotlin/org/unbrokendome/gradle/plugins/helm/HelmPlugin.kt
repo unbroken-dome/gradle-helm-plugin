@@ -43,10 +43,10 @@ import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
 import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.fileProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.toUri
+import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.fileProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.toUri
 
 
 class HelmPlugin

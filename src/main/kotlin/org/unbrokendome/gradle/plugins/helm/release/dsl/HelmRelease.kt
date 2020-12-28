@@ -24,13 +24,13 @@ import org.unbrokendome.gradle.plugins.helm.command.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.withDefaults
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.util.andThen
-import org.unbrokendome.gradle.plugins.helm.util.asFile
-import org.unbrokendome.gradle.plugins.helm.util.capitalizeWords
-import org.unbrokendome.gradle.plugins.helm.util.combine
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.setProperty
+import org.unbrokendome.gradle.pluginutils.andThen
+import org.unbrokendome.gradle.pluginutils.asFile
+import org.unbrokendome.gradle.pluginutils.capitalizeWords
+import org.unbrokendome.gradle.pluginutils.combine
+import org.unbrokendome.gradle.pluginutils.listProperty
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.setProperty
 import java.io.File
 import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
@@ -438,6 +438,7 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
 
 
 internal interface HelmReleaseInternal {
+
     /**
      * Returns a [HelmReleaseProperties] with target-specific configuration applied
      * when evaluated.
@@ -603,7 +604,6 @@ private open class DefaultHelmRelease
         targetSpecificCache.computeIfAbsent(target.name) {
             doResolveForTarget(target)
         }
-
 
 
     private fun doResolveForTarget(target: HelmReleaseTarget): HelmReleaseProperties {

@@ -11,8 +11,8 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
 import org.gradle.util.GradleVersion
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
+import org.unbrokendome.gradle.pluginutils.GradleVersions
+import org.unbrokendome.gradle.pluginutils.mapProperty
 import java.util.concurrent.Callable
 
 
@@ -78,7 +78,7 @@ internal data class HelmValueOptionsHolder(
     constructor(objects: ObjectFactory, layout: ProjectLayout) : this(
         values = objects.mapProperty(),
         fileValues = objects.mapProperty(),
-        valueFiles = if (GradleVersion.current() >= GRADLE_VERSION_5_3) {
+        valueFiles = if (GradleVersion.current() >= GradleVersions.Version_5_3) {
             objects.fileCollection()
         } else {
             @Suppress("DEPRECATION")

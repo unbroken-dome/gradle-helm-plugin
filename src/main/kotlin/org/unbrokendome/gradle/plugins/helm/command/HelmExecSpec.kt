@@ -2,7 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.provider.Provider
 import org.gradle.process.ExecSpec
-import org.unbrokendome.gradle.plugins.helm.util.ifPresent
+import org.unbrokendome.gradle.pluginutils.ifPresent
 
 
 /**
