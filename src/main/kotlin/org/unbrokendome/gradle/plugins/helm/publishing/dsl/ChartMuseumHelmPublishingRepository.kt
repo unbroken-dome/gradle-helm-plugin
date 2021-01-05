@@ -63,7 +63,7 @@ private open class DefaultChartMuseumHelmPublishingRepository
             get() = "POST"
 
         override fun uploadPath(chartName: String, chartVersion: String): String =
-            "/api" + tenantIds.joinToString(separator = "/", prefix = "/") + "/charts"
+            (arrayOf("api") + tenantIds + arrayOf("charts")).joinToString(separator = "/", prefix = "/")
     }
 }
 
