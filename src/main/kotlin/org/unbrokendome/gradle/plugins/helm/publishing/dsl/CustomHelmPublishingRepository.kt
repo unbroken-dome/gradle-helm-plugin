@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
+import okhttp3.MultipartBody
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCredentials
@@ -8,6 +9,8 @@ import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHe
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
 import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.plugins.helm.util.toMultipartBody
+import java.io.File
 import java.net.URI
 import javax.inject.Inject
 
@@ -33,6 +36,13 @@ interface CustomHelmPublishingRepository : HelmPublishingRepository {
      * Defaults to an empty string.
      */
     val uploadPath: Property<String>
+
+    /**
+     * Indicates to use a multipart form for publishing.
+     *
+     * Defaults to `false`.
+     */
+    val multipartForm: Property<Boolean>
 }
 
 
@@ -51,13 +61,17 @@ private open class DefaultCustomHelmPublishingRepository
         objects.property<String>()
             .convention("")
 
+    override val multipartForm: Property<Boolean> =
+        objects.property<Boolean>()
+            .convention(false)
 
     override val publisherParams: PublisherParams
         get() = CustomPublisherParams(
             url = url.get(),
             credentials = configuredCredentials.orNull?.toSerializable(),
             uploadMethod = uploadMethod.get(),
-            uploadPath = uploadPath.get()
+            uploadPath = uploadPath.get(),
+            multipartForm = multipartForm.get()
         )
 
 
@@ -65,19 +79,20 @@ private open class DefaultCustomHelmPublishingRepository
         private val url: URI,
         private val credentials: SerializableCredentials?,
         private val uploadMethod: String,
-        private val uploadPath: String
+        private val uploadPath: String,
+        private val multipartForm: Boolean
     ) : PublisherParams {
 
         override fun createPublisher(): HelmChartPublisher =
-            CustomPublisher(url, credentials, uploadMethod, uploadPath)
+            CustomPublisher(url, credentials, uploadMethod, uploadPath, multipartForm)
     }
-
 
     private class CustomPublisher(
         url: URI,
         credentials: SerializableCredentials?,
         override val uploadMethod: String,
-        private val uploadPath: String
+        private val uploadPath: String,
+        private val multipartForm: Boolean
     ) : AbstractHttpHelmChartPublisher(url, credentials) {
 
         override fun uploadPath(chartName: String, chartVersion: String): String =
@@ -85,6 +100,10 @@ private open class DefaultCustomHelmPublishingRepository
                 .replace("{name}", chartName)
                 .replace("{version}", chartVersion)
                 .replace("{filename}", "$chartName-$chartVersion.tgz")
+
+        override fun requestBody(chartFile: File) = super.requestBody(chartFile).let {
+            it.takeUnless { multipartForm } ?: it.toMultipartBody(chartFile.name)
+        }
     }
 }
 

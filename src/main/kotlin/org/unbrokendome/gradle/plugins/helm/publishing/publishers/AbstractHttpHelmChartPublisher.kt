@@ -1,8 +1,13 @@
 package org.unbrokendome.gradle.plugins.helm.publishing.publishers
 
-import okhttp3.*
+import okhttp3.Credentials
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Interceptor
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.tls.HandshakeCertificates
 import okhttp3.tls.HeldCertificate
@@ -29,7 +34,6 @@ internal abstract class AbstractHttpHelmChartPublisher(
 
 
     protected abstract fun uploadPath(chartName: String, chartVersion: String): String
-
 
     protected open fun additionalHeaders(
         chartName: String,
@@ -109,7 +113,7 @@ internal abstract class AbstractHttpHelmChartPublisher(
 
     private fun SerializablePasswordCredentials.createAuthInterceptor(): Interceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
-            .addHeader("Authorization", "${Credentials.basic(username, password ?: "")}")
+            .addHeader("Authorization", Credentials.basic(username, password.orEmpty()))
             .build()
         chain.proceed(request)
     }

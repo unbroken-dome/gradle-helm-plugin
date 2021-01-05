@@ -54,6 +54,20 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         configuration: Action<HarborHelmPublishingRepository>
     ): HarborHelmPublishingRepository =
         harbor("default", configuration)
+
+    @JvmDefault
+    fun nexus(
+        name: String,
+        configuration: Action<NexusHelmPublishingRepository>
+    ): NexusHelmPublishingRepository =
+        create(name, NexusHelmPublishingRepository::class.java, configuration)
+
+
+    @JvmDefault
+    fun nexus(
+        configuration: Action<NexusHelmPublishingRepository>
+    ): NexusHelmPublishingRepository =
+        nexus("default", configuration)
 }
 
 
@@ -82,6 +96,10 @@ private open class DefaultHelmPublishingRepositoryContainer
         registerFactory(
             CustomHelmPublishingRepository::class.java,
             objects::newCustomHelmPublishingRepository
+        )
+        registerFactory(
+            NexusHelmPublishingRepository::class.java,
+            objects::newNexusHelmPublishingRepository
         )
 
         // Default type is "custom"
