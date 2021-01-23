@@ -76,6 +76,13 @@ tasks.withType<Test> {
     // give tests a temporary directory below the build dir so
     // we don't pollute the system temp dir (Gradle tests don't clean up)
     systemProperty("java.io.tmpdir", layout.buildDirectory.dir("tmp").get())
+
+    maxParallelForks = (project.property("test.maxParallelForks") as String).toInt()
+    if (maxParallelForks > 1) {
+        // Parallel tests seem to need a little more time to set up, so increase the test timeout to
+        // make sure that the first test in a forked process doesn't fail because of this
+        systemProperty("SPEK_TIMEOUT", 30000)
+    }
 }
 
 
