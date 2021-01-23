@@ -47,11 +47,11 @@ dependencies {
     testImplementation(kotlin("reflect"))
 }
 
-val kotlinVersion: String by extra
+
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.jetbrains.kotlin") {
-            useVersion(kotlinVersion)
+            useVersion(embeddedKotlinVersion)
         }
     }
 }
