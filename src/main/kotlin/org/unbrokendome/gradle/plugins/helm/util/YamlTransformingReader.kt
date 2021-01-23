@@ -170,6 +170,10 @@ internal abstract class AbstractYamlTransformingReader(
                         } else {
                             val indent = " ".repeat(mappingStartEvent.startMark.column)
                             extraEntries.forEach { (key, value) ->
+
+                                // replacement appendLine was added in 1.4,
+                                // use legacy method for now to keep compatible with Gradle pre 6.8
+                                @Suppress("DEPRECATION")
                                 writer.appendln()
                                 writer.write("${indent}$key: ${value.quoteValue()}")
                             }

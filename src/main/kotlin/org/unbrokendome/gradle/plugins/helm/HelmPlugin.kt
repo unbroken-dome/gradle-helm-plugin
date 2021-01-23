@@ -299,9 +299,9 @@ class HelmPlugin
                 )
 
                 if (hasProperty("$prefix.credentials.username")) {
-                    repository.credentials {
-                        username.set(providerFromProjectProperty("$prefix.credentials.username"))
-                        password.set(providerFromProjectProperty("$prefix.credentials.password"))
+                    repository.credentials { cred ->
+                        cred.username.set(providerFromProjectProperty("$prefix.credentials.username"))
+                        cred.password.set(providerFromProjectProperty("$prefix.credentials.password"))
                     }
                 } else if (hasProperty("$prefix.credentials.certificateFile")) {
                     repository.credentials(CertificateCredentials::class) {

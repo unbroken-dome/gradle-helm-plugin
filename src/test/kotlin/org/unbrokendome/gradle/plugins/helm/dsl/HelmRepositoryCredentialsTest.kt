@@ -31,9 +31,9 @@ object HelmRepositoryCredentialsTest : Spek({
             with(project.helm.repositories) {
                 create("myRepo") { repo ->
                     repo.url.set(project.uri("http://repository.example.com"))
-                    repo.credentials {
-                        username.set("username")
-                        password.set("password")
+                    repo.credentials { cred ->
+                        cred.username.set("username")
+                        cred.password.set("password")
                     }
                 }
             }
