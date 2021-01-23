@@ -131,14 +131,14 @@ class DefaultExecutableGradleExecMock : ExecutableGradleExecMock {
             if (invocations.isEmpty()) {
                 append(" (no recorded invocations)")
             } else {
-                appendln()
-                appendln("    Recorded invocations (${invocations.size}):")
-                appendln(formatInvocations(invocations))
+                appendLine()
+                appendLine("    Recorded invocations (${invocations.size}):")
+                appendLine(formatInvocations(invocations))
             }
             val otherInvocations = allInvocations - invocations
             if (otherInvocations.isNotEmpty()) {
-                appendln("    Other invocations (${otherInvocations.size}):")
-                appendln(formatInvocations(otherInvocations))
+                appendLine("    Other invocations (${otherInvocations.size}):")
+                appendLine(formatInvocations(otherInvocations))
             }
         }
     }

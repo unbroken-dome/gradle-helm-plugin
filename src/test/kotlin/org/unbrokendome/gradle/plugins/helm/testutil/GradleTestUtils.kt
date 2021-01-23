@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.testutil
 
+import org.gradle.BuildResult
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.internal.TaskInternal
@@ -36,7 +37,7 @@ fun Task.execute(checkUpToDate: Boolean = true) {
         workerExecutor.await()
 
     } finally {
-        buildOperation.setResult(null)
+        buildOperation.setResult(BuildResult(project.gradle, null))
     }
 }
 

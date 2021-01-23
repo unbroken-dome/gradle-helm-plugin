@@ -32,9 +32,9 @@ internal class HelmCommandSupport(
         val stdout = execProvider
             .withOptionsAppliers(GlobalHelmOptionsApplier, HelmServerOptionsApplier)
             .withDescription("get release info")
-            .execHelmCaptureOutput("ls") {
-                option("-o", "json")
-                option("-f", releaseName.map { "^${Regex.escape(it)}$" })
+            .execHelmCaptureOutput("ls") { exec ->
+                exec.option("-o", "json")
+                exec.option("-f", releaseName.map { "^${Regex.escape(it)}$" })
             }
 
         return JSONArray(stdout)

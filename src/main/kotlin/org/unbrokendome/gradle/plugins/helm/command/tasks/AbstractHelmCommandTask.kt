@@ -1,5 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
@@ -14,8 +15,6 @@ import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.execHelm
-import org.unbrokendome.gradle.plugins.helm.command.execHelmCaptureOutput
 import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withDefault
 import javax.inject.Inject
@@ -102,14 +101,14 @@ abstract class AbstractHelmCommandTask
     protected fun execHelm(
         command: String, subcommand: String? = null, action: (HelmExecSpec.() -> Unit)? = null
     ) {
-        execProviderSupport.execHelm(command, subcommand, action)
+        execProviderSupport.execHelm(command, subcommand, action?.let { Action(it) })
     }
 
 
     protected fun execHelmCaptureOutput(
         command: String, subcommand: String? = null, action: (HelmExecSpec.() -> Unit)? = null
     ): String =
-        execProviderSupport.execHelmCaptureOutput(command, subcommand, action)
+        execProviderSupport.execHelmCaptureOutput(command, subcommand, action?.let { Action(it) })
 
 
     @get:Internal
