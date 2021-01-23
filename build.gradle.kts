@@ -35,7 +35,7 @@ dependencies {
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.22")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.23")
     testImplementation("io.mockk:mockk:1.10.0")
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
