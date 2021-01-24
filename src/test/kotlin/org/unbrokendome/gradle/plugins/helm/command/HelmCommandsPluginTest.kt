@@ -7,9 +7,9 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.spek.gradleProject
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
-import org.unbrokendome.gradle.plugins.helm.testutil.evaluate
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
+import org.unbrokendome.gradle.pluginutils.test.evaluate
+import org.unbrokendome.gradle.pluginutils.test.spek.gradleProject
 
 
 object HelmCommandsPluginTest : Spek({

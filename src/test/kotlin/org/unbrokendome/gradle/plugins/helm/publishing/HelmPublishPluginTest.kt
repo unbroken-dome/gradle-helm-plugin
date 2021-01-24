@@ -8,11 +8,11 @@ import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
-import org.unbrokendome.gradle.plugins.helm.spek.applyPlugin
-import org.unbrokendome.gradle.plugins.helm.spek.setupGradleProject
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
-import org.unbrokendome.gradle.plugins.helm.testutil.evaluate
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
+import org.unbrokendome.gradle.pluginutils.test.evaluate
+import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
+import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
 
 
 object HelmPublishPluginTest : Spek({

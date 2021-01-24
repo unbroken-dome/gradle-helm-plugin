@@ -24,21 +24,21 @@ import org.unbrokendome.gradle.plugins.helm.dsl.charts
 import org.unbrokendome.gradle.plugins.helm.dsl.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.lint
-import org.unbrokendome.gradle.plugins.helm.spek.applyPlugin
-import org.unbrokendome.gradle.plugins.helm.spek.setupGradleProject
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsItem
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.dirValue
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.doesNotContainItem
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasOnlyTaskDependency
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasTaskDependencies
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresentAndEmptyMap
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.taskDependencies
-import org.unbrokendome.gradle.plugins.helm.testutil.directory
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.dirValue
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.doesNotContainItem
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasOnlyTaskDependency
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasTaskDependencies
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasValueEqualTo
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresentAndEmptyMap
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.taskDependencies
+import org.unbrokendome.gradle.pluginutils.test.directory
+import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
+import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
 
 
 object HelmPluginChartsTest : Spek({
