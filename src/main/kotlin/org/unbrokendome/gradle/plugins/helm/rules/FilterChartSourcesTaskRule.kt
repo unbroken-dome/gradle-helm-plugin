@@ -7,6 +7,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChartInternal
 import org.unbrokendome.gradle.plugins.helm.dsl.setParent
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 
 private val namePattern = RuleNamePattern.parse("helmFilter<Chart>ChartSources")

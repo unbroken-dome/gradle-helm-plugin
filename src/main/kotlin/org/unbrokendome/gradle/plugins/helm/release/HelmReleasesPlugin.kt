@@ -35,10 +35,10 @@ import org.unbrokendome.gradle.plugins.helm.release.rules.installAllToTargetTask
 import org.unbrokendome.gradle.plugins.helm.release.rules.testAllOnTargetTaskName
 import org.unbrokendome.gradle.plugins.helm.release.rules.uninstallAllFromTargetTaskName
 import org.unbrokendome.gradle.plugins.helm.release.tags.TagExpression
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.durationProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
 
 
 class HelmReleasesPlugin : Plugin<Project> {

@@ -20,8 +20,8 @@ import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
 import org.unbrokendome.gradle.plugins.helm.model.ChartModelDependencies
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.versionProvider
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.versionProvider
 import javax.inject.Inject
 
 

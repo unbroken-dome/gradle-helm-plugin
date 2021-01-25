@@ -13,14 +13,13 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
-import org.unbrokendome.gradle.plugins.helm.util.requiredExtension
+import org.unbrokendome.gradle.pluginutils.extensionByName
 
 
 /**
  * Gets the chart's [Linting] extension.
  */
-val HelmChart.lint: Linting
-    get() = requiredExtension(HELM_LINT_EXTENSION_NAME)
+val HelmChart.lint: Linting by extensionByName(HELM_LINT_EXTENSION_NAME)
 
 
 /**
@@ -33,8 +32,7 @@ fun HelmChart.lint(configure: Action<Linting>) =
 /**
  * Gets the chart's [Filtering] extension.
  */
-val HelmChart.filtering: Filtering
-    get() = requiredExtension(HELM_FILTERING_EXTENSION_NAME)
+val HelmChart.filtering: Filtering by extensionByName(HELM_FILTERING_EXTENSION_NAME)
 
 
 /**
@@ -47,8 +45,7 @@ fun HelmChart.filtering(configure: Action<Filtering>) =
 /**
  * Gets the chart's `dependencies` extension.
  */
-val HelmChart.dependencies: ChartDependencyHandler
-    get() = requiredExtension(HELM_DEPENDENCIES_EXTENSION_NAME)
+val HelmChart.dependencies: ChartDependencyHandler by extensionByName(HELM_DEPENDENCIES_EXTENSION_NAME)
 
 
 /**

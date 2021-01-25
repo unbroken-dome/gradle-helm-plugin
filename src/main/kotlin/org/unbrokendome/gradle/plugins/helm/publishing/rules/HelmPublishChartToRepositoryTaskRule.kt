@@ -6,9 +6,9 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.tasks.HelmPublishChart
-import org.unbrokendome.gradle.plugins.helm.rules.AbstractTaskRule2
-import org.unbrokendome.gradle.plugins.helm.rules.RuleNamePattern2
 import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
+import org.unbrokendome.gradle.pluginutils.rules.AbstractTaskRule2
+import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern2
 
 
 private val namePattern =

@@ -5,9 +5,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.toHelmString
-import org.unbrokendome.gradle.plugins.helm.util.withDefault
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.toSimpleString
+import org.unbrokendome.gradle.pluginutils.withDefault
 import java.time.Duration
 
 
@@ -112,7 +112,7 @@ internal object HelmServerOperationOptionsApplier : HelmOptionsApplier {
 
                 flag("--dry-run", options.dryRun)
                 flag("--no-hooks", options.noHooks)
-                option("--timeout", options.remoteTimeout.map { it.toHelmString() })
+                option("--timeout", options.remoteTimeout.map { it.toSimpleString() })
             }
         }
     }

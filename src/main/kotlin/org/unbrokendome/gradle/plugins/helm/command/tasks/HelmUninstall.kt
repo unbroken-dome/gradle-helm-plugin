@@ -5,7 +5,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.unbrokendome.gradle.plugins.helm.command.helmCommandSupport
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.pluginutils.property
 
 
 /**

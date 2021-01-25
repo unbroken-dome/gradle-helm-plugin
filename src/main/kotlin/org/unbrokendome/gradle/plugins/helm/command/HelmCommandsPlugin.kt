@@ -16,8 +16,8 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.dsl.createHelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.durationProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.durationProviderFromProjectProperty
 
 
 class HelmCommandsPlugin

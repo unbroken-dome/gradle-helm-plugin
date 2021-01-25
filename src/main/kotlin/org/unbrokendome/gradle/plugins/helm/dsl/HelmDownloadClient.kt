@@ -8,10 +8,10 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.HelmExtractClient
-import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_6_2
-import org.unbrokendome.gradle.plugins.helm.util.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.providerFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.GradleVersions
+import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
 import javax.inject.Inject
 
 
@@ -157,7 +157,7 @@ internal open class DefaultHelmDownloadClient
             }
         }
 
-        if (GradleVersion.current() >= GRADLE_VERSION_6_2) {
+        if (GradleVersion.current() >= GradleVersions.Version_6_2) {
             repositories.exclusiveContent {
                 it.filter { filter -> filter.includeGroup(helmGroup) }
                 it.forRepositories(repository)

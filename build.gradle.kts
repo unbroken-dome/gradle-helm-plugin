@@ -32,6 +32,8 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
 
+    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.1.0")
+
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
 
@@ -42,6 +44,8 @@ dependencies {
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2")
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
+
+    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.1.0")
 
     testImplementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("reflect"))

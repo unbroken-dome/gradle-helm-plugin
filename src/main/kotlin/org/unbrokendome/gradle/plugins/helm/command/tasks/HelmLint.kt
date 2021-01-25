@@ -19,10 +19,10 @@ import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.util.GRADLE_VERSION_5_3
-import org.unbrokendome.gradle.plugins.helm.util.ifPresent
-import org.unbrokendome.gradle.plugins.helm.util.mapProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.pluginutils.GradleVersions
+import org.unbrokendome.gradle.pluginutils.ifPresent
+import org.unbrokendome.gradle.pluginutils.mapProperty
+import org.unbrokendome.gradle.pluginutils.property
 
 
 /**
@@ -83,7 +83,7 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
      */
     @get:InputFiles
     final override val valueFiles: ConfigurableFileCollection =
-        if (GradleVersion.current() >= GRADLE_VERSION_5_3) {
+        if (GradleVersion.current() >= GradleVersions.Version_5_3) {
             project.objects.fileCollection()
         } else {
             @Suppress("DEPRECATION")

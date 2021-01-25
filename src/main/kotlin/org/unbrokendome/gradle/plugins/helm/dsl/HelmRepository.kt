@@ -9,7 +9,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainerSupport
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsFactory
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.DefaultCredentialsFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
+import org.unbrokendome.gradle.pluginutils.property
 import java.net.URI
 import javax.inject.Inject
 

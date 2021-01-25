@@ -20,13 +20,13 @@ import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
 import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.repositories
-import org.unbrokendome.gradle.plugins.helm.spek.applyPlugin
-import org.unbrokendome.gradle.plugins.helm.spek.setupGradleProject
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsTask
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasExtension
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.taskDependencies
-import org.unbrokendome.gradle.plugins.helm.testutil.evaluate
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.taskDependencies
+import org.unbrokendome.gradle.pluginutils.test.evaluate
+import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
+import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
 import java.net.URI
 
 

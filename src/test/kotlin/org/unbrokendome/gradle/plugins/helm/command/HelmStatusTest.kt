@@ -7,12 +7,12 @@ import assertk.assertions.hasText
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmStatus
 import org.unbrokendome.gradle.plugins.helm.spek.ExecutionResultAwareSpek
-import org.unbrokendome.gradle.plugins.helm.spek.applyPlugin
 import org.unbrokendome.gradle.plugins.helm.spek.gradleExecMock
-import org.unbrokendome.gradle.plugins.helm.spek.gradleTask
-import org.unbrokendome.gradle.plugins.helm.spek.setupGradleProject
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.singleInvocation
-import org.unbrokendome.gradle.plugins.helm.testutil.execute
+import org.unbrokendome.gradle.pluginutils.test.execute
+import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
+import org.unbrokendome.gradle.pluginutils.test.spek.gradleTask
+import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
 
 
 object HelmStatusTest : ExecutionResultAwareSpek({

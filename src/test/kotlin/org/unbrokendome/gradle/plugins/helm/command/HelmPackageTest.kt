@@ -7,15 +7,15 @@ import assertk.assertions.prop
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
 import org.unbrokendome.gradle.plugins.helm.spek.ExecutionResultAwareSpek
-import org.unbrokendome.gradle.plugins.helm.spek.applyPlugin
 import org.unbrokendome.gradle.plugins.helm.spek.gradleExecMock
-import org.unbrokendome.gradle.plugins.helm.spek.gradleTask
-import org.unbrokendome.gradle.plugins.helm.spek.setupGradleProject
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.fileValue
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.hasValueEqualTo
-import org.unbrokendome.gradle.plugins.helm.testutil.directory
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.singleInvocation
-import org.unbrokendome.gradle.plugins.helm.testutil.execute
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.fileValue
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasValueEqualTo
+import org.unbrokendome.gradle.pluginutils.test.directory
+import org.unbrokendome.gradle.pluginutils.test.execute
+import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
+import org.unbrokendome.gradle.pluginutils.test.spek.gradleTask
+import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
 
 
 object HelmPackageTest : ExecutionResultAwareSpek({

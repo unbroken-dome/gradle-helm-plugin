@@ -7,9 +7,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.listProperty
-import org.unbrokendome.gradle.plugins.helm.util.property
 import org.unbrokendome.gradle.plugins.helm.util.withLockFile
+import org.unbrokendome.gradle.pluginutils.listProperty
+import org.unbrokendome.gradle.pluginutils.property
 import java.time.Duration
 
 
@@ -51,6 +51,7 @@ open class HelmUpdateRepositories : AbstractHelmCommandTask() {
 
     init {
         // skip the task if we don't have any repositories configured in the project
+        @Suppress("LeakingThis")
         onlyIf { !repositoryNames.orNull.isNullOrEmpty() }
 
         // declare the repositories.yaml file as a skip-when-empty input, so we get a

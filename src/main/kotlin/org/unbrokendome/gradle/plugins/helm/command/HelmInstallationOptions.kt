@@ -5,8 +5,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.util.property
-import org.unbrokendome.gradle.plugins.helm.util.withDefault
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.withDefault
 
 
 interface HelmInstallationOptions : HelmServerOperationOptions {
@@ -135,7 +135,7 @@ internal data class HelmInstallationOptionsHolder(
     ConfigurableHelmServerOperationOptions by serverOperationOptions {
 
     constructor(objects: ObjectFactory)
-    : this(
+            : this(
         serverOperationOptions = HelmServerOperationOptionsHolder(objects),
         atomic = objects.property(),
         devel = objects.property(),

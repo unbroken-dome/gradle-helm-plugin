@@ -12,11 +12,11 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentia
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
-import org.unbrokendome.gradle.plugins.helm.spek.applyPlugin
-import org.unbrokendome.gradle.plugins.helm.spek.setupGradleProject
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.containsItem
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.fileValue
-import org.unbrokendome.gradle.plugins.helm.testutil.assertions.isPresent
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.fileValue
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent
+import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
+import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
 import java.io.File
 
 
