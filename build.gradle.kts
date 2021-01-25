@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
     id("com.gradle.plugin-publish") version "0.12.0"
-    id("org.jetbrains.dokka") version "0.10.1"
+    id("org.jetbrains.dokka") version "1.4.20"
     id("maven-publish")
     id("org.asciidoctor.jvm.convert") version "3.2.0"
 }
@@ -138,23 +138,24 @@ pluginBundle {
 }
 
 
-tasks.named("dokka", DokkaTask::class) {
-    outputFormat = "html"
-    configuration {
+tasks.named("dokkaHtml", DokkaTask::class) {
+    dokkaSourceSets.named("main") {
         externalDocumentationLink {
-            url = uri("https://docs.oracle.com/javase/8/docs/api/").toURL()
+            url.set(uri("https://docs.oracle.com/javase/8/docs/api/").toURL())
         }
         externalDocumentationLink {
-            url = uri("https://docs.gradle.org/current/javadoc/").toURL()
+            url.set(uri("https://docs.gradle.org/current/javadoc/").toURL())
         }
         externalDocumentationLink {
-            url = uri("https://docs.groovy-lang.org/latest/html/groovy-jdk/").toURL()
+            url.set(uri("https://docs.groovy-lang.org/latest/html/groovy-jdk/").toURL())
         }
-        reportUndocumented = false
+        reportUndocumented.set(false)
         sourceLink {
-            path = "src/main/kotlin"
-            url = "https://github.com/unbroken-dome/gradle-helm-plugin/blob/v${project.version}/src/main/kotlin"
-            lineSuffix = "#L"
+            localDirectory.set(project.file("src/main/kotlin"))
+            remoteUrl.set(
+                uri("https://github.com/unbroken-dome/gradle-helm-plugin/blob/v${project.version}/src/main/kotlin").toURL()
+            )
+            remoteLineSuffix.set("#L")
         }
     }
 }
