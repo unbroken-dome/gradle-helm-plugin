@@ -8,8 +8,6 @@ import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -292,7 +290,7 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
  *
  * Provides methods for target-specific configuration of the release.
  */
-interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFromRepositoryOptions, ExtensionAware {
+interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFromRepositoryOptions {
 
     /**
      * Tags for this release.
@@ -662,12 +660,6 @@ private open class DefaultHelmRelease
                 logger.debug("No target-specific configuration actions specified")
             }
         }
-    }
-
-
-    override fun getExtensions(): ExtensionContainer {
-        // this will be overridden by the Gradle class generator
-        throw UnsupportedOperationException()
     }
 
 
