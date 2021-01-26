@@ -14,4 +14,8 @@ pluginManagement {
 }
 
 
-rootProject.name = "gradle-helm-plugin"
+rootProject.name = "gradle-helm-plugin-parent"
+
+include(
+    "helm-plugin"
+)

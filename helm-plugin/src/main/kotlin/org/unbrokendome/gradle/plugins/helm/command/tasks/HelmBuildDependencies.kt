@@ -17,6 +17,7 @@ open class HelmBuildDependencies : AbstractHelmDependenciesTask() {
         outputs.dir(subchartsDir)
             .withPropertyName("subchartsDir")
 
+        @Suppress("LeakingThis")
         onlyIf {
             val lockFile = project.file(this.lockFile)
             if (lockFile.exists()) {
