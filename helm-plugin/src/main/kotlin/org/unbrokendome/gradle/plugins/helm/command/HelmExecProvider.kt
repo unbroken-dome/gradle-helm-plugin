@@ -6,6 +6,7 @@ import org.gradle.process.ExecSpec
 import org.gradle.util.GradleVersion
 import org.gradle.workers.WorkerExecutor
 import org.slf4j.LoggerFactory
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmOptionsApplier
 import org.unbrokendome.gradle.pluginutils.GradleVersions
 import java.io.ByteArrayOutputStream
 import java.io.File

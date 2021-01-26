@@ -19,8 +19,8 @@ import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
 import org.unbrokendome.gradle.plugins.helm.release.dsl.activeReleaseTarget
 import org.unbrokendome.gradle.plugins.helm.release.dsl.releaseTargets
 import org.unbrokendome.gradle.plugins.helm.release.dsl.releases
-import org.unbrokendome.gradle.plugins.helm.spek.propertyMappingInfo
-import org.unbrokendome.gradle.plugins.helm.spek.propertyMappingTests
+import org.unbrokendome.gradle.plugins.helm.release.spek.propertyMappingInfo
+import org.unbrokendome.gradle.plugins.helm.release.spek.propertyMappingTests
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.cast
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.doesNotContainItem

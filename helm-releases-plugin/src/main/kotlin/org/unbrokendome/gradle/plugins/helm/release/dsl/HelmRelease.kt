@@ -15,11 +15,11 @@ import org.gradle.api.provider.SetProperty
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.mergeValues
-import org.unbrokendome.gradle.plugins.helm.command.setFrom
-import org.unbrokendome.gradle.plugins.helm.command.withDefaults
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.internal.mergeValues
+import org.unbrokendome.gradle.plugins.helm.command.internal.setFrom
+import org.unbrokendome.gradle.plugins.helm.command.internal.withDefaults
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
 import org.unbrokendome.gradle.pluginutils.andThen

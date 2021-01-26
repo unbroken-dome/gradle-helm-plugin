@@ -6,7 +6,7 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.mergeValues
+import org.unbrokendome.gradle.plugins.helm.command.internal.mergeValues
 import javax.inject.Inject
 
 

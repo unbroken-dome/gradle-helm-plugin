@@ -2,7 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.setFrom
+import org.unbrokendome.gradle.plugins.helm.command.internal.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmStatus
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseInternal

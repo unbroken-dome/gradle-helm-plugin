@@ -18,7 +18,7 @@ import org.gradle.util.GFileUtils
 import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
 import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.ifPresent
 import org.unbrokendome.gradle.pluginutils.mapProperty

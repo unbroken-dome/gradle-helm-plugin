@@ -13,8 +13,8 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallationOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallationOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
 import org.unbrokendome.gradle.plugins.helm.release.tags.TagExpression
 import javax.inject.Inject
 

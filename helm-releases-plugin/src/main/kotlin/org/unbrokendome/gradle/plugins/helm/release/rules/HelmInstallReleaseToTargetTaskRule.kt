@@ -2,8 +2,8 @@ package org.unbrokendome.gradle.plugins.helm.release.rules
 
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.mergeValues
-import org.unbrokendome.gradle.plugins.helm.command.setFrom
+import org.unbrokendome.gradle.plugins.helm.command.internal.mergeValues
+import org.unbrokendome.gradle.plugins.helm.command.internal.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
 import org.unbrokendome.gradle.plugins.helm.release.dsl.ChartReference
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease

@@ -18,5 +18,6 @@ rootProject.name = "gradle-helm-plugin-parent"
 
 include(
     "helm-plugin",
-    "helm-publish-plugin"
+    "helm-publish-plugin",
+    "helm-releases-plugin"
 )

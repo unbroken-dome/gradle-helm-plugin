@@ -6,6 +6,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.HELM_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import org.unbrokendome.gradle.plugins.helm.command.internal.conventionsFrom
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerCommandTask

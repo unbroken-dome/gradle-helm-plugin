@@ -14,7 +14,7 @@ import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.HELM_RELEASES_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_RELEASE_TARGETS_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.command.conventionsFrom
+import org.unbrokendome.gradle.plugins.helm.command.internal.conventionsFrom
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
 import org.unbrokendome.gradle.plugins.helm.release.dsl.helmReleaseContainer

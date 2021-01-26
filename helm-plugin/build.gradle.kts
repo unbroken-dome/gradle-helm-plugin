@@ -35,10 +35,6 @@ gradlePlugin {
             id = "org.unbroken-dome.helm"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.HelmPlugin"
         }
-        create("helmReleasesPlugin") {
-            id = "org.unbroken-dome.helm-releases"
-            implementationClass = "org.unbrokendome.gradle.plugins.helm.release.HelmReleasesPlugin"
-        }
     }
 }
 
@@ -50,9 +46,6 @@ pluginBundle {
         }
         "helmPlugin" {
             displayName = "Helm plugin"
-        }
-        "helmReleasesPlugin" {
-            displayName = "Helm Releases Plugin"
         }
     }
 }

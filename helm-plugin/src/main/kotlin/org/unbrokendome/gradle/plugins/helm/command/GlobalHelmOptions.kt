@@ -5,8 +5,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.pluginutils.ifPresent
 
 
 interface GlobalHelmOptions : HelmOptions {
@@ -77,65 +75,4 @@ interface ConfigurableGlobalHelmOptions : GlobalHelmOptions, ConfigurableHelmOpt
      * See [https://helm.sh/docs/helm/helm/] for details about how XDG base directories are used by the Helm CLI.
      */
     override val xdgCacheHome: DirectoryProperty
-}
-
-
-internal fun ConfigurableGlobalHelmOptions.conventionsFrom(source: GlobalHelmOptions) = apply {
-    executable.convention(source.executable)
-    extraArgs.addAll(source.extraArgs)
-    xdgDataHome.convention(source.xdgDataHome)
-    xdgConfigHome.convention(source.xdgConfigHome)
-    xdgCacheHome.convention(source.xdgCacheHome)
-}
-
-
-internal class DelegateGlobalHelmOptions(
-    private val provider: Provider<GlobalHelmOptions>
-) : GlobalHelmOptions {
-
-    override val executable: Provider<String>
-        get() = provider.flatMap { it.executable }
-
-    override val debug: Provider<Boolean>
-        get() = provider.flatMap { it.debug }
-
-    override val extraArgs: Provider<List<String>>
-        get() = provider.flatMap { it.extraArgs }
-
-    override val xdgDataHome: Provider<Directory>
-        get() = provider.flatMap { it.xdgDataHome }
-
-    override val xdgConfigHome: Provider<Directory>
-        get() = provider.flatMap { it.xdgConfigHome }
-
-    override val xdgCacheHome: Provider<Directory>
-        get() = provider.flatMap { it.xdgCacheHome }
-}
-
-
-internal object GlobalHelmOptionsApplier : HelmOptionsApplier {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
-
-    override fun apply(spec: HelmExecSpec, options: HelmOptions) {
-        if (options is GlobalHelmOptions) {
-
-            logger.debug("Applying options: {}", options)
-
-            with(spec) {
-
-                executable(options.executable.getOrElse("helm"))
-
-                flag("--debug", options.debug)
-
-                options.extraArgs.ifPresent { extraArgs ->
-                    args(extraArgs)
-                }
-
-                environment("XDG_DATA_HOME", options.xdgDataHome)
-                environment("XDG_CONFIG_HOME", options.xdgConfigHome)
-                environment("XDG_CACHE_HOME", options.xdgCacheHome)
-            }
-        }
-    }
 }

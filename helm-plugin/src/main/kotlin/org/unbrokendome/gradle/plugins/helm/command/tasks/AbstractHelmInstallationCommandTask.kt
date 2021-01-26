@@ -16,9 +16,9 @@ import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallationOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
 import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.mapProperty
 import org.unbrokendome.gradle.pluginutils.property

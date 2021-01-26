@@ -8,11 +8,11 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableGlobalHelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
-import org.unbrokendome.gradle.plugins.helm.command.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptionsHolder
+import org.unbrokendome.gradle.plugins.helm.command.internal.GlobalHelmOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmServerOptionsHolder
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.dirProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.fileProviderFromProjectProperty

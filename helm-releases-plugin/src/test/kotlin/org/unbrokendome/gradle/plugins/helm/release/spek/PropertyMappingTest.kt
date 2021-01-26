@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.spek
+package org.unbrokendome.gradle.plugins.helm.release.spek
 
 import assertk.assertThat
 import assertk.assertions.prop

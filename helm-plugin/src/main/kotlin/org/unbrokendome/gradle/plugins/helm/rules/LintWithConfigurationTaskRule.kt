@@ -3,7 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.rules
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.lint
-import org.unbrokendome.gradle.plugins.helm.command.mergeValues
+import org.unbrokendome.gradle.plugins.helm.command.internal.mergeValues
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting

@@ -23,7 +23,7 @@ val HelmChart.dirArtifactConfigurationName: String
 /**
  * A rule that registers an artifact configuration and an artifact for a chart directory.
  */
-internal class ChartDirArtifactRule(
+class ChartDirArtifactRule(
     configurations: ConfigurationContainer,
     private val tasks: TaskContainer,
     charts: NamedDomainObjectCollection<HelmChart>

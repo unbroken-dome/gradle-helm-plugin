@@ -4,7 +4,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOperationOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOperationOptionsApplier
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmServerOperationOptionsApplier
 import org.unbrokendome.gradle.pluginutils.property
 import java.time.Duration
 
