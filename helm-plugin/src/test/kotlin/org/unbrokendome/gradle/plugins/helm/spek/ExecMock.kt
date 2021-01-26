@@ -5,7 +5,7 @@ import org.spekframework.spek2.dsl.LifecycleAware
 import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.lifecycle.MemoizedValue
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.DefaultExecutableGradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.ExecutableGradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock

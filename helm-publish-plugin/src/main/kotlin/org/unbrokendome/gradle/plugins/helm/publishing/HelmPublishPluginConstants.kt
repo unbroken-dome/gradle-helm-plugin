@@ -14,12 +14,6 @@ internal const val HELM_PUBLISHING_REPOSITORIES_EXTENSION_NAME = "repositories"
 
 
 /**
- * The name of the `publishing.httpClient` sub-extension.
- */
-internal const val HELM_PUBLISHING_HTTPCLIENT_EXTENSION_NAME = "httpClient"
-
-
-/**
  * The name of the publishing convention object installed on each chart.
  *
  * Note that since convention properties are accessible directly on the object, the name of the convention

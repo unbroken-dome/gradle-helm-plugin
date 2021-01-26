@@ -21,12 +21,12 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentia
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.createChartDependencyHandler
-import org.unbrokendome.gradle.plugins.helm.dsl.filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.helmChartContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.helmRepositoryHandler
-import org.unbrokendome.gradle.plugins.helm.dsl.lint
-import org.unbrokendome.gradle.plugins.helm.dsl.repositories
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.lint
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
 import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDependenciesConfigurationRule
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule

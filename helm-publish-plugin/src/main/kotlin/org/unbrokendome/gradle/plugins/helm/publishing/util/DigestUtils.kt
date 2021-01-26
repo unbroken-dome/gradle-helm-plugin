@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.util
+package org.unbrokendome.gradle.plugins.helm.publishing.util
 
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel

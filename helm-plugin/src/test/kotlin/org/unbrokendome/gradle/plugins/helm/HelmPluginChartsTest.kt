@@ -20,10 +20,10 @@ import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.dsl.charts
-import org.unbrokendome.gradle.plugins.helm.dsl.filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.lint
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.charts
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.filtering
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.lint
 import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask

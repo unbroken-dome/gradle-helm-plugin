@@ -4,7 +4,6 @@ package org.gradle.kotlin.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.HELM_DEPENDENCIES_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
@@ -12,7 +11,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
 import org.unbrokendome.gradle.pluginutils.extensionByName
 
 
@@ -53,12 +51,3 @@ val HelmChart.dependencies: ChartDependencyHandler by extensionByName(HELM_DEPEN
  */
 fun HelmChart.dependencies(configure: Action<ChartDependencyHandler>) =
     (this as ExtensionAware).extensions.configure(HELM_DEPENDENCIES_EXTENSION_NAME, configure)
-
-
-/**
- * Indicates whether tasks for publishing this chart should be created automatically.
- *
- * Defaults to `true`.
- */
-val HelmChart.publish: Property<Boolean>
-    get() = publishConvention.publish

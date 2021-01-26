@@ -13,7 +13,7 @@ import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTest
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
 import org.unbrokendome.gradle.plugins.helm.release.dsl.activeReleaseTarget

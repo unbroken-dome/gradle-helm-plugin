@@ -18,8 +18,8 @@ import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.repositories
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent

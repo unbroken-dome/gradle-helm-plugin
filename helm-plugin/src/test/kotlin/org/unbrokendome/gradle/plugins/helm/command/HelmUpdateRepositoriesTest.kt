@@ -2,7 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateRepositories
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.spek.ExecutionResultAwareSpek
 import org.unbrokendome.gradle.plugins.helm.spek.gradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.singleInvocation

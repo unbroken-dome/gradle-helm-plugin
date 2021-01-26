@@ -8,7 +8,7 @@ import org.gradle.api.Project
 import org.spekframework.spek2.dsl.GroupBody
 import org.spekframework.spek2.dsl.LifecycleAware
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.spek.afterEachSuccessfulTest
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.StatefulInvocation

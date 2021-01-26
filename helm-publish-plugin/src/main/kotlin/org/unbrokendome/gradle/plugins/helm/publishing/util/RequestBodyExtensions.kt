@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.util
+package org.unbrokendome.gradle.plugins.helm.publishing.util
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

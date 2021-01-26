@@ -11,8 +11,8 @@ import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.HelmPlugin
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.charts
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.charts
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmChartPublishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmChartPublishConvention
@@ -53,7 +53,6 @@ class HelmPublishPlugin
 
             createPublishAllTask(project, charts)
         }
-
     }
 
 

@@ -2,7 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.command
 
 import org.gradle.api.Project
 import org.unbrokendome.gradle.plugins.helm.command.GlobalServerOptionsTests.serverCommands
-import org.unbrokendome.gradle.plugins.helm.dsl.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.Invocation
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.eachInvocation

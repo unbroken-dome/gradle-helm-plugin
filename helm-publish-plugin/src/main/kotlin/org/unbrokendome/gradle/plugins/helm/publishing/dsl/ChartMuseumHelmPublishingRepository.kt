@@ -2,8 +2,8 @@ package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.SerializableCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.toSerializable
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.SerializableCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.toSerializable
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams

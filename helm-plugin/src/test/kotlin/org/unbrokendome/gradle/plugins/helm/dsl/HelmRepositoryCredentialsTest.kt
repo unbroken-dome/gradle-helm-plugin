@@ -12,6 +12,8 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentia
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.fileValue
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent

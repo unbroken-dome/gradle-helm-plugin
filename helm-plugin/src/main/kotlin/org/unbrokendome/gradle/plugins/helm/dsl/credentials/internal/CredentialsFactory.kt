@@ -1,13 +1,17 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.credentials
+package org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal
 
 import org.gradle.api.credentials.Credentials
 import org.gradle.api.model.ObjectFactory
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.DefaultCertificateCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.DefaultPasswordCredentials
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 
 
 /**
  * Instantiates [Credentials] objects of known types.
  */
-internal interface CredentialsFactory {
+interface CredentialsFactory {
 
     /**
      * Instantiates a credentials object given its public type.
@@ -30,7 +34,7 @@ internal interface CredentialsFactory {
 }
 
 
-internal class DefaultCredentialsFactory(private val objectFactory: ObjectFactory) : CredentialsFactory {
+class DefaultCredentialsFactory(private val objectFactory: ObjectFactory) : CredentialsFactory {
 
     private val knownTypes: Map<Class<out Credentials>, Class<out Credentials>> = mapOf(
         PasswordCredentials::class.java to DefaultPasswordCredentials::class.java,

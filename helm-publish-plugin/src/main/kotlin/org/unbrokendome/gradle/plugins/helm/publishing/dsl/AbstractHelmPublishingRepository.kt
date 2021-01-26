@@ -4,9 +4,9 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainerSupport
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsFactory
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.DefaultCredentialsFactory
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.CredentialsContainerSupport
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.CredentialsFactory
+import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.DefaultCredentialsFactory
 import org.unbrokendome.gradle.pluginutils.property
 import java.net.URI
 

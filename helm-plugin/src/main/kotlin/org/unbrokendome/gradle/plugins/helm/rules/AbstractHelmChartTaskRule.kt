@@ -11,7 +11,7 @@ import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern2
 
 
-internal abstract class AbstractHelmChartTaskRule<T : Task>(
+abstract class AbstractHelmChartTaskRule<T : Task>(
     taskType: Class<T>,
     tasks: TaskContainer,
     charts: NamedDomainObjectCollection<HelmChart>,
@@ -25,7 +25,7 @@ internal abstract class AbstractHelmChartTaskRule<T : Task>(
 }
 
 
-internal abstract class AbstractHelmChartTaskRuleOuterInner<S : Named, T : Task>(
+abstract class AbstractHelmChartTaskRuleOuterInner<S : Named, T : Task>(
     taskType: Class<T>,
     tasks: TaskContainer,
     charts: NamedDomainObjectCollection<HelmChart>,
