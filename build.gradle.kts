@@ -75,6 +75,15 @@ subprojects {
 
     plugins.withId("org.jetbrains.dokka") {
 
+        dependencies {
+            "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.20")
+        }
+
+        tasks.withType<Jar>().matching { it.name == "javadocJar" }
+            .configureEach {
+                from(tasks.named("dokkaJavadoc"))
+            }
+
         tasks.withType<org.jetbrains.dokka.gradle.DokkaTask> {
             dokkaSourceSets.all {
                 externalDocumentationLink {
