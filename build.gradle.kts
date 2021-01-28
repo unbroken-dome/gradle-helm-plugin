@@ -23,6 +23,11 @@ subprojects {
         with(the<GradlePluginDevelopmentExtension>()) {
             isAutomatedPublishing = true
         }
+
+        with(the<JavaPluginExtension>()) {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 
 
@@ -79,8 +84,8 @@ subprojects {
             "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.20")
         }
 
-        tasks.withType<Jar>().matching { it.name == "javadocJar" }
-            .configureEach {
+        tasks.withType<Jar>().matching { it.name == "javadocJar" || it.name == "publishPluginJavaDocsJar" }
+            .all {
                 from(tasks.named("dokkaJavadoc"))
             }
 
@@ -124,6 +129,7 @@ subprojects {
         val githubUrl = project.extra["github.url"] as String
 
         with(the<com.gradle.publish.PluginBundleExtension>()) {
+
             website = githubUrl
             vcsUrl = githubUrl
             description = "A suite of Gradle plugins for building, publishing and managing Helm charts."
