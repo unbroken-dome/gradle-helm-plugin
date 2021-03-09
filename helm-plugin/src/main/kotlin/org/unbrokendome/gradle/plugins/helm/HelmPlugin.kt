@@ -121,11 +121,14 @@ class HelmPlugin
 
         charts.addRule(MainChartRule(this, charts))
 
-        listOf(
-            ::FilterChartSourcesTaskRule, ::CollectChartDependenciesTaskRule, ::CollectChartSourcesTaskRule,
-            ::UpdateDependenciesTaskRule, ::LintTaskRule, ::LintWithConfigurationTaskRule, ::PackageTaskRule
-        ).forEach { ruleCreator ->
-            tasks.addRule(ruleCreator(tasks, charts))
+        with (tasks) {
+            addRule(FilterChartSourcesTaskRule(this, charts))
+            addRule(CollectChartDependenciesTaskRule(this, charts))
+            addRule(CollectChartSourcesTaskRule(this, charts))
+            addRule(UpdateDependenciesTaskRule(this, charts))
+            addRule(LintTaskRule(this, charts))
+            addRule(LintWithConfigurationTaskRule(this, charts))
+            addRule(PackageTaskRule(this, charts))
         }
 
         tasks.register("helmPackage") { task ->

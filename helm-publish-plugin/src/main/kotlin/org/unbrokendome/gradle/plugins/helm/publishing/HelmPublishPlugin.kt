@@ -17,7 +17,7 @@ import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmChartPublishConve
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmChartPublishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmPublishingExtension
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.repositories
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.internal.repositories
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartToRepositoryTaskRule
 import org.unbrokendome.gradle.plugins.helm.publishing.rules.publishTaskName

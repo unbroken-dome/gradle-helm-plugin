@@ -99,10 +99,10 @@ internal object TagExpressionParser {
             }
 
             val reducedTokens = tokens
-                .reduceWith(this::reduceParentheses)
-                .reduceWith(this::reduceNotExpression)
-                .reduceWith(this::reduceAndExpression)
-                .reduceWith(this::reduceOrExpression)
+                .reduceWith { reduceParentheses(it) }
+                .reduceWith { reduceNotExpression(it) }
+                .reduceWith { reduceAndExpression(it) }
+                .reduceWith { reduceOrExpression(it) }
 
             return reducedTokens
                 .map { token ->
@@ -112,7 +112,7 @@ internal object TagExpressionParser {
                         .expression
                 }
                 // having multiple ExpressionTokens left is ok, just combine them with OR
-                .reduce(TagExpression::or)
+                .reduce { t1, t2 -> t1.or(t2) }
 
         } catch (e: ParseException) {
             throw IllegalArgumentException("Invalid tag expression: ${e.message}", e)
@@ -163,7 +163,7 @@ internal object TagExpressionParser {
 
 
     private fun reduceAndExpression(tokens: List<Token>): List<Token>? =
-        reduceBinaryExpression(tokens, ScanToken.AND, BinaryOperator(TagExpression::and))
+        reduceBinaryExpression(tokens, ScanToken.AND) { e1, e2 -> e1.and(e2) }
 
 
     private fun reduceOrExpression(tokens: List<Token>): List<Token>? =

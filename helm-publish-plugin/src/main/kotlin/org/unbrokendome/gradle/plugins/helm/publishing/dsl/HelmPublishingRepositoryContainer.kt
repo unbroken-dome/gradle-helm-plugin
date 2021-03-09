@@ -81,31 +81,26 @@ private open class DefaultHelmPublishingRepositoryContainer
 ), HelmPublishingRepositoryContainer {
 
     init {
-        registerFactory(
-            ArtifactoryHelmPublishingRepository::class.java,
-            objects::newArtifactoryHelmPublishingRepository
-        )
-        registerFactory(
-            ChartMuseumHelmPublishingRepository::class.java,
-            objects::newChartMuseumHelmPublishingRepository
-        )
-        registerFactory(
-            HarborHelmPublishingRepository::class.java,
-            objects::newHarborHelmPublishingRepository
-        )
-        registerFactory(
-            CustomHelmPublishingRepository::class.java,
-            objects::newCustomHelmPublishingRepository
-        )
-        registerFactory(
-            NexusHelmPublishingRepository::class.java,
-            objects::newNexusHelmPublishingRepository
-        )
+        registerFactory(ArtifactoryHelmPublishingRepository::class.java) { name ->
+            objects.newArtifactoryHelmPublishingRepository(name)
+        }
+        registerFactory(ChartMuseumHelmPublishingRepository::class.java) { name ->
+            objects.newChartMuseumHelmPublishingRepository(name)
+        }
+        registerFactory(HarborHelmPublishingRepository::class.java) { name ->
+            objects.newHarborHelmPublishingRepository(name)
+        }
+        registerFactory(CustomHelmPublishingRepository::class.java) { name ->
+            objects.newCustomHelmPublishingRepository(name)
+        }
+        registerFactory(NexusHelmPublishingRepository::class.java) { name ->
+            objects.newNexusHelmPublishingRepository(name)
+        }
 
         // Default type is "custom"
-        registerDefaultFactory(
-            objects::newCustomHelmPublishingRepository
-        )
+        registerDefaultFactory { name ->
+            objects.newCustomHelmPublishingRepository(name)
+        }
     }
 }
 

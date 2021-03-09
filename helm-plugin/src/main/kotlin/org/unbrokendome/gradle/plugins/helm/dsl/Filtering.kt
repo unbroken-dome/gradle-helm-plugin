@@ -61,5 +61,5 @@ internal fun ObjectFactory.createFiltering(parent: Filtering? = null): Filtering
         .apply {
             values.empty()
             fileValues.empty()
-            parent?.let(this::setParent)
+            parent?.let { setParent(it) }
         }
