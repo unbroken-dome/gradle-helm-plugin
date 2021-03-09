@@ -1,3 +1,4 @@
+@file:JvmName("HelmPublishPluginExtensionAccessors")
 package org.gradle.kotlin.dsl
 
 import org.gradle.api.provider.Property
