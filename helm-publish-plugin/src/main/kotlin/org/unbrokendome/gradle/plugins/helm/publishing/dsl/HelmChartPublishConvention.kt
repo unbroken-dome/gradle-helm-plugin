@@ -3,8 +3,8 @@ package org.unbrokendome.gradle.plugins.helm.publishing.dsl
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.pluginutils.conventionPluginByType
 import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.requiredConventionPlugin
 import javax.inject.Inject
 
 
@@ -44,4 +44,5 @@ internal fun ObjectFactory.createHelmChartPublishConvention(): HelmChartPublishC
 /**
  * Gets the [HelmChartPublishConvention] object for the given chart.
  */
-internal val HelmChart.publishConvention: HelmChartPublishConvention by conventionPluginByType()
+internal val HelmChart.publishConvention: HelmChartPublishConvention
+    get() = requiredConventionPlugin()
