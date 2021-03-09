@@ -63,7 +63,7 @@ private object EmptyChartDescriptor : ChartDescriptor {
 internal object ChartDescriptorYaml {
 
     fun loading(from: Provider<RegularFile>): Provider<ChartDescriptor> =
-        from.map(this::load)
+        from.map { load(it) }
 
 
     fun load(file: RegularFile): ChartDescriptor =
@@ -72,7 +72,7 @@ internal object ChartDescriptorYaml {
 
     fun load(file: File): ChartDescriptor =
         file.takeIf { it.exists() }
-            ?.reader()?.use(this::load)
+            ?.reader()?.use { load(it) }
             ?: EmptyChartDescriptor
 
 

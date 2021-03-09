@@ -470,7 +470,7 @@ private abstract class AbstractHelmRelease(
 
     final override fun from(notation: Any) {
         if (notation is Provider<*>) {
-            chart.set(notation.map(this::notationToChartReference))
+            chart.set(notation.map { notationToChartReference(it) })
         } else {
             chart.set(notationToChartReference(notation))
         }

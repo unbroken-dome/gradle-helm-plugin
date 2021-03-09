@@ -62,7 +62,7 @@ interface Linting : ConfigurableHelmValueOptions {
      */
     @JvmDefault
     fun configurations(configureAction: Action<NamedDomainObjectContainer<Configuration>>) =
-        configurations.apply(configureAction::execute)
+        configurations.also { configureAction.execute(it) }
 }
 
 
@@ -115,5 +115,5 @@ internal fun ObjectFactory.createLinting(parent: Linting? = null): Linting =
                 }
             }
 
-            parent?.let(this::setParent)
+            parent?.let { setParent(it) }
         }

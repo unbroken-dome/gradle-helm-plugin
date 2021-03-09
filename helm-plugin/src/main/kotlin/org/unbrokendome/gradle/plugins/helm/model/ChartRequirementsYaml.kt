@@ -13,7 +13,7 @@ import java.io.Reader
 internal object ChartRequirementsYaml {
 
     fun loading(from: Provider<RegularFile>): Provider<ChartModelDependencies> =
-        from.map(this::load)
+        from.map { load(it) }
 
 
     fun load(file: RegularFile): ChartModelDependencies =
@@ -40,6 +40,6 @@ internal object ChartRequirementsYaml {
      */
     fun load(file: File): ChartModelDependencies =
         file.takeIf { it.exists() }
-            ?.reader()?.use(this::load)
+            ?.reader()?.use { load(it) }
             ?: ChartModelDependencies.empty
 }

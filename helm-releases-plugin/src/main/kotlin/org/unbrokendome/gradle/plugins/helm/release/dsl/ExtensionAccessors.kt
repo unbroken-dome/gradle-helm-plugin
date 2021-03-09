@@ -6,25 +6,26 @@ import org.unbrokendome.gradle.plugins.helm.HELM_ACTIVE_RELEASE_TARGET_EXTENSION
 import org.unbrokendome.gradle.plugins.helm.HELM_RELEASES_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_RELEASE_TARGETS_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.pluginutils.extensionByName
+import org.unbrokendome.gradle.pluginutils.requiredExtension
 
 
 /**
  * Gets the `releases` sub-extension.
  */
 internal val HelmExtension.releases: NamedDomainObjectContainer<HelmRelease>
-        by extensionByName(HELM_RELEASES_EXTENSION_NAME)
+    get() = requiredExtension(HELM_RELEASES_EXTENSION_NAME)
 
 
 /**
  * Gets the `releaseTargets` sub-extension.
  */
 internal val HelmExtension.releaseTargets: NamedDomainObjectContainer<HelmReleaseTarget>
-        by extensionByName(HELM_RELEASE_TARGETS_EXTENSION_NAME)
+    get() = requiredExtension(HELM_RELEASE_TARGETS_EXTENSION_NAME)
 
 
 /**
  * Gets the `activeReleaseTarget` sub-extension.
  */
+@Suppress("UNCHECKED_CAST")
 internal val HelmExtension.activeReleaseTarget: Property<String>
-        by extensionByName(HELM_ACTIVE_RELEASE_TARGET_EXTENSION_NAME)
+    get() = requiredExtension(HELM_ACTIVE_RELEASE_TARGET_EXTENSION_NAME)

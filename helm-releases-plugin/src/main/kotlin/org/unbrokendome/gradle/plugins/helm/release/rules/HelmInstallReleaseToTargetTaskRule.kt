@@ -5,7 +5,6 @@ import org.gradle.api.tasks.TaskContainer
 import org.unbrokendome.gradle.plugins.helm.command.internal.mergeValues
 import org.unbrokendome.gradle.plugins.helm.command.internal.setFrom
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
-import org.unbrokendome.gradle.plugins.helm.release.dsl.ChartReference
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseInternal
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
@@ -58,7 +57,7 @@ internal class HelmInstallReleaseToTargetTaskRule(
         setFrom(targetSpecific)
         mergeValues(targetSpecific)
         releaseName.set(targetSpecific.releaseName)
-        chart.set(targetSpecific.chart.map(ChartReference::chartLocation))
+        chart.set(targetSpecific.chart.map { it.chartLocation })
         version.set(targetSpecific.version)
         replace.set(targetSpecific.replace)
 

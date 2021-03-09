@@ -178,7 +178,7 @@ class HelmReleasesPlugin : Plugin<Project> {
             task.description = "Installs all Helm releases to the active target."
 
             task.dependsOn(
-                activeReleaseTarget.map(::installAllToTargetTaskName)
+                activeReleaseTarget.map { installAllToTargetTaskName(it) }
             )
         }
     }
@@ -192,7 +192,7 @@ class HelmReleasesPlugin : Plugin<Project> {
             task.description = "Uninstalls all Helm releases from the active target."
 
             task.dependsOn(
-                activeReleaseTarget.map(::uninstallAllFromTargetTaskName)
+                activeReleaseTarget.map { uninstallAllFromTargetTaskName(it) }
             )
         }
     }
@@ -206,7 +206,7 @@ class HelmReleasesPlugin : Plugin<Project> {
             task.description = "Tests all Helm releases on the active target."
 
             task.dependsOn(
-                activeReleaseTarget.map(::testAllOnTargetTaskName)
+                activeReleaseTarget.map { testAllOnTargetTaskName(it) }
             )
         }
     }

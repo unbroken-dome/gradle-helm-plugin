@@ -18,7 +18,7 @@ internal interface ChartModelDependencies {
             val dependencies = (map["dependencies"] as? List<Map<String, Any?>>)
                 ?.map { ChartModelDependency.fromMap(it) }
                 ?.takeUnless { it.isEmpty() }
-            return dependencies?.let(::DefaultChartModelDependencies) ?: Empty
+            return dependencies?.let { DefaultChartModelDependencies(it) } ?: Empty
         }
 
 
