@@ -11,8 +11,8 @@ dependencies {
 
     implementation(project(":helm-plugin"))
 
-    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.2.0")
-    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.2.0")
+    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.2.1")
+    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.2.1")
 }
 
 
