@@ -68,6 +68,19 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         configuration: Action<NexusHelmPublishingRepository>
     ): NexusHelmPublishingRepository =
         nexus("default", configuration)
+
+    @JvmDefault
+    fun gitlab(
+        name: String,
+        configuration: Action<GitlabHelmPublishingRepository>
+    ): GitlabHelmPublishingRepository =
+        create(name, GitlabHelmPublishingRepository::class.java, configuration)
+
+    @JvmDefault
+    fun gitlab(
+        configuration: Action<GitlabHelmPublishingRepository>
+    ): GitlabHelmPublishingRepository =
+        gitlab("default", configuration)
 }
 
 
@@ -95,6 +108,9 @@ private open class DefaultHelmPublishingRepositoryContainer
         }
         registerFactory(NexusHelmPublishingRepository::class.java) { name ->
             objects.newNexusHelmPublishingRepository(name)
+        }
+        registerFactory(GitlabHelmPublishingRepository::class.java) { name ->
+            objects.newGitlabHelmPublishingRepository(name)
         }
 
         // Default type is "custom"

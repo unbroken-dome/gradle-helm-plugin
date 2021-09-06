@@ -6,7 +6,9 @@ The `helm-publish` plugin allows you to publish your charts to remote repositori
 ====
 There is currently no "official" API to publish Helm charts; Helm defines only how charts should be
 served from a repository. The plugin directly supports several types of popular repository servers, including
-https://chartmuseum.com/[ChartMuseum], https://jfrog.com/artifactory/[Artifactory] and https://goharbor.io/[Harbor].
+https://chartmuseum.com/[ChartMuseum], https://jfrog.com/artifactory/[Artifactory],
+https://goharbor.io/[Harbor], https://blog.sonatype.com/nexus-as-a-container-registry[Nexus] and
+https://docs.gitlab.com/ce/user/packages/container_registry/[Gitlab].
 
 For other repository types that are not directly supported, you could try using the `custom` repository type,
 or consider creating a PR to add support for it.
@@ -127,6 +129,8 @@ The following repository types are supported:
 - `artifactory`
 - `chartMuseum`
 - `harbor`
+- `nexus`
+- `gitlab`
 - `custom`
 
 
@@ -284,6 +288,43 @@ helm {
 ----
 TIP: Nexus API
 https://help.sonatype.com/repomanager3/rest-and-integration-api/components-api#ComponentsAPI-UploadComponent[documentation].
+
+=== Gitlab Repositories
+
+The plugin provides direct support for Gitlab repositories. The Gitlab API `url` and the `projectId` must be set in the
+repository configuration block.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    publishing {
+        repositories {
+            gitlab {
+                url = uri('https://gitlab.example.com/api/v4')
+                projectId = 1234
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    publishing {
+        repositories {
+            gitlab {
+                url.set(uri("https://gitlab.example.com/api/v4"))
+                projectName.set(1234)
+            }
+        }
+    }
+}
+----
+TIP: Helm charts in the Gitlab Package Registry
+https://docs.gitlab.com/ee/user/packages/helm_repository/#helm-charts-in-the-package-registry[documentation].
 
 === Custom Repositories
 
