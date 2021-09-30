@@ -48,22 +48,22 @@ The following properties can be configured on a chart:
 |===
 | Property | Description | Default
 
-`chartName`
-The name of the chart, as used in various `helm` CLI commands. The plugin will make sure that the chart sources are
- in a directory with this name when calling `helm`.
-Defaults to the name of the chart in the DSL.
+| `chartName`
+| The name of the chart, as used in various `helm` CLI commands. The plugin will make sure that the chart sources are
+  in a directory with this name when calling `helm`.
+| Defaults to the name of the chart in the DSL.
 
-`chartVersion`
-The version of the chart, as used by `helm`.
-Defaults to the Gradle project version.
+| `chartVersion`
+| The version of the chart, as used by `helm`.
+| Defaults to the Gradle project version.
 
-`sourceDir`
-The directory containing the chart sources (`Chart.yaml` file, etc.).
-Defaults to `src/main/helm` for the `main` chart (see below), _required_ for all other charts.
+| `sourceDir`
+| The directory containing the chart sources (`Chart.yaml` file, etc.).
+| Defaults to `src/main/helm` for the `main` chart (see below), _required_ for all other charts.
 
-`extraFiles`
-An optional Gradle `CopySpec` that allows injecting files from external sources into the chart.
-By default, no files are copied.
+| `extraFiles`
+| An optional Gradle `CopySpec` that allows injecting files from external sources into the chart.
+| By default, no files are copied.
 |===
 
 
