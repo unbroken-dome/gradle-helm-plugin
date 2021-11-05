@@ -27,7 +27,8 @@ internal abstract class HelmExecWorkAction
 
                 parameters.environment.ifPresent { spec.environment.putAll(it) }
 
-                stdout?.let { spec.standardOutput = it }
+                spec.standardOutput = stdout ?: LoggerOutputStream { message -> logger.info(message) }
+                spec.errorOutput = stdout ?: LoggerOutputStream { message -> logger.error(message) }
 
                 if (logger.isInfoEnabled) {
                     logger.info("Executing: {}\n  with environment: {}", maskCommandLine(spec.commandLine), spec.environment)
@@ -36,10 +37,26 @@ internal abstract class HelmExecWorkAction
         }
     }
 
-
     private fun fileOutputStream(provider: Provider<RegularFile>): OutputStream? =
         provider.orNull?.asFile?.let { file ->
             file.parentFile.mkdirs()
             file.outputStream()
         }
+
+    class LoggerOutputStream(val log: (String) -> Unit) : OutputStream() {
+        private val currentLine: StringBuilder = StringBuilder()
+
+        override fun write(b: Int) {
+            if (b.toChar() == '\n') {
+                flush()
+                return
+            }
+            currentLine.append(b.toChar())
+        }
+
+        override fun flush() {
+            log(currentLine.toString())
+            currentLine.clear()
+        }
+  }
 }
