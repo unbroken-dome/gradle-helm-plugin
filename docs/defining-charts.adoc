@@ -221,7 +221,7 @@ helm.charts {
 .Kotlin
 ----
 helm.charts {
-    myChart {
+    create("myChart") {
         sourceDir.set(file("src/helm/my-chart"))
 
         extraFiles {
