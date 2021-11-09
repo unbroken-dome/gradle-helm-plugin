@@ -11,6 +11,8 @@ Filtered files are processed using a Groovy
 link:https://docs.groovy-lang.org/latest/html/api/groovy/text/SimpleTemplateEngine.html[SimpleTemplateEngine]. Filter
 expressions are Groovy expressions enclosed in `${` and `}`, for example `${chartName}`.
 
+TIP: If you have actual `$` characters in these files, you can escape them as `\$` so they are not interpreted as a filter expression.
+
 The following placeholders are automatically available based on the corresponding properties of the chart in
 the DSL. You can also define additional placeholders and their values using the `filtering.values` property (see below).
 
