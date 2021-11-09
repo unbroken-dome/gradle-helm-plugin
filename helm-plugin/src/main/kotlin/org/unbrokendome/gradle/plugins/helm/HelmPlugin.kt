@@ -9,40 +9,16 @@ import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateRepositories
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtensionInternal
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
-import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
+import org.unbrokendome.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
 import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.createChartDependencyHandler
-import org.unbrokendome.gradle.plugins.helm.dsl.helmChartContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.helmRepositoryHandler
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.lint
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
-import org.unbrokendome.gradle.plugins.helm.rules.AddRepositoryTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.ChartDependenciesConfigurationRule
-import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.plugins.helm.rules.ChartPackagedArtifactRule
-import org.unbrokendome.gradle.plugins.helm.rules.CollectChartDependenciesTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.CollectChartSourcesTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.FilterChartSourcesTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.LintTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.LintWithConfigurationTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.MainChartRule
-import org.unbrokendome.gradle.plugins.helm.rules.PackageTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.UpdateDependenciesTaskRule
-import org.unbrokendome.gradle.plugins.helm.rules.dirArtifactConfigurationName
-import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
-import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
-import org.unbrokendome.gradle.plugins.helm.rules.registerTaskName
+import org.unbrokendome.gradle.plugins.helm.rules.*
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.fileProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
@@ -129,15 +105,27 @@ class HelmPlugin
             addRule(LintTaskRule(this, charts))
             addRule(LintWithConfigurationTaskRule(this, charts))
             addRule(PackageTaskRule(this, charts))
+            addRule(RenderTaskRule(this, charts))
+            addRule(RenderAllTaskRule(this, charts))
         }
 
         tasks.register("helmPackage") { task ->
             task.group = HELM_GROUP
             task.description = "Packages all Helm charts."
             task.dependsOn(TaskDependency {
-                charts.map { chart ->
+                charts.mapTo(mutableSetOf()) { chart ->
                     tasks.getByName(chart.packageTaskName)
-                }.toSet()
+                }
+            })
+        }
+
+        tasks.register("helmRender") { task ->
+            task.group = HELM_GROUP
+            task.description = "Renders all renderings of all Helm charts."
+            task.dependsOn(TaskDependency {
+                charts.mapTo(mutableSetOf()) { chart ->
+                    tasks.getByName(chart.renderAllTaskName)
+                }
             })
         }
 
@@ -181,6 +169,7 @@ class HelmPlugin
 
         return helmChartContainer(
                 baseOutputDir = helm.outputDir,
+                globalRenderBaseOutputDir = helm.renderOutputDir,
                 filteredSourcesBaseDir = helm.tmpDir.dir("filtered"),
                 dependenciesBaseDir = helm.tmpDir.dir("dependencies")
             )

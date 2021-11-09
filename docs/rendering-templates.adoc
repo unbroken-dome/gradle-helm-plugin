@@ -1,0 +1,173 @@
+= Rendering Templates Locally
+
+The `helm` plugin allows you to locally render a Helm chart that is defined in your
+build script by calling `helm template`.
+
+== Simple Usage
+
+When you declare a chart in your build script using the `helm.charts` construct, the
+plugin will register a task for each chart named `helmRender<Name>Chart` to invoke
+`helm template` on the packaged chart. The rendered manifests will be placed in
+`helm/render/<chart>/default/` beneath the project's build directory.
+
+For example, given the following build script:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.charts {
+    awesome {
+        // ... configure the chart
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.charts {
+    create("awesome") {
+        // ... configure the chart
+    }
+}
+----
+
+Then there will be a task named `helmRenderAwesomeChart` that
+will render the templates of the chart into `build/helm/render/awesome/default`.
+
+The `helmRender` task will render all charts in the
+project. This can be useful if you have multiple charts defined in the project, or
+simply for the convenience of a short task name.
+
+
+== Configure Renderings
+
+Each chart has a `renderings` container where you can fine-tune the renderings.
+The options of a rendering correspond with the arguments to the `helm template`
+invocation.
+
+A rendering named `default` will automatically be available for each chart (if you don't
+create one named `default` yourself), and it starts out with a basic configuration.
+You can adjust the `default` rendering in your script, for example to add some values:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.charts {
+    main {
+        renderings {
+            'default' {
+
+                releaseName = 'my-release'
+
+                // Kubernetes API versions used for Capabilities.APIVersions
+                // (helm template --api-versions)
+                apiVersions.addAll('v1', 'apps/v1', 'batch/v1')
+
+                // set .Release.IsUpgrade instead of .Release.IsInstall
+                // (helm template --is-upgrade)
+                isUpgrade = true
+
+                // only show manifests rendered from the given templates
+                // (helm template --show-only)
+                showOnly.addAll('deployment.yaml', 'service.yaml')
+
+                // use release name in the output-dir path
+                // (helm template --release-name)
+                useReleaseNameInOutputPath = true
+
+                // validate manifests against the Kubernetes cluster
+                // (helm template --validate)
+                validate = true
+
+                values.put('foo', 'bar')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.charts {
+    create("main") {
+        renderings {
+            // Note: you can use create, register or named -- the default rendering
+            // will be created automatically if it does not exist
+            named("default") {
+                releaseName.set("my-release")
+
+                // Kubernetes API versions used for Capabilities.APIVersions
+                // (helm template --api-versions)
+                apiVersions.addAll("v1", "apps/v1", "batch/v1")
+
+                // set .Release.IsUpgrade instead of .Release.IsInstall
+                // (helm template --is-upgrade)
+                isUpgrade.set(true)
+
+                // only show manifests rendered from the given templates
+                // (helm template --show-only)
+                showOnly.addAll("deployment.yaml", "service.yaml")
+
+                // use release name in the output-dir path
+                // (helm template --release-name)
+                useReleaseNameInOutputPath.set(true)
+
+                // validate manifests against the Kubernetes cluster
+                // (helm template --validate)
+                validate.set(true)
+
+                values.put("foo", "bar")
+            }
+        }
+    }
+}
+----
+
+Additional renderings can be added, for example to supply a different set of values
+to catch all conditional branches in your template logic:
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm.charts {
+    main {
+        renderings {
+            withExistingSecret {
+                values.put('existingSecret', 'secretName')
+            }
+        }
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm.charts {
+    create("main") {
+        renderings {
+            create("withExistingSecret") {
+                values.put("existingSecret", "secretName")
+            }
+        }
+    }
+}
+----
+
+The following tasks will execute the renderings:
+
+* Task `helmRenderMainChart<Name>Rendering` for a specific rendering. In the above
+  example, run the `helmRenderMainChartWithExistingSecretRendering` task to execute
+  the `withExistingSecret` rendering.
+* Task `helmRenderMainChart` will execute all renderings of the `main` chart
+  (including the `default` rendering).
+* Task `helmRender` will execute all renderings of all charts.
+
+== Rendering Output
+
+The output for each rendering (i.e. the rendered manifests) will be placed in the
+`build/helm/render/main/<name>` directory. You can access the output directory with
+the `outputDir` property of each rendering, for example to configure other tasks
+that perform further work on the output of `helm template`.

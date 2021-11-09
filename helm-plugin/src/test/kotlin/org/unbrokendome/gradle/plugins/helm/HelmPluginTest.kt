@@ -2,28 +2,21 @@ package org.unbrokendome.gradle.plugins.helm
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsOnly
-import assertk.assertions.each
-import assertk.assertions.extracting
-import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
-import assertk.assertions.isSuccess
-import assertk.assertions.prop
+import assertk.assertions.*
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Task
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTemplate
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
+import org.unbrokendome.gradle.plugins.helm.dsl.internal.charts
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.taskDependencies
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
 import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
@@ -61,6 +54,53 @@ object HelmPluginTest : Spek({
             assertThat(project)
                 .hasExtension<HelmExtension>("helm")
                 .hasExtension<NamedDomainObjectContainer<HelmChart>>("charts")
+        }
+    }
+
+
+    describe("renderings") {
+        it("should create a default rendering") {
+            val chart = project.helm.charts.create("my-chart")
+            assertThat(chart.renderings)
+                .containsItem("default")
+        }
+
+        it("should create a HelmTemplate task for each rendering") {
+            val chart = project.helm.charts.create("foo")
+            chart.renderings.create("red")
+
+            assertThat(project)
+                .containsTask<HelmTemplate>("helmRenderFooChartRedRendering")
+        }
+
+        it("should create a task that renders all renderings for a chart") {
+            val chart = project.helm.charts.create("foo")
+            chart.renderings.create("red")
+            chart.renderings.create("yellow")
+
+            assertThat(project)
+                .containsTask<Task>("helmRenderFooChart")
+                .hasTaskDependencies(
+                    "helmRenderFooChartDefaultRendering",
+                    "helmRenderFooChartRedRendering",
+                    "helmRenderFooChartYellowRendering",
+                    exactly = true
+                )
+        }
+
+        it("should create a task that renders all renderings for all charts") {
+            with(project.helm.charts) {
+                create("foo")
+                create("bar")
+            }
+
+            assertThat(project)
+                .containsTask<Task>("helmRender")
+                .hasTaskDependencies(
+                    "helmRenderFooChart",
+                    "helmRenderBarChart",
+                    exactly = true
+                )
         }
     }
 

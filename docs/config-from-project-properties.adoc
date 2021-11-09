@@ -127,6 +127,20 @@ You can configure repositories entirely from Gradle properties -- just the prese
 
 |===
 
+== Rendering
+
+[cols="2*"]
+|===
+| Property | Description
+
+| `helm.renderOutputDir`
+| The base directory under which the outputs of renderings will be placed.
+
+The output for a particular rendering will be placed in a
+subdirectory `<chart-name>/<rendering-name>`.
+
+|===
+
 == Releases
 
 [cols="2*"]

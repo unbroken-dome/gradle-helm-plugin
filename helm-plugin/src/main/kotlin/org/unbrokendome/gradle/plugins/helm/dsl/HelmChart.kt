@@ -1,10 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.dsl
 
-import org.gradle.api.Action
-import org.gradle.api.Buildable
-import org.gradle.api.Named
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Project
+import org.gradle.api.*
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
@@ -19,6 +15,7 @@ import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
 import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
 import org.unbrokendome.gradle.plugins.helm.model.ChartModelDependencies
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
+import org.unbrokendome.gradle.plugins.helm.rules.DefaultRenderingRule
 import org.unbrokendome.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.versionProvider
@@ -123,6 +120,42 @@ interface HelmChart : Named, Buildable {
     fun extraFiles(action: Action<CopySpec>) {
         action.execute(extraFiles)
     }
+
+
+    /**
+     * The base output directory for renderings. When a rendering is executed using
+     * `helm template`, a subdirectory with the name of the rendering will be created
+     * below this. (That subdirectory can be queried using [HelmRendering.outputDir].)
+     *
+     * By default, this is a subdirectory with the name of the chart, under the global base directory
+     * configured using [HelmExtension.renderOutputDir] on the global `helm` extension.
+     */
+    val renderBaseOutputDir: DirectoryProperty
+
+
+    /**
+     * The renderings for this chart.
+     *
+     * Each rendering allows specifying a different set of values and other options to pass
+     * to `helm template`. If no renderings are added to this container, the plugin will
+     * add a single rendering named "default" with no values.
+     */
+    val renderings: NamedDomainObjectContainer<HelmRendering>
+
+
+    /**
+     * Configures the renderings for this chart.
+     *
+     * Each rendering allows specifying a different set of values and other options to pass
+     * to `helm template`. If no renderings are added to this container, the plugin will
+     * add a single rendering named "default" with no values.
+     *
+     * @param action an [Action] to configure the renderings for this chart
+     */
+    @JvmDefault
+    fun renderings(action: Action<NamedDomainObjectContainer<HelmRendering>>) {
+        action.execute(renderings)
+    }
 }
 
 
@@ -159,6 +192,7 @@ private open class DefaultHelmChart
     private val name: String,
     project: Project,
     baseOutputDir: Provider<Directory>,
+    globalRenderBaseOutputDir: Provider<Directory>,
     filteredSourcesBaseDir: Provider<Directory>,
     dependenciesBaseDir: Provider<Directory>,
     objects: ObjectFactory
@@ -229,6 +263,24 @@ private open class DefaultHelmChart
 
 
     override val extraFiles: CopySpec = project.copySpec()
+
+
+    final override val renderBaseOutputDir: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                globalRenderBaseOutputDir.map { it.dir(name) }
+            )
+
+
+    override val renderings: NamedDomainObjectContainer<HelmRendering> =
+        objects.domainObjectContainer(HelmRendering::class.java) { name ->
+            objects.createHelmRendering(name, this.name)
+                .apply {
+                    outputDir.convention(renderBaseOutputDir.dir(name))
+                }
+        }.also { container ->
+            container.addRule(DefaultRenderingRule(container))
+        }
 }
 
 
@@ -240,13 +292,15 @@ private open class DefaultHelmChart
  */
 internal fun Project.helmChartContainer(
     baseOutputDir: Provider<Directory>,
+    globalRenderBaseOutputDir: Provider<Directory>,
     filteredSourcesBaseDir: Provider<Directory>,
     dependenciesBaseDir: Provider<Directory>
 ): NamedDomainObjectContainer<HelmChart> =
     container(HelmChart::class.java) { name ->
         objects.newInstance<HelmChart>(
             DefaultHelmChart::class.java, name,
-            this, baseOutputDir, filteredSourcesBaseDir, dependenciesBaseDir
+            this, baseOutputDir, globalRenderBaseOutputDir, filteredSourcesBaseDir,
+            dependenciesBaseDir
         ).also { chart ->
             // The "main" chart should be named like the project by default
             if (name == HELM_MAIN_CHART_NAME) {
