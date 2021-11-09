@@ -26,6 +26,8 @@ include::linting-charts.adoc[leveloffset=1]
 
 include::managing-chart-dependencies.adoc[leveloffset=1]
 
+include::rendering-templates.adoc[leveloffset=1]
+
 include::publishing-charts.adoc[leveloffset=1]
 
 include::managing-releases.adoc[leveloffset=1]

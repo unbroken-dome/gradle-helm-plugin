@@ -18,6 +18,11 @@ internal interface ChartDescriptor : ChartModelDependencies {
     /** The version of the chart. */
     val version: String?
 
+    /**
+     * The type of chart.
+     */
+    val type: String?
+
     companion object {
         fun fromMap(map: Map<String, Any?>): ChartDescriptor {
             val apiVersion = (map["apiVersion"] as String?) ?: ChartApiVersion.DEFAULT
@@ -28,7 +33,8 @@ internal interface ChartDescriptor : ChartModelDependencies {
                 version = map["version"]?.toString(),
                 dependencies = if (apiVersion != ChartApiVersion.V1) {
                     ChartModelDependencies.fromMap(map).dependencies
-                } else emptyList()
+                } else emptyList(),
+                type = map["type"]?.toString()
             )
         }
     }
@@ -39,9 +45,9 @@ private data class DefaultChartDescriptor(
     override val apiVersion: String,
     override val name: String?,
     override val version: String?,
-    override val dependencies: List<ChartModelDependency> = emptyList()
-) : ChartDescriptor {
-}
+    override val dependencies: List<ChartModelDependency> = emptyList(),
+    override val type: String?
+) : ChartDescriptor
 
 
 private object EmptyChartDescriptor : ChartDescriptor {
@@ -57,6 +63,9 @@ private object EmptyChartDescriptor : ChartDescriptor {
 
     override val dependencies: List<ChartModelDependency>
         get() = emptyList()
+
+    override val type: String?
+        get() = null
 }
 
 

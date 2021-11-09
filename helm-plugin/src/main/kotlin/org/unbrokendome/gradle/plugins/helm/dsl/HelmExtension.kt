@@ -6,19 +6,10 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableGlobalHelmOptions
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecProvider
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
+import org.unbrokendome.gradle.plugins.helm.command.*
 import org.unbrokendome.gradle.plugins.helm.command.internal.GlobalHelmOptionsApplier
 import org.unbrokendome.gradle.plugins.helm.command.internal.HelmServerOptionsHolder
-import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
-import org.unbrokendome.gradle.pluginutils.dirProviderFromProjectProperty
-import org.unbrokendome.gradle.pluginutils.fileProviderFromProjectProperty
-import org.unbrokendome.gradle.pluginutils.listProperty
-import org.unbrokendome.gradle.pluginutils.property
-import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
+import org.unbrokendome.gradle.pluginutils.*
 import javax.inject.Inject
 
 
@@ -50,6 +41,14 @@ interface HelmExtension : HelmExecProvider, ConfigurableGlobalHelmOptions, Confi
      * Defaults to `"${project.buildDir}/helm/charts"`.
      */
     val outputDir: DirectoryProperty
+
+
+    /**
+     * Base output directory for rendering (`helm template`) outputs.
+     *
+     * Defaults to `"${project.buildDir}/helm/render"`.
+     */
+    val renderOutputDir: DirectoryProperty
 }
 
 
@@ -97,6 +96,16 @@ private open class DefaultHelmExtension
                 project.dirProviderFromProjectProperty(
                     "helm.outputDir",
                     defaultPath = "\$buildDir/helm/charts", evaluateGString = true
+                )
+            )
+
+
+    final override val renderOutputDir: DirectoryProperty =
+        objects.directoryProperty()
+            .convention(
+                project.dirProviderFromProjectProperty(
+                    "helm.renderOutputDir",
+                    defaultPath = "\$buildDir/helm/render", evaluateGString = true
                 )
             )
 

@@ -35,7 +35,7 @@ abstract class AbstractHelmInstallationCommandTask :
      * Release name.
      */
     @get:Input
-    val releaseName: Property<String> =
+    open val releaseName: Property<String> =
         project.objects.property()
 
 
