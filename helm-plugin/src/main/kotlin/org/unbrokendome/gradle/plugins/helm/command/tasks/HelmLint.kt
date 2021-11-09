@@ -7,21 +7,13 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.util.GFileUtils
-import org.gradle.util.GradleVersion
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
-import org.unbrokendome.gradle.pluginutils.GradleVersions
+import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
 import org.unbrokendome.gradle.pluginutils.ifPresent
-import org.unbrokendome.gradle.pluginutils.mapProperty
 import org.unbrokendome.gradle.pluginutils.property
 
 
@@ -30,6 +22,8 @@ import org.unbrokendome.gradle.pluginutils.property
  * Corresponds to the `helm lint` CLI command.
  */
 open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
+
+    private val valueOptions = HelmValueOptionsHolder(project.objects, project.layout)
 
     /**
      * The directory that contains the sources for the Helm chart.
@@ -54,8 +48,8 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
      * `--set` option (for all other types).
      */
     @get:Input
-    final override val values: MapProperty<String, Any> =
-        project.objects.mapProperty()
+    final override val values: MapProperty<String, Any>
+        get() = valueOptions.values
 
 
     /**
@@ -70,8 +64,8 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
      * Not to be confused with [valueFiles], which contains a collection of YAML files that supply multiple values.
      */
     @get:Input
-    final override val fileValues: MapProperty<String, Any> =
-        project.objects.mapProperty()
+    final override val fileValues: MapProperty<String, Any>
+        get() = valueOptions.fileValues
 
 
     /**
@@ -82,13 +76,18 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
      * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     @get:InputFiles
-    final override val valueFiles: ConfigurableFileCollection =
-        if (GradleVersion.current() >= GradleVersions.Version_5_3) {
-            project.objects.fileCollection()
-        } else {
-            @Suppress("DEPRECATION")
-            project.layout.configurableFiles()
-        }
+    final override val valueFiles: ConfigurableFileCollection
+        get() = valueOptions.valueFiles
+
+
+    /**
+     * If `true`, also lint dependent charts.
+     *
+     * Corresponds to the `--with-subcharts` CLI option.
+     */
+    @get:[Input Optional]
+    val withSubcharts: Property<Boolean> =
+        project.objects.property()
 
 
     /**
@@ -116,6 +115,7 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
 
         execHelm("lint") {
             flag("--strict", strict)
+            flag("--with-subcharts", withSubcharts)
             args(chartDir)
         }
 
