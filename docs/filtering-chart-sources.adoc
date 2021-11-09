@@ -3,10 +3,6 @@
 The plugin includes a _filtering_ step that will resolve placeholders in certain chart files before the chart
 is packaged.
 
-Filtering applies only to `*.yaml` files directly in the chart directory. Chart templates will _not_ be filtered
-this way; instead apply filtering to the `values.yaml` file and then use Helm's templating constructs for building
-the Chart templates.
-
 Filtered files are processed using a Groovy
 link:https://docs.groovy-lang.org/latest/html/api/groovy/text/SimpleTemplateEngine.html[SimpleTemplateEngine]. Filter
 expressions are Groovy expressions enclosed in `${` and `}`, for example `${chartName}`.
@@ -70,6 +66,39 @@ helm {
 }
 ----
 
+== Configure Which Files are Filtered
+
+By default, filtering applies only to the `Chart.yaml`, `requirements.yaml` and `values.yaml` files directly
+in the chart directory, but not to any templates or other files in the chart.
+
+TIP: If templates in a chart need to be dynamically modified based on the Gradle script, consider adding a value
+  to the `values.yaml` file that uses a filtering expression, and then use that value in your templates using
+  Helm's templating constructs.
+
+The `filtering` block has a `filePatterns` property which holds the (Ant-style) patterns of files to be filtered.
+If this list is empty, it is equivalent to the pattern `*` so _all_ files in the chart will be filtered.
+
+[source,groovy,role="primary"]
+.Groovy
+----
+helm {
+    filtering {
+        // apply filtering to all files in the chart
+        filePatterns.add('*')
+    }
+}
+----
+
+[source,kotlin,role="secondary"]
+.Kotlin
+----
+helm {
+    filtering {
+        // apply filtering to all files in the chart
+        filePatterns.add("*")
+    }
+}
+----
 
 
 == Supply Additional Values

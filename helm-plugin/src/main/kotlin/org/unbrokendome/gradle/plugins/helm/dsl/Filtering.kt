@@ -2,6 +2,7 @@ package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -13,6 +14,12 @@ import org.gradle.api.tasks.Internal
  * Configures filtering of chart sources.
  */
 interface Filtering {
+
+    companion object {
+        @JvmStatic
+        val DEFAULT_FILE_PATTERNS = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
+    }
+
 
     /**
      * Indicates if filtering is enabled. The default is `true`.
@@ -39,6 +46,18 @@ interface Filtering {
      */
     @get:Internal
     val fileValues: MapProperty<String, Any>
+
+    /**
+     * Patterns of file names to be filtered.
+     *
+     * If this is an empty list, all files in the chart will be subject to filtering.
+     *
+     * By default, this includes `Chart.yaml`, `values.yaml` and `requirements.yaml` but not any
+     * of the chart's template files. For the latter, it is recommended to put the filtered values
+     * into values.yaml and apply Helm's templating mechanisms in the template files.
+     */
+    @get:Input
+    val filePatterns: ListProperty<String>
 }
 
 
@@ -46,6 +65,10 @@ internal fun Filtering.setParent(parent: Filtering) {
     enabled.convention(parent.enabled)
     values.putAll(parent.values)
     fileValues.putAll(parent.fileValues)
+
+    // Inherit by convention here instead of addAll, so we can selectively override
+    // the entire list in a child filtering block
+    filePatterns.convention(parent.filePatterns)
 }
 
 
@@ -61,5 +84,6 @@ internal fun ObjectFactory.createFiltering(parent: Filtering? = null): Filtering
         .apply {
             values.empty()
             fileValues.empty()
+            filePatterns.convention(Filtering.DEFAULT_FILE_PATTERNS)
             parent?.let { setParent(it) }
         }
