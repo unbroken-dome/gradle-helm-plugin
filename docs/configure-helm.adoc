@@ -125,7 +125,8 @@ found on the local machine where the Gradle build runs.
 
 The download can be configured either through the `helm.downloadClient` DSL block or through project properties (e.g.
 in the `gradle.properties` file). Project properties have the advantage of being automatically inherited by subprojects,
-and are easier to adapt for the local machine.
+and are easier to adapt for different build environments.
+
 
 The following example shows how the download can be configured in the build script:
 
@@ -161,7 +162,19 @@ helm.client.download.enabled=true
 helm.client.download.version=3.4.1
 ----
 
+=== Using with Multi-Project Builds
 
+When using the Helm plugin in a multi-project build, the tasks to download and extract the Helm client are installed
+only once on the root project, in order to avoid multiple downloads of the same client package.
+
+While it is possible that different subprojects use different versions of Helm, some of the properties that control
+the download behavior (e.g. the URL) can only be configured globally in the root project's `gradle.properties` file.
+
+It is recommended that these settings are configured entirely by the root project `gradle.properties`, so that the
+same settings will automatically be used for all subprojects that use Helm.
+
+
+=== Helm Client Download Property Reference
 
 The following properties control the download of the Helm client:
 
@@ -178,33 +191,24 @@ The following properties control the download of the Helm client:
 | The version of the Helm client to be downloaded.
 | The latest version of Helm available at the time the plugin is published (currently `3.4.1`)
 
-| `destinationDir`
-|
-| The base directory where Helm client executables are extracted. By default, this is a directory under
- `(rootDir)/.gradle`, so the client will only be downloaded and extracted once in a multi-module build, and is not
- removed by a `clean` task. You can set this to a different directory (e.g. under the `build` directory) if you
- prefer different behavior.
-| `.gradle/helm/client` under the _root_ project dir
-
 |
 | `helm.client.download.baseUrl`
 | The base URL for downloading the client executables.
 
   You can change this to a different URL if required, for example when behind a corporate proxy.
+
+  Note that this property is considered "global" for multi-project builds, and has to be specified
+  on the root project.
+
 | `https://get.helm.sh/`
-
-|
-| `helm.client.download.group`
-| A pseudo "group" coordinate for the Helm client artifacts; required for Gradle artifact resolution.
-
-  Change this to a different value in the unlikely case that the default group name `sh.helm` conflicts
-  with other external dependencies used by the build script.
-| `sh.helm`
 
 |
 | `helm.client.download.osClassifier`
 | Override the OS classifier (the suffix of the downloaded filename) if auto-detection does not work as expected.
 | Auto-detected for the current system based on Java system properties.
+
+  Note that this property is considered "global" for multi-project builds, and has to be specified
+  on the root project.
 
   For example, `darwin-amd64` or `windows-amd64`.
 |===

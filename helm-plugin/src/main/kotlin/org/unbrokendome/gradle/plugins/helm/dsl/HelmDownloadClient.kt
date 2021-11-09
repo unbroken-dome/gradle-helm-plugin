@@ -1,14 +1,11 @@
 package org.unbrokendome.gradle.plugins.helm.dsl
 
 import org.gradle.api.Project
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.TaskProvider
-import org.gradle.util.GradleVersion
-import org.unbrokendome.gradle.plugins.helm.command.HelmExtractClient
-import org.unbrokendome.gradle.pluginutils.GradleVersions
+import org.unbrokendome.gradle.plugins.helm.command.rules.extractClientTaskName
+import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmExtractClient
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
@@ -23,19 +20,12 @@ interface HelmDownloadClient {
 
     companion object {
 
-        @JvmStatic
-        val HELM_EXTRACT_CLIENT_TASK_NAME = "helmExtractClient"
-
         /**
          * Default version of the Helm client executable. This is the latest version available at the time
          * the plugin is released.
          */
         @JvmStatic
         val DEFAULT_HELM_CLIENT_VERSION = "3.4.1"
-
-
-        internal const val DEFAULT_HELM_CLIENT_GROUP = "sh.helm"
-        internal const val REPOSITORY_NAME = "_helmClientReleases"
     }
 
     /**
@@ -53,18 +43,18 @@ interface HelmDownloadClient {
      * @see DEFAULT_HELM_CLIENT_VERSION
      */
     val version: Property<String>
-
-    /**
-     * The local directory where downloaded Helm client artifacts will be extracted.
-     *
-     * Defaults to `.gradle/helm/client` in the _root project_ directory, and can also be configured using the
-     * `helm.client.download.destinationDir` project property.
-     */
-    val destinationDir: DirectoryProperty
 }
 
 
 internal interface HelmDownloadClientInternal : HelmDownloadClient {
+
+    /**
+     * The task that extracts the Helm client executable.
+     *
+     * If the automatic client download is [enabled], then this will point to a task in the
+     * root project for the desired version. If not [enabled], the provider will have no value.
+     */
+    val extractClientTask: Provider<HelmExtractClient>
 
     /**
      * Path of the extracted executable file.
@@ -85,7 +75,7 @@ internal open class DefaultHelmDownloadClient
             )
 
 
-    override val version: Property<String> =
+    final override val version: Property<String> =
         project.objects.property<String>()
             .convention(
                 project.providerFromProjectProperty(
@@ -94,21 +84,13 @@ internal open class DefaultHelmDownloadClient
             )
 
 
-    override val destinationDir: DirectoryProperty =
-        project.objects.directoryProperty()
-            .convention(
-                project.rootProject.layout.projectDirectory.dir(".gradle/helm/client")
-            )
-
-
-    private val extractClientTask: TaskProvider<HelmExtractClient> =
-        project.tasks.register(
-            HelmDownloadClient.HELM_EXTRACT_CLIENT_TASK_NAME,
-            HelmExtractClient::class.java
-        ) { task ->
-            task.onlyIf { enabled.get() }
-            task.version.set(version)
-            task.baseDestinationDir.set(destinationDir)
+    override val extractClientTask: Provider<HelmExtractClient> =
+        version.flatMap { version ->
+            if (enabled.get()) {
+                project.rootProject.tasks.named(extractClientTaskName(version), HelmExtractClient::class.java)
+            } else {
+                project.provider { null }
+            }
         }
 
 
@@ -121,62 +103,4 @@ internal open class DefaultHelmDownloadClient
                 project.provider { null }
             }
         }
-
-    /**
-     * A pseudo "group" coordinate for the Helm client artifacts; it is not used in the actual artifact URL
-     * but to make sure that Helm artifacts are only downloaded from the one repository declared here
-     * and don't interfere with any other repositories declared in the project.
-     */
-    private val helmGroup: Provider<String> =
-        project.providerFromProjectProperty(
-            "helm.client.download.group", defaultValue = HelmDownloadClient.DEFAULT_HELM_CLIENT_GROUP
-        )
-
-
-    init {
-        project.createHelmClientRepository()
-    }
-
-
-    private fun Project.createHelmClientRepository() {
-
-        if (repositories.findByName(HelmDownloadClient.REPOSITORY_NAME) != null) {
-            return
-        }
-
-        val helmGroup = helmGroup.get()
-
-        val repository = repositories.ivy { repo ->
-            repo.name = HelmDownloadClient.REPOSITORY_NAME
-            repo.url = uri(findProperty("helm.client.download.baseUrl") ?: "https://get.helm.sh")
-            repo.patternLayout { layout ->
-                layout.artifact("[module]-v[revision]-[classifier].[ext]")
-            }
-            repo.metadataSources { sources ->
-                sources.artifact()
-            }
-        }
-
-        if (GradleVersion.current() >= GradleVersions.Version_6_2) {
-            repositories.exclusiveContent {
-                it.filter { filter -> filter.includeGroup(helmGroup) }
-                it.forRepositories(repository)
-            }
-
-        } else {
-            // Before Gradle 6.2, we don't have exclusiveContent, so we need to
-            // (a) specify that our repository hosts the Helm client artifacts, and
-            // (b) specify that all other repositories don't have them
-            repository.content { content ->
-                content.includeGroup(helmGroup)
-            }
-            repositories.all { otherRepo ->
-                if (otherRepo != repository) {
-                    otherRepo.content { content ->
-                        content.excludeGroup(helmGroup)
-                    }
-                }
-            }
-        }
-    }
 }
