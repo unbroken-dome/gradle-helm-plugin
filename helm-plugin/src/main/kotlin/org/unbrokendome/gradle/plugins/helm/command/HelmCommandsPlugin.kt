@@ -3,6 +3,7 @@ package org.unbrokendome.gradle.plugins.helm.command
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.HELM_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.command.internal.conventionsFrom
@@ -47,7 +48,9 @@ class HelmCommandsPlugin
         project.tasks.withType(AbstractHelmCommandTask::class.java) { task ->
             task.globalOptions.set(helmExtension)
 
-            task.dependsOn(downloadClient.extractClientTask)
+            task.dependsOn(TaskDependency {
+                setOfNotNull(downloadClient.extractClientTask.orNull)
+            })
 
             task.downloadedExecutable.set(
                 downloadClient.executable.map { it.asFile.absolutePath }
