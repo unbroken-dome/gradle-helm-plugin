@@ -3,7 +3,6 @@ package org.unbrokendome.gradle.plugins.helm.command
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.TaskDependency
 import org.unbrokendome.gradle.plugins.helm.HELM_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
 import org.unbrokendome.gradle.plugins.helm.command.internal.conventionsFrom
@@ -11,12 +10,7 @@ import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmCommandTas
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerCommandTask
 import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerOperationCommandTask
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmDownloadClient
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmDownloadClientInternal
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.dsl.createHelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.createLinting
+import org.unbrokendome.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.durationProviderFromProjectProperty
 
@@ -28,6 +22,10 @@ class HelmCommandsPlugin
 
         val helmExtension = project.createHelmExtension()
         project.extensions.add(HelmExtension::class.java, HELM_EXTENSION_NAME, helmExtension)
+
+        // Install the HelmDownloadClientPlugin on the root project, this allows us to sync the download
+        // between multiple subprojects that need the Helm client
+        project.rootProject.pluginManager.apply(HelmDownloadClientPlugin::class.java)
 
         project.objects.createLinting()
             .apply {
@@ -44,20 +42,16 @@ class HelmCommandsPlugin
 
 
         // Apply the global Helm options as defaults to each command task
+        val downloadClient = helmExtension.downloadClient as HelmDownloadClientInternal
+
         project.tasks.withType(AbstractHelmCommandTask::class.java) { task ->
             task.globalOptions.set(helmExtension)
 
-            task.downloadedExecutable.set(
-                (helmExtension.downloadClient as HelmDownloadClientInternal).executable.map { it.asFile.absolutePath }
-            )
+            task.dependsOn(downloadClient.extractClientTask)
 
-            // Depend on the helmExtractClient task, but only if it's configured to download & extract the client
-            task.dependsOn(TaskDependency {
-                val hasLocalExecutable = (it as? AbstractHelmCommandTask?)?.localExecutable?.isPresent == true
-                if (!hasLocalExecutable && helmExtension.downloadClient.enabled.get()) {
-                    setOf(project.tasks.getByName(HelmDownloadClient.HELM_EXTRACT_CLIENT_TASK_NAME))
-                } else emptySet()
-            })
+            task.downloadedExecutable.set(
+                downloadClient.executable.map { it.asFile.absolutePath }
+            )
         }
 
         project.tasks.withType(AbstractHelmServerCommandTask::class.java) { task ->

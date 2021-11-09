@@ -6,7 +6,7 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.toSerializa
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
-import org.unbrokendome.gradle.plugins.helm.publishing.util.calculateDigestHex
+import org.unbrokendome.gradle.plugins.helm.util.calculateDigestHex
 import java.io.File
 import java.net.URI
 import javax.inject.Inject
@@ -53,9 +53,9 @@ private open class DefaultArtifactoryHelmPublishingRepository
 
         override fun additionalHeaders(chartName: String, chartVersion: String, chartFile: File): Map<String, String> =
             mapOf(
-                "X-Checksum-Sha1" to calculateDigestHex(chartFile.toPath(), "SHA-1"),
-                "X-Checksum-Sha256" to calculateDigestHex(chartFile.toPath(), "SHA-256"),
-                "X-Checksum-Md5" to calculateDigestHex(chartFile.toPath(), "MD5")
+                "X-Checksum-Sha1" to chartFile.calculateDigestHex("SHA-1"),
+                "X-Checksum-Sha256" to chartFile.calculateDigestHex("SHA-256"),
+                "X-Checksum-Md5" to chartFile.calculateDigestHex("MD5")
             )
     }
 }
