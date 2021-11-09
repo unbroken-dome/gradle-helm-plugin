@@ -5,12 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.putFrom
 import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
 import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
@@ -19,9 +14,6 @@ import org.unbrokendome.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.pluginutils.io.expand
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.versionProvider
-
-
-private val FilteredFilePatterns = listOf("Chart.yaml", "values.yaml", "requirements.yaml")
 
 
 /**
@@ -159,7 +151,11 @@ open class HelmFilterSources : DefaultTask() {
                     project.files(value).singleFile.readText()
                 }
 
-            filesMatching(FilteredFilePatterns) { details ->
+            val filePatterns = filtering.filePatterns.get()
+                .takeIf { it.isNotEmpty() }
+                ?: listOf("*")
+
+            filesMatching(filePatterns) { details ->
                 details.expand(valuesFromFiles + values, true)
             }
         }
