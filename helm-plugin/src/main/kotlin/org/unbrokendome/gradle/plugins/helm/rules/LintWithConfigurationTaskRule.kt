@@ -40,6 +40,7 @@ internal class LintWithConfigurationTaskRule(
         chart.lint.let { chartLint ->
             onlyIf { chartLint.enabled.get() }
             strict.set(chartLint.strict)
+            withSubcharts.set(chartLint.withSubcharts)
             mergeValues(chartLint)
         }
         mergeValues(lintConfiguration)

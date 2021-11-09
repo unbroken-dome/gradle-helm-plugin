@@ -40,6 +40,13 @@ interface Linting : ConfigurableHelmValueOptions {
     val strict: Property<Boolean>
 
     /**
+     * If `true`, also lint dependent charts.
+     *
+     * Corresponds to the `--with-subcharts` CLI option.
+     */
+    val withSubcharts: Property<Boolean>
+
+    /**
      * A collection of linter configurations.
      *
      * Each configuration allows specifying a different set of values to pass to `helm lint`. Values defined in
@@ -70,6 +77,7 @@ internal fun Linting.setParent(parent: Linting) {
     mergeValues(parent)
     enabled.set(parent.enabled)
     strict.set(parent.strict)
+    withSubcharts.set(parent.withSubcharts)
 }
 
 

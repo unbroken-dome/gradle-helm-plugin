@@ -37,19 +37,33 @@ object HelmLintTest : ExecutionResultAwareSpek({
                     expectArg("${project.projectDir}/src")
                 }
             }
+        }
+    }
 
+    describe("executing a HelmLint task") {
+        it("should use strict property") {
 
-            it("should use strict property") {
+            task.strict.set(true)
 
-                task.strict.set(true)
+            task.execute()
 
-                task.execute()
+            execMock.singleInvocation {
+                expectCommand("lint")
+                expectFlag("--strict")
+                expectArg("${project.projectDir}/src")
+            }
+        }
 
-                execMock.singleInvocation {
-                    expectCommand("lint")
-                    expectFlag("--strict")
-                    expectArg("${project.projectDir}/src")
-                }
+        it("should use withSubcharts property") {
+
+            task.withSubcharts.set(true)
+
+            task.execute()
+
+            execMock.singleInvocation {
+                expectCommand("lint")
+                expectFlag("--with-subcharts")
+                expectArg("${project.projectDir}/src")
             }
         }
     }

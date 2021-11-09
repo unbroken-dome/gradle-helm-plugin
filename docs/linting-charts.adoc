@@ -16,6 +16,9 @@ helm {
     lint {
         // treat linter warnings as errors (failing the build)
         strict = true
+
+        // also lint dependent charts
+        withSubcharts = true
     }
 
     charts {
@@ -39,6 +42,9 @@ helm {
     lint {
         // treat linter warnings as errors (failing the build)
         strict.set(true)
+
+        // also lint dependent charts
+        withSubcharts.set(true)
     }
 
     charts {
