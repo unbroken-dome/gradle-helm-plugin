@@ -136,4 +136,4 @@ fun File.calculateDigestHex(
     toPath().calculateDigestHex(algorithm, bufferSize)
 
 
-private val HEX_ALPHABET: CharArray = "01234567890abcdef".toCharArray()
+private val HEX_ALPHABET: CharArray = "0123456789abcdef".toCharArray()
