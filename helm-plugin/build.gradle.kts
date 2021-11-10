@@ -12,7 +12,7 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.27")
     implementation("org.json:json:20200518")
 
-    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.2.1")
+    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.4.0")
 
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
@@ -20,7 +20,7 @@ dependencies {
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
 
-    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.2.1")
+    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.4.0")
 }
 
 

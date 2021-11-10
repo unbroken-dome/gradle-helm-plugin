@@ -4,15 +4,7 @@ import org.unbrokendome.gradle.pluginutils.io.DelegateReader
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.error.Mark
 import org.yaml.snakeyaml.error.YAMLException
-import org.yaml.snakeyaml.events.DocumentStartEvent
-import org.yaml.snakeyaml.events.Event
-import org.yaml.snakeyaml.events.MappingEndEvent
-import org.yaml.snakeyaml.events.MappingStartEvent
-import org.yaml.snakeyaml.events.ScalarEvent
-import org.yaml.snakeyaml.events.SequenceEndEvent
-import org.yaml.snakeyaml.events.SequenceStartEvent
-import org.yaml.snakeyaml.events.StreamEndEvent
-import org.yaml.snakeyaml.events.StreamStartEvent
+import org.yaml.snakeyaml.events.*
 import java.io.Reader
 import java.io.StringReader
 import java.io.StringWriter
@@ -67,9 +59,8 @@ internal abstract class AbstractYamlTransformingReader(
     protected open fun addToMapping(path: YamlPath): Map<String, String> = emptyMap()
 
 
-    override val delegate: Reader by lazy(LazyThreadSafetyMode.NONE) {
-
-        val events = Yaml().parse(`in`)
+    override fun createDelegateReader(input: Reader): Reader {
+        val events = Yaml().parse(input)
         var currentMark: Mark? = null
         var state: ParseState = Initial()
         val output = StringWriter()
@@ -83,7 +74,7 @@ internal abstract class AbstractYamlTransformingReader(
             currentMark = event.endMark
         }
 
-        StringReader(output.toString())
+        return StringReader(output.toString())
     }
 
 
