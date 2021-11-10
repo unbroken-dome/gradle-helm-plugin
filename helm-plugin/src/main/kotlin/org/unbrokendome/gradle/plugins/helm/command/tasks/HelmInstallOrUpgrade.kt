@@ -53,6 +53,20 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
         project.objects.property()
 
 
+    /**
+     * Limit the maximum number of revisions saved per release.
+     *
+     * Use `0` for no limit. If not set, the default value from Helm (currently `10`) is used.
+     *
+     * Corresponds to the `--history-max` parameter of the `helm upgrade` CLI command.
+     *
+     * If [replace] is set to `true`, this property will be ignored.
+     */
+    @get:Internal
+    val historyMax: Property<Int> =
+        project.objects.property()
+
+
     @TaskAction
     fun installOrUpgrade() {
 
@@ -70,6 +84,7 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
                 flag("--install")
                 flag("--reset-values", resetValues)
                 flag("--reuse-values", reuseValues)
+                option("--history-max", historyMax)
             }
         }
     }

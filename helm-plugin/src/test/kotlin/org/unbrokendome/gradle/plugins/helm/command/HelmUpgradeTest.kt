@@ -42,50 +42,58 @@ object HelmUpgradeTest : ExecutionResultAwareSpek({
                     expectArg("custom/awesome")
                 }
             }
+        }
+    }
 
 
-            it("should use install property") {
+    describe("executing a HelmUpgrade task") {
+        it("should use install property") {
 
-                task.install.set(true)
+            task.install.set(true)
 
-                task.execute()
+            task.execute()
 
-                execMock.singleInvocation {
-                    expectCommand("upgrade")
-                    expectFlag("--install")
-                    expectArg("awesome-release")
-                    expectArg("custom/awesome")
-                }
+            execMock.singleInvocation {
+                expectCommand("upgrade")
+                expectFlag("--install")
             }
+        }
 
 
-            it("should use reuseValues property") {
+        it("should use reuseValues property") {
 
-                task.reuseValues.set(true)
+            task.reuseValues.set(true)
 
-                task.execute()
+            task.execute()
 
-                execMock.singleInvocation {
-                    expectCommand("upgrade")
-                    expectFlag("--reuse-values")
-                    expectArg("awesome-release")
-                    expectArg("custom/awesome")
-                }
+            execMock.singleInvocation {
+                expectCommand("upgrade")
+                expectFlag("--reuse-values")
             }
+        }
 
 
-            it("should use resetValues property") {
+        it("should use resetValues property") {
 
-                task.resetValues.set(true)
+            task.resetValues.set(true)
 
-                task.execute()
+            task.execute()
 
-                execMock.singleInvocation {
-                    expectCommand("upgrade")
-                    expectFlag("--reset-values")
-                    expectArg("awesome-release")
-                    expectArg("custom/awesome")
-                }
+            execMock.singleInvocation {
+                expectCommand("upgrade")
+                expectFlag("--reset-values")
+            }
+        }
+
+        it("should use resetValues property") {
+
+            task.historyMax.set(42)
+
+            task.execute()
+
+            execMock.singleInvocation {
+                expectCommand("upgrade")
+                expectOption("--history-max", "42")
             }
         }
     }
