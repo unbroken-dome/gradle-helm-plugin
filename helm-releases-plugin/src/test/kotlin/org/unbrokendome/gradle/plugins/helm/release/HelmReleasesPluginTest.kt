@@ -178,12 +178,7 @@ object HelmReleasesPluginTest : Spek({
             propertyMappingTests<HelmRelease, HelmInstallOrUpgrade>(
                 { release },
                 "helmInstallAwesomeToDefault",
-                propertyMappingInfo(
-                    HelmRelease::releaseName, HelmInstallOrUpgrade::releaseName, "awesome-release"
-                ),
-                propertyMappingInfo(
-                    HelmRelease::version, HelmInstallOrUpgrade::version, "3.42.19"
-                ),
+                // Properties from HelmServerOptions
                 propertyMappingInfo(
                     HelmRelease::kubeConfig, HelmInstallOrUpgrade::kubeConfig, "local.kubeconfig"
                 ),
@@ -193,24 +188,36 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmRelease::namespace, HelmInstallOrUpgrade::namespace, "custom-namespace"
                 ),
+                // Properties from HelmServerOperationOptions
                 propertyMappingInfo(HelmRelease::dryRun, HelmInstallOrUpgrade::dryRun, true),
                 propertyMappingInfo(HelmRelease::noHooks, HelmInstallOrUpgrade::noHooks, true),
                 propertyMappingInfo(
                     HelmRelease::remoteTimeout, HelmInstallOrUpgrade::remoteTimeout, Duration.ofSeconds(42)
                 ),
+                // Properties from HelmInstallationOptions
                 propertyMappingInfo(HelmRelease::atomic, HelmInstallOrUpgrade::atomic, true),
                 propertyMappingInfo(HelmRelease::devel, HelmInstallOrUpgrade::devel, true),
                 propertyMappingInfo(HelmRelease::verify, HelmInstallOrUpgrade::verify, true),
-                propertyMappingInfo(HelmRelease::wait, HelmInstallOrUpgrade::wait, true),
                 propertyMappingInfo(HelmRelease::version, HelmInstallOrUpgrade::version, "1.2.3"),
-                propertyMappingInfo(HelmRelease::repository, HelmInstallOrUpgrade::repository, URI.create("http://charts.example.com")),
+                propertyMappingInfo(HelmRelease::wait, HelmInstallOrUpgrade::wait, true),
+                propertyMappingInfo(HelmRelease::waitForJobs, HelmInstallOrUpgrade::waitForJobs, true),
+                propertyMappingInfo(
+                    HelmRelease::repository,
+                    HelmInstallOrUpgrade::repository,
+                    URI.create("http://charts.example.com")
+                ),
+                // Properties from HelmInstallFromRepositoryOptions
                 propertyMappingInfo(HelmRelease::username, HelmInstallOrUpgrade::username, "john.doe"),
                 propertyMappingInfo(HelmRelease::password, HelmInstallOrUpgrade::password, "topsecret"),
                 propertyMappingInfo(HelmRelease::caFile, HelmInstallOrUpgrade::caFile, "ca.pem"),
                 propertyMappingInfo(HelmRelease::certFile, HelmInstallOrUpgrade::certFile, "cert.pem"),
                 propertyMappingInfo(HelmRelease::keyFile, HelmInstallOrUpgrade::keyFile, "key.pem"),
+                // Properties from HelmRelease
+                propertyMappingInfo(
+                    HelmRelease::releaseName, HelmInstallOrUpgrade::releaseName, "awesome-release"
+                ),
+                propertyMappingInfo(HelmRelease::historyMax, HelmInstallOrUpgrade::historyMax, 42),
                 propertyMappingInfo(HelmRelease::replace, HelmInstallOrUpgrade::replace, true),
-                propertyMappingInfo(HelmRelease::historyMax, HelmInstallOrUpgrade::historyMax, 42)
             )
         }
 
@@ -220,9 +227,7 @@ object HelmReleasesPluginTest : Spek({
             propertyMappingTests<HelmRelease, HelmUninstall>(
                 { release },
                 "helmUninstallAwesomeFromDefault",
-                propertyMappingInfo(
-                    HelmRelease::releaseName, HelmUninstall::releaseName, "awesome-release"
-                ),
+                // Properties from HelmServerOptions
                 propertyMappingInfo(
                     HelmRelease::kubeConfig, HelmUninstall::kubeConfig, "local.kubeconfig"
                 ),
@@ -232,10 +237,15 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmRelease::namespace, HelmUninstall::namespace, "custom-namespace"
                 ),
+                // Properties from HelmServerOperationOptions
                 propertyMappingInfo(HelmRelease::dryRun, HelmUninstall::dryRun, true),
                 propertyMappingInfo(HelmRelease::noHooks, HelmUninstall::noHooks, true),
                 propertyMappingInfo(
                     HelmRelease::remoteTimeout, HelmUninstall::remoteTimeout, Duration.ofSeconds(42)
+                ),
+                // Properties from HelmRelease
+                propertyMappingInfo(
+                    HelmRelease::releaseName, HelmUninstall::releaseName, "awesome-release"
                 ),
                 propertyMappingInfo(
                     HelmRelease::keepHistoryOnUninstall, HelmUninstall::keepHistory, true
@@ -249,9 +259,11 @@ object HelmReleasesPluginTest : Spek({
             propertyMappingTests<HelmRelease, HelmTest>(
                 { release },
                 "helmTestAwesomeOnDefault",
+                // Properties from HelmRelease
                 propertyMappingInfo(
                     HelmRelease::releaseName, HelmTest::releaseName, "awesome-release"
                 ),
+                // Properties from HelmServerOptions
                 propertyMappingInfo(
                     HelmRelease::kubeConfig, HelmTest::kubeConfig, "local.kubeconfig"
                 ),
@@ -261,6 +273,7 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmRelease::namespace, HelmTest::namespace, "custom-namespace"
                 ),
+                // Properties from HelmReleaseTestOptions
                 propertyMappingInfo(
                     { test.showLogs.set(it) }, HelmTest::showLogs, true
                 ),
@@ -377,6 +390,7 @@ object HelmReleasesPluginTest : Spek({
             propertyMappingTests<HelmReleaseTarget, HelmInstallOrUpgrade>(
                 { releaseTarget },
                 "helmInstallAwesomeToLocal",
+                // Properties from HelmServerOptions
                 propertyMappingInfo(
                     HelmReleaseTarget::kubeConfig, HelmInstallOrUpgrade::kubeConfig, "local.kubeconfig"
                 ),
@@ -386,15 +400,18 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmReleaseTarget::namespace, HelmInstallOrUpgrade::namespace, "custom-namespace"
                 ),
+                // Properties from HelmServerOperationOptions
                 propertyMappingInfo(HelmReleaseTarget::dryRun, HelmInstallOrUpgrade::dryRun, true),
                 propertyMappingInfo(HelmReleaseTarget::noHooks, HelmInstallOrUpgrade::noHooks, true),
                 propertyMappingInfo(
                     HelmReleaseTarget::remoteTimeout, HelmInstallOrUpgrade::remoteTimeout, Duration.ofSeconds(42)
                 ),
+                // properties from HelmInstallationOptions
                 propertyMappingInfo(HelmReleaseTarget::atomic, HelmInstallOrUpgrade::atomic, true),
                 propertyMappingInfo(HelmReleaseTarget::devel, HelmInstallOrUpgrade::devel, true),
                 propertyMappingInfo(HelmReleaseTarget::verify, HelmInstallOrUpgrade::verify, true),
-                propertyMappingInfo(HelmReleaseTarget::wait, HelmInstallOrUpgrade::wait, true)
+                propertyMappingInfo(HelmReleaseTarget::wait, HelmInstallOrUpgrade::wait, true),
+                propertyMappingInfo(HelmReleaseTarget::waitForJobs, HelmInstallOrUpgrade::waitForJobs, true)
             )
         }
 
@@ -404,6 +421,7 @@ object HelmReleasesPluginTest : Spek({
             propertyMappingTests<HelmReleaseTarget, HelmUninstall>(
                 { releaseTarget },
                 "helmUninstallAwesomeFromLocal",
+                // Properties from HelmServerOptions
                 propertyMappingInfo(
                     HelmReleaseTarget::kubeConfig, HelmUninstall::kubeConfig, "local.kubeconfig"
                 ),
@@ -413,6 +431,7 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmReleaseTarget::namespace, HelmUninstall::namespace, "custom-namespace"
                 ),
+                // Properties from HelmServerOperationOptions
                 propertyMappingInfo(HelmReleaseTarget::dryRun, HelmUninstall::dryRun, true),
                 propertyMappingInfo(HelmReleaseTarget::noHooks, HelmUninstall::noHooks, true),
                 propertyMappingInfo(
@@ -427,6 +446,7 @@ object HelmReleasesPluginTest : Spek({
             propertyMappingTests<HelmReleaseTarget, HelmTest>(
                 { releaseTarget },
                 "helmTestAwesomeOnLocal",
+                // Properties from HelmServerOptions
                 propertyMappingInfo(
                     HelmReleaseTarget::kubeConfig, HelmTest::kubeConfig, "local.kubeconfig"
                 ),
@@ -436,6 +456,7 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmReleaseTarget::namespace, HelmTest::namespace, "custom-namespace"
                 ),
+                // Properties from HelmReleaseTestOptions
                 propertyMappingInfo(
                     { test.showLogs.set(it) }, HelmTest::showLogs, true
                 ),
@@ -555,7 +576,7 @@ object HelmReleasesPluginTest : Spek({
         describe("release target and global tag expressions are combined") {
 
             beforeEachTest {
-                with (project.helm.releases) {
+                with(project.helm.releases) {
                     create("taggedFoo") { release ->
                         release.from("my-repo/awesome-chart")
                         release.tags("foo")

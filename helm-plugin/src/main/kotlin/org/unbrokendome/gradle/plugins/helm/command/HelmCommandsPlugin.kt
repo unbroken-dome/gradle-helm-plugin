@@ -80,6 +80,9 @@ class HelmCommandsPlugin
             task.wait.convention(
                 project.booleanProviderFromProjectProperty("helm.wait")
             )
+            task.waitForJobs.convention(
+                project.booleanProviderFromProjectProperty("helm.waitForJobs")
+            )
         }
     }
 }

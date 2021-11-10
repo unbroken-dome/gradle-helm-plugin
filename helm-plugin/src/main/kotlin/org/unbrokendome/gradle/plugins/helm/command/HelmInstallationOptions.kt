@@ -14,6 +14,8 @@ interface HelmInstallationOptions : HelmServerOperationOptions {
 
     val wait: Provider<Boolean>
 
+    val waitForJobs: Provider<Boolean>
+
     val version: Provider<String>
 
     val createNamespace: Provider<Boolean>
@@ -47,10 +49,21 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
 
 
     /**
-     * If `true`, will wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment are in a ready
-     * state before marking the release as successful. It will wait for as long as [remoteTimeout].
+     * If `true`, use the `--wait` flag when installing/upgrading or uninstalling this release.
+     *
+     * When installing or upgrading, it will wait until all Pods, PVCs, Services, and minimum
+     * number of Pods of a Deployment are in a ready state before marking the release as successful.
+     * When uninstalling, will wait until all the resources are deleted before returning.
+     * It will wait for as long as [remoteTimeout].
      */
     override val wait: Property<Boolean>
+
+
+    /**
+     * If `true`, and [wait] is also `true`, will wait until all Jobs have been completed before
+     * marking the release as successful. It will wait for as long as [remoteTimeout].
+     */
+    override val waitForJobs: Property<Boolean>
 
 
     /**

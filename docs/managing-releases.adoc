@@ -138,7 +138,7 @@ from chart(project: ':foo')
 from(chart("foo"))
 
 // foo chart in the foo project
-from(chart(project = ":foo", chart = "foo")
+from(chart(project = ":foo", chart = "foo"))
 
 // main chart in the foo project
 from(chart(project = ":foo"))
@@ -198,6 +198,10 @@ helm.releases {
         // Set the wait property to true if the following release
         // requires this to be successfully deployed
         wait = true
+
+        // You can set the waitForJobs property in addition to wait,
+        // so we will also wait for all hook jobs to be completed
+        waitForJobs = true
     }
 
     myApp {
@@ -217,7 +221,11 @@ helm.releases {
 
         // Set the wait property to true if the following release
         // requires this to be successfully deployed
-        wait = true
+        wait.set(true)
+
+        // You can set the waitForJobs property in addition to wait,
+        // so we will also wait for all hook jobs to be completed
+        waitForJobs.set(true)
     }
 
     create("myApp") {

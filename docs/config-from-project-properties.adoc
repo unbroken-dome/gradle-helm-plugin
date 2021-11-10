@@ -163,5 +163,8 @@ subdirectory `<chart-name>/<rendering-name>`.
 | Specify an expression to filter releases by tag. By default, all releases are matched.
 
 | `helm.wait`
-| Use the `--wait` flag when installing.
+| Use the `--wait` flag when installing or upgrading.
+
+| `helm.waitForJobs`
+| Use the `--wait-for-jobs` flag when installing or upgrading.
 |===
