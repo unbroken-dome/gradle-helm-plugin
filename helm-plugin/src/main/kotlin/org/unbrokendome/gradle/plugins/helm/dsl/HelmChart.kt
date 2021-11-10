@@ -156,6 +156,16 @@ interface HelmChart : Named, Buildable {
     fun renderings(action: Action<NamedDomainObjectContainer<HelmRendering>>) {
         action.execute(renderings)
     }
+
+
+    /**
+     * If `true`, override the `name` and `version` fields in the Chart.yaml file with the
+     * values of [chartName] and [chartVersion], respectively. This step is performed after
+     * any filtering (as configured by the `filtering` block).
+     *
+     * Defaults to `true`.
+     */
+    val overrideChartInfo: Property<Boolean>
 }
 
 
@@ -272,7 +282,7 @@ private open class DefaultHelmChart
             )
 
 
-    override val renderings: NamedDomainObjectContainer<HelmRendering> =
+    final override val renderings: NamedDomainObjectContainer<HelmRendering> =
         objects.domainObjectContainer(HelmRendering::class.java) { name ->
             objects.createHelmRendering(name, this.name)
                 .apply {
@@ -281,6 +291,11 @@ private open class DefaultHelmChart
         }.also { container ->
             container.addRule(DefaultRenderingRule(container))
         }
+
+
+    final override val overrideChartInfo: Property<Boolean> =
+        project.objects.property<Boolean>()
+            .convention(true)
 }
 
 

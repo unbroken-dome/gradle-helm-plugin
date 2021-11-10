@@ -20,9 +20,9 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
 
-    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.2.1")
+    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.4.0")
 
-    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.2.1")
+    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.4.0")
 }
 
 
