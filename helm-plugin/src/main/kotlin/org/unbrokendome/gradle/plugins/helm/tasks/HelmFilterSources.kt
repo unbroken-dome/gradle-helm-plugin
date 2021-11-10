@@ -120,8 +120,8 @@ open class HelmFilterSources : DefaultTask() {
         val result = project.sync { spec ->
             spec.from(sourceDir)
             spec.into(targetDir)
-            spec.applyChartInfoOverrides()
             spec.applyFiltering()
+            spec.applyChartInfoOverrides()
         }
         didWork = result.didWork
     }
