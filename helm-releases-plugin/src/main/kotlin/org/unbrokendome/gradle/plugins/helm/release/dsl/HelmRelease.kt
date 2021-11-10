@@ -1,10 +1,6 @@
 package org.unbrokendome.gradle.plugins.helm.release.dsl
 
-import org.gradle.api.Action
-import org.gradle.api.Named
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Project
-import org.gradle.api.Task
+import org.gradle.api.*
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
@@ -15,20 +11,10 @@ import org.gradle.api.provider.SetProperty
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.command.internal.mergeValues
-import org.unbrokendome.gradle.plugins.helm.command.internal.setFrom
-import org.unbrokendome.gradle.plugins.helm.command.internal.withDefaults
+import org.unbrokendome.gradle.plugins.helm.command.internal.*
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.pluginutils.andThen
-import org.unbrokendome.gradle.pluginutils.asFile
-import org.unbrokendome.gradle.pluginutils.capitalizeWords
-import org.unbrokendome.gradle.pluginutils.combine
-import org.unbrokendome.gradle.pluginutils.listProperty
-import org.unbrokendome.gradle.pluginutils.property
-import org.unbrokendome.gradle.pluginutils.setProperty
+import org.unbrokendome.gradle.pluginutils.*
 import java.io.File
 import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
@@ -133,6 +119,18 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * Defaults to `false`.
      */
     val replace: Property<Boolean>
+
+
+    /**
+     * Limit the maximum number of revisions saved per release.
+     *
+     * Use `0` for no limit. If not set, the default value from Helm (currently `10`) is used.
+     *
+     * Corresponds to the `--history-max` parameter of the `helm upgrade` CLI command.
+     *
+     * If [replace] is set to `true`, this property will be ignored.
+     */
+    val historyMax: Property<Int>
 
 
     /**
@@ -515,6 +513,10 @@ private abstract class AbstractHelmRelease(
             .convention(false)
 
 
+    final override val historyMax: Property<Int> =
+        project.objects.property()
+
+
     final override val keepHistoryOnUninstall: Property<Boolean> =
         project.objects.property<Boolean>()
             .convention(false)
@@ -623,6 +625,7 @@ private open class DefaultHelmRelease
             targetSpecific.releaseName.set(this.releaseName)
             targetSpecific.chart.set(this.chart)
             targetSpecific.replace.set(this.replace)
+            targetSpecific.historyMax.set(this.historyMax)
             targetSpecific.keepHistoryOnUninstall.set(this.keepHistoryOnUninstall)
             @Suppress("DEPRECATION")
             targetSpecific.dependsOn.addAll(this.dependsOn)

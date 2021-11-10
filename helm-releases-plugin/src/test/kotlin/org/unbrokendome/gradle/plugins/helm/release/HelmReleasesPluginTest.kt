@@ -14,22 +14,10 @@ import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTest
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
-import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
-import org.unbrokendome.gradle.plugins.helm.release.dsl.activeReleaseTarget
-import org.unbrokendome.gradle.plugins.helm.release.dsl.releaseTargets
-import org.unbrokendome.gradle.plugins.helm.release.dsl.releases
+import org.unbrokendome.gradle.plugins.helm.release.dsl.*
 import org.unbrokendome.gradle.plugins.helm.release.spek.propertyMappingInfo
 import org.unbrokendome.gradle.plugins.helm.release.spek.propertyMappingTests
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.cast
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.doesNotContainItem
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.doesNotHaveTaskDependency
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtensionNamed
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasOnlyTaskDependency
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasTaskDependency
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasValueEqualTo
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
 import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
@@ -220,7 +208,9 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(HelmRelease::password, HelmInstallOrUpgrade::password, "topsecret"),
                 propertyMappingInfo(HelmRelease::caFile, HelmInstallOrUpgrade::caFile, "ca.pem"),
                 propertyMappingInfo(HelmRelease::certFile, HelmInstallOrUpgrade::certFile, "cert.pem"),
-                propertyMappingInfo(HelmRelease::keyFile, HelmInstallOrUpgrade::keyFile, "key.pem")
+                propertyMappingInfo(HelmRelease::keyFile, HelmInstallOrUpgrade::keyFile, "key.pem"),
+                propertyMappingInfo(HelmRelease::replace, HelmInstallOrUpgrade::replace, true),
+                propertyMappingInfo(HelmRelease::historyMax, HelmInstallOrUpgrade::historyMax, 42)
             )
         }
 
