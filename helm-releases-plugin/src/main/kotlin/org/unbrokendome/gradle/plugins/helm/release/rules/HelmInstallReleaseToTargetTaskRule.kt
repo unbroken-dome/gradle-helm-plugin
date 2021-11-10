@@ -60,6 +60,7 @@ internal class HelmInstallReleaseToTargetTaskRule(
         chart.set(targetSpecific.chart.map { it.chartLocation })
         version.set(targetSpecific.version)
         replace.set(targetSpecific.replace)
+        historyMax.set(targetSpecific.historyMax)
 
         dependsOn(targetSpecific.chart)
 

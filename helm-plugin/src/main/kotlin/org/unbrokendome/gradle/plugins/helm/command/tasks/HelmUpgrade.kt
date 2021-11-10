@@ -11,7 +11,6 @@ import org.unbrokendome.gradle.pluginutils.property
  */
 open class HelmUpgrade : AbstractHelmInstallationCommandTask() {
 
-
     /**
      * If `true`, run an install if a release by this name doesn't already exist.
      */
@@ -41,6 +40,18 @@ open class HelmUpgrade : AbstractHelmInstallationCommandTask() {
         project.objects.property()
 
 
+    /**
+     * Limit the maximum number of revisions saved per release.
+     *
+     * Use `0` for no limit. If not set, the default value from Helm (currently `10`) is used.
+     *
+     * Corresponds to the `--history-max` parameter of the `helm upgrade` CLI command.
+     */
+    @get:Internal
+    val historyMax: Property<Int> =
+        project.objects.property()
+
+
     @TaskAction
     fun upgradeRelease() {
         execHelm("upgrade") {
@@ -50,6 +61,7 @@ open class HelmUpgrade : AbstractHelmInstallationCommandTask() {
             flag("--install", install)
             flag("--reset-values", resetValues)
             flag("--reuse-values", reuseValues)
+            option("--history-max", historyMax)
         }
     }
 }
