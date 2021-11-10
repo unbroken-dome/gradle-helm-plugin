@@ -1,5 +1,9 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
+import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 
@@ -11,18 +15,17 @@ import org.gradle.api.tasks.TaskAction
  */
 open class HelmBuildDependencies : AbstractHelmDependenciesTask() {
 
-    init {
-        inputs.file(lockFile)
-            .withPropertyName("lockFile").optional()
-        outputs.dir(subchartsDir)
-            .withPropertyName("subchartsDir")
+    @get:[InputFile Optional]
+    final override val lockFile: Provider<RegularFile>
+        get() = super.lockFile
 
+    init {
         @Suppress("LeakingThis")
         onlyIf {
             val lockFile = project.file(this.lockFile)
             if (lockFile.exists()) {
                 // regular helm dep build behavior
-                false
+                true
 
             } else {
                 // helm dep update behavior
