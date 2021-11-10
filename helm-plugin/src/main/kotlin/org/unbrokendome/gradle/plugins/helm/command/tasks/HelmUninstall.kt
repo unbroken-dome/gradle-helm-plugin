@@ -11,6 +11,7 @@ import org.unbrokendome.gradle.pluginutils.property
 /**
  * Uninstalls a release from the cluster. Corresponds to the `helm uninstall` CLI command.
  */
+@Suppress("LeakingThis")
 open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
 
     /**
@@ -43,8 +44,14 @@ open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
 
 
     init {
-        outputs.upToDateWhen {
-            !doesReleaseExist()
+        onlyIf {
+            if (!doesReleaseExist()) {
+                logger.info(
+                    "Release \"{}\" does not exist. Skipping uninstall.",
+                    releaseName.orNull
+                )
+                false
+            } else true
         }
     }
 
@@ -61,12 +68,6 @@ open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
     }
 
 
-    private fun doesReleaseExist(): Boolean {
-        val release = helmCommandSupport.getRelease(releaseName)
-        if (release == null) {
-            logger.info("Release \"{}\" does not exist. Skipping uninstall.")
-            return false
-        }
-        return true
-    }
+    private fun doesReleaseExist(): Boolean =
+        helmCommandSupport.getRelease(releaseName) != null
 }
