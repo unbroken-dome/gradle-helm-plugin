@@ -1,10 +1,16 @@
 package org.unbrokendome.gradle.plugins.helm.command
 
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import org.spekframework.spek2.dsl.LifecycleAware
 import org.spekframework.spek2.style.specification.describe
 import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
 import org.unbrokendome.gradle.plugins.helm.spek.ExecutionResultAwareSpek
 import org.unbrokendome.gradle.plugins.helm.spek.gradleExecMock
+import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock
 import org.unbrokendome.gradle.plugins.helm.testutil.exec.singleInvocation
+import org.unbrokendome.gradle.plugins.helm.testutil.exec.verifyNoInvocations
+import org.unbrokendome.gradle.pluginutils.test.TaskOutcome
 import org.unbrokendome.gradle.pluginutils.test.execute
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
 import org.unbrokendome.gradle.pluginutils.test.spek.gradleTask
@@ -22,6 +28,33 @@ object HelmUninstallTest : ExecutionResultAwareSpek({
         releaseName.set("awesome-release")
     }
 
+    fun GradleExecMock.verifyHelmLsInvocation() {
+        singleInvocation {
+            expectCommand("ls")
+            expectOption("-o", "json")
+            expectOption("-f", "^\\Qawesome-release\\E$")
+        }
+    }
+
+
+    fun LifecycleAware.givenReleaseExists() {
+        beforeEachTest {
+            lsExecMock.everyExec {
+                printsOnStdout(
+                    """[{
+                          "name": "awesome-release", "namespace": "default",
+                          "revision": "42", "updated": "2020-03-15 10:56:45.906903 +0100 CET",
+                          "status": "deployed", "chart": "my-repo/awesome-chart",
+                          "app_version": "1.2.3"
+                        }]""".trimIndent()
+                )
+            }
+        }
+        afterEachTest {
+            lsExecMock.verifyHelmLsInvocation()
+        }
+    }
+
 
     withOptionsTesting(
         GlobalOptionsTests,
@@ -31,28 +64,10 @@ object HelmUninstallTest : ExecutionResultAwareSpek({
 
         describe("when the release exists on the server") {
 
-            beforeEachTest {
-                lsExecMock.everyExec {
-                    printsOnStdout(
-                        """[{
-                          "name": "awesome-release", "namespace": "default",
-                          "revision": "42", "updated": "2020-03-15 10:56:45.906903 +0100 CET",
-                          "status": "deployed", "chart": "my-repo/awesome-chart",
-                          "app_version": "1.2.3"
-                        }]""".trimIndent()
-                    )
-                }
-            }
-
-
+            givenReleaseExists()
             afterEachTest {
-                lsExecMock.singleInvocation() {
-                    expectCommand("ls")
-                    expectOption("-o", "json")
-                    expectOption("-f", "^\\Qawesome-release\\E$")
-                }
+                lsExecMock.verifyHelmLsInvocation()
             }
-
 
             describe("executing a HelmUninstall task") {
 
@@ -65,19 +80,62 @@ object HelmUninstallTest : ExecutionResultAwareSpek({
                         expectArg("awesome-release")
                     }
                 }
+            }
+        }
+    }
 
+    describe("when the release exists on the server") {
 
-                it("should use keepHistory property") {
-                    task.keepHistory.set(true)
+        givenReleaseExists()
 
-                    task.execute()
+        describe("executing a HelmUninstall task") {
 
-                    commandExecMock.singleInvocation {
-                        expectCommand("uninstall")
-                        expectFlag("--keep-history")
-                        expectArg("awesome-release")
-                    }
+            it("should use keepHistory property") {
+                task.keepHistory.set(true)
+
+                task.execute()
+
+                commandExecMock.singleInvocation {
+                    expectCommand("uninstall")
+                    expectFlag("--keep-history")
+                    expectArg("awesome-release")
                 }
+            }
+
+            it("should use wait property") {
+                task.wait.set(true)
+
+                task.execute()
+
+                commandExecMock.singleInvocation {
+                    expectCommand("uninstall")
+                    expectFlag("--wait")
+                    expectArg("awesome-release")
+                }
+            }
+        }
+
+    }
+
+    describe("when the release does not exist on the server") {
+
+        beforeEachTest {
+            lsExecMock.everyExec {
+                printsOnStdout("[]")
+            }
+        }
+        afterEachTest {
+            lsExecMock.verifyHelmLsInvocation()
+        }
+
+        describe("executing a HelmUninstall task") {
+
+            it("should skip the helm uninstall invocation") {
+
+                val result = task.execute()
+                assertThat(result, "result").isEqualTo(TaskOutcome.SKIPPED)
+
+                commandExecMock.verifyNoInvocations()
             }
         }
     }
