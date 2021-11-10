@@ -249,7 +249,8 @@ object HelmReleasesPluginTest : Spek({
                 ),
                 propertyMappingInfo(
                     HelmRelease::keepHistoryOnUninstall, HelmUninstall::keepHistory, true
-                )
+                ),
+                propertyMappingInfo(HelmRelease::wait, HelmUninstall::wait, true)
             )
         }
 
@@ -436,7 +437,8 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(HelmReleaseTarget::noHooks, HelmUninstall::noHooks, true),
                 propertyMappingInfo(
                     HelmReleaseTarget::remoteTimeout, HelmUninstall::remoteTimeout, Duration.ofSeconds(42)
-                )
+                ),
+                propertyMappingInfo(HelmReleaseTarget::wait, HelmUninstall::wait, true),
             )
         }
 
