@@ -13,28 +13,29 @@ import org.unbrokendome.gradle.plugins.helm.model.ChartModelDependencies
 import org.unbrokendome.gradle.plugins.helm.model.ChartRequirementsYaml
 
 
+@Suppress("LeakingThis")
 abstract class AbstractHelmDependenciesTask : AbstractHelmCommandTask() {
 
     /**
      * The chart directory.
      */
     @get:Internal("Represented as part of other properties")
-    val chartDir: DirectoryProperty =
+    open val chartDir: DirectoryProperty =
         project.objects.directoryProperty()
 
 
     /**
      * Path to the `Chart.yaml` file of the chart (read-only).
      */
-    private val chartYamlFile: Provider<RegularFile>
-        get() = chartDir.file("Chart.yaml")
+    private val chartYamlFile: Provider<RegularFile> =
+        chartDir.file("Chart.yaml")
 
 
     /**
      * Path to the `requirements.yaml` file of the chart (read-only).
      */
-    private val requirementsYamlFile: Provider<RegularFile>
-        get() = chartDir.file("requirements.yaml")
+    private val requirementsYamlFile: Provider<RegularFile> =
+        chartDir.file("requirements.yaml")
 
 
     /**
@@ -49,8 +50,8 @@ abstract class AbstractHelmDependenciesTask : AbstractHelmCommandTask() {
      * Provides the correct name of the file containing the chart's dependencies, as indicated by the
      * API version specified in the Chart.yaml file.
      */
-    private val dependencyDescriptorFileName: Provider<String>
-        get() = chartDescriptor.map { descriptor ->
+    private val dependencyDescriptorFileName: Provider<String> =
+        chartDescriptor.map { descriptor ->
             if (descriptor.apiVersion == "v1") "requirements.yaml" else "Chart.yaml"
         }
 
@@ -60,16 +61,16 @@ abstract class AbstractHelmDependenciesTask : AbstractHelmCommandTask() {
      * in the Chart.yaml file.
      */
     @get:Internal
-    internal val dependencyDescriptorFile: Provider<RegularFile>
-        get() = chartDir.file(dependencyDescriptorFileName)
+    internal open val dependencyDescriptorFile: Provider<RegularFile> =
+        chartDir.file(dependencyDescriptorFileName)
 
 
     /**
      * Provides the correct name of the lock file, as indicated by the API version specified in the
      * Chart.yaml file.
      */
-    private val lockFileName: Provider<String>
-        get() = chartDescriptor.map { descriptor ->
+    private val lockFileName: Provider<String> =
+        chartDescriptor.map { descriptor ->
             if (descriptor.apiVersion == "v1") "requirements.lock" else "Chart.lock"
         }
 
@@ -79,8 +80,8 @@ abstract class AbstractHelmDependenciesTask : AbstractHelmCommandTask() {
      * Chart API version and only if it is present.
      */
     @get:Internal
-    internal val lockFile: Provider<RegularFile>
-        get() = chartDir.file(lockFileName)
+    internal open val lockFile: Provider<RegularFile> =
+        chartDir.file(lockFileName)
 
 
     @get:Internal

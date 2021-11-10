@@ -1,8 +1,9 @@
 package org.unbrokendome.gradle.plugins.helm.command.tasks
 
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.*
 import org.unbrokendome.gradle.pluginutils.property
 
 
@@ -24,10 +25,17 @@ open class HelmUpdateDependencies : AbstractHelmDependenciesTask() {
         project.objects.property()
 
 
-    init {
-        inputs.file(dependencyDescriptorFile).optional()
-        outputs.file(lockFile)
+    @get:[InputFile Optional]
+    final override val dependencyDescriptorFile: Provider<RegularFile>
+        get() = super.dependencyDescriptorFile
 
+
+    @get:[OutputFile]
+    override val lockFile: Provider<RegularFile>
+        get() = super.lockFile
+
+
+    init {
         @Suppress("LeakingThis")
         onlyIf {
             // skip if the chart has no declared external dependencies
