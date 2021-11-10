@@ -5,12 +5,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallationOptions
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOperationOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOperationOptions
+import org.unbrokendome.gradle.plugins.helm.command.*
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.withDefault
 
@@ -33,6 +28,9 @@ fun HelmInstallationOptions.withDefaults(
         override val wait: Provider<Boolean>
             get() = this@withDefaults.wait.withDefault(defaults.wait, providers)
 
+        override val waitForJobs: Provider<Boolean>
+            get() = this@withDefaults.waitForJobs.withDefault(defaults.waitForJobs, providers)
+
         override val version: Provider<String>
             get() = this@withDefaults.version.withDefault(defaults.version, providers)
 
@@ -47,6 +45,7 @@ fun ConfigurableHelmInstallationOptions.conventionsFrom(source: HelmInstallation
     devel.convention(source.devel)
     verify.convention(source.verify)
     wait.convention(source.wait)
+    waitForJobs.convention(source.waitForJobs)
     version.convention(source.version)
     createNamespace.convention(source.createNamespace)
 }
@@ -58,6 +57,7 @@ fun ConfigurableHelmInstallationOptions.setFrom(source: HelmInstallationOptions)
     devel.set(source.devel)
     verify.set(source.verify)
     wait.set(source.wait)
+    waitForJobs.set(source.waitForJobs)
     version.set(source.version)
     createNamespace.set(source.createNamespace)
 }
@@ -69,6 +69,7 @@ data class HelmInstallationOptionsHolder(
     override val devel: Property<Boolean>,
     override val verify: Property<Boolean>,
     override val wait: Property<Boolean>,
+    override val waitForJobs: Property<Boolean>,
     override val version: Property<String>,
     override val createNamespace: Property<Boolean>
 ) : ConfigurableHelmInstallationOptions,
@@ -81,6 +82,7 @@ data class HelmInstallationOptionsHolder(
         devel = objects.property(),
         verify = objects.property(),
         wait = objects.property(),
+        waitForJobs = objects.property(),
         version = objects.property(),
         createNamespace = objects.property()
     )
@@ -102,6 +104,7 @@ object HelmInstallationOptionsApplier : HelmOptionsApplier {
                 flag("--devel", options.devel)
                 flag("--verify", options.verify)
                 flag("--wait", options.wait)
+                flag("--wait-for-jobs", options.waitForJobs)
                 option("--version", options.version)
                 flag("--create-namespace", options.createNamespace)
             }

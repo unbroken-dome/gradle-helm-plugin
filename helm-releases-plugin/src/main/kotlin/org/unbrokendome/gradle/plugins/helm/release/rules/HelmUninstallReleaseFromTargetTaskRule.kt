@@ -57,6 +57,7 @@ internal class HelmUninstallReleaseFromTargetTaskRule(
         setFrom(targetSpecific)
         releaseName.set(targetSpecific.releaseName)
         keepHistory.set(targetSpecific.keepHistoryOnUninstall)
+        wait.set(targetSpecific.wait)
 
         // Make sure all dependent releases are uninstalled first
         dependsOn(TaskDependency {

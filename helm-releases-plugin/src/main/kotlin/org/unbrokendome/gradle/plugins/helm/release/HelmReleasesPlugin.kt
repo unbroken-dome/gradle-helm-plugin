@@ -1,39 +1,17 @@
 package org.unbrokendome.gradle.plugins.helm.release
 
-import org.gradle.api.GradleException
-import org.gradle.api.NamedDomainObjectCollection
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import org.gradle.api.*
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.reflect.TypeOf
-import org.unbrokendome.gradle.plugins.helm.HELM_DEFAULT_RELEASE_TARGET
-import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.HELM_RELEASES_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_RELEASE_TARGETS_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HelmPlugin
+import org.unbrokendome.gradle.plugins.helm.*
 import org.unbrokendome.gradle.plugins.helm.command.internal.conventionsFrom
 import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
 import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmReleaseTarget
 import org.unbrokendome.gradle.plugins.helm.release.dsl.helmReleaseContainer
 import org.unbrokendome.gradle.plugins.helm.release.dsl.helmReleaseTargetContainer
-import org.unbrokendome.gradle.plugins.helm.release.rules.DefaultReleaseTargetRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallReleaseToTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmInstallToTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmStatusReleaseOnTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmStatusReleaseTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestOnTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestReleaseOnTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmTestReleaseTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallFromTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallReleaseFromTargetTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.HelmUninstallReleaseTaskRule
-import org.unbrokendome.gradle.plugins.helm.release.rules.installAllToTargetTaskName
-import org.unbrokendome.gradle.plugins.helm.release.rules.testAllOnTargetTaskName
-import org.unbrokendome.gradle.plugins.helm.release.rules.uninstallAllFromTargetTaskName
+import org.unbrokendome.gradle.plugins.helm.release.rules.*
 import org.unbrokendome.gradle.plugins.helm.release.tags.TagExpression
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.durationProviderFromProjectProperty
@@ -152,6 +130,7 @@ class HelmReleasesPlugin : Plugin<Project> {
                 val noHooks = booleanProviderFromProjectProperty("helm.noHooks")
                 val remoteTimeout = durationProviderFromProjectProperty("helm.remoteTimeout")
                 val wait = booleanProviderFromProjectProperty("helm.wait")
+                val waitForJobs = booleanProviderFromProjectProperty("helm.waitForJobs")
 
                 releaseTargets.all { releaseTarget ->
                     releaseTarget.conventionsFrom(project.helm)
@@ -160,6 +139,7 @@ class HelmReleasesPlugin : Plugin<Project> {
                     releaseTarget.noHooks.convention(noHooks)
                     releaseTarget.remoteTimeout.convention(remoteTimeout)
                     releaseTarget.wait.convention(wait)
+                    releaseTarget.waitForJobs.convention(waitForJobs)
                 }
 
                 // Realize the "default" target so it will be found when enumerating release targets

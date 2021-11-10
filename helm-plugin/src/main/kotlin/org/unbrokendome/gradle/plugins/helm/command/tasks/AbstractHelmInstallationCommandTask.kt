@@ -236,6 +236,15 @@ abstract class AbstractHelmInstallationCommandTask :
 
 
     /**
+     * If `true`, and [wait] is also `true`, will wait until all Jobs have been completed before
+     * marking the release as successful. It will wait for as long as [remoteTimeout].
+     */
+    @get:Internal
+    final override val waitForJobs: Property<Boolean> =
+        project.objects.property()
+
+
+    /**
      * If `true`, create the release namespace if not present.
      *
      * Corresponds to the `--create-namespace` CLI parameter.

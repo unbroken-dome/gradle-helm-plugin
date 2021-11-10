@@ -31,6 +31,17 @@ open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
         project.objects.property()
 
 
+    /**
+     * If `true`, will wait until all the resources are deleted before returning.
+     * It will wait for as long as [remoteTimeout].
+     *
+     * Corresponds to the `--wait` CLI parameter.
+     */
+    @get:Internal
+    val wait: Property<Boolean> =
+        project.objects.property()
+
+
     init {
         outputs.upToDateWhen {
             !doesReleaseExist()
@@ -45,6 +56,7 @@ open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
             args(releaseName)
             flag("--dry-run", dryRun)
             flag("--keep-history", keepHistory)
+            flag("--wait", wait)
         }
     }
 

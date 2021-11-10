@@ -73,7 +73,21 @@ class InstallationOptionsTests(vararg commands: String) : AbstractOptionsTests({
     }
 
 
-    variant("with wait property") {
+    variant("with waitForJobs property") {
+
+        beforeEachTest {
+            options.waitForJobs.set(true)
+        }
+
+        afterEachTest {
+            execMock.eachInvocation(Invocation::matchesCommand) {
+                expectFlag("--wait-for-jobs")
+            }
+        }
+    }
+
+
+    variant("with version property") {
 
         beforeEachTest {
             options.version.set("1.2.3")
