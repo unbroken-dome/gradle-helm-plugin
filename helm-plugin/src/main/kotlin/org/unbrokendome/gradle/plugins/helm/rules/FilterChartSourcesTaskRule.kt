@@ -36,6 +36,7 @@ internal class FilterChartSourcesTaskRule(
         chartVersion.set(chart.chartVersion)
         sourceDir.set(chart.sourceDir)
         targetDir.set((chart as HelmChartInternal).filteredSourcesDir)
+        overrideChartInfo.set(chart.overrideChartInfo)
 
         filtering.setParent(chart.filtering)
     }
