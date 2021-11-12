@@ -20,7 +20,7 @@ dependencies {
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
 
-    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.5.0-SNAPSHOT")
+    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.5.0")
 }
 
 
