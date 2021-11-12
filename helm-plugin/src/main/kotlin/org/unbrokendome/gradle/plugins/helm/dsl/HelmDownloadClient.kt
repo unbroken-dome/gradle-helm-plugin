@@ -25,7 +25,7 @@ interface HelmDownloadClient {
          * the plugin is released.
          */
         @JvmStatic
-        val DEFAULT_HELM_CLIENT_VERSION = "3.4.1"
+        val DEFAULT_HELM_CLIENT_VERSION = "3.7.1"
     }
 
     /**
