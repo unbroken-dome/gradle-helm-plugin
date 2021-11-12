@@ -7,7 +7,7 @@ ifdef::env-github[]
 endif::[]
 
 = Gradle Helm Plugin
-:version: 1.6.1
+:version: 1.7.0
 :pluginId: org.unbroken-dome.helm
 
 image:https://img.shields.io/gradle-plugin-portal/v/{pluginId}?versionPrefix={version}[link=https://plugins.gradle.org/plugin/{pluginId}/{version}]
