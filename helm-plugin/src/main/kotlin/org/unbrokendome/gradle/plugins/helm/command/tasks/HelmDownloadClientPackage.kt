@@ -9,7 +9,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.command.HelmDownloadClientPlugin
 import org.unbrokendome.gradle.plugins.helm.util.calculateDigestHex
 import org.unbrokendome.gradle.plugins.helm.util.formatDataSize
 import org.unbrokendome.gradle.pluginutils.SystemUtils
@@ -19,7 +18,6 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.IOException
 import java.net.URI
-
 
 /**
  * Downloads a Helm client package from the official Helm releases website.
@@ -44,13 +42,11 @@ abstract class HelmDownloadClientPackage : DefaultTask() {
 
 
     /**
-     * The base URL. Defaults to `https://get.helm.sh`.
+     * The base URL.
      */
-    @get:Internal("Represented as part of downloadUrl")
+    @get:Input
     val baseUrl: Property<URI> =
-        project.objects.property<URI>()
-            .convention(HelmDownloadClientPlugin.DEFAULT_BASE_URL)
-
+        project.objects.property()
 
     /**
      * The OS classifier. Will use the project property `helm.client.download.osclassifier`
