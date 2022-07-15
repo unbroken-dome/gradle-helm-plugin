@@ -3,8 +3,8 @@
 With the `helm` plugin you can configure your Helm chart using a declarative DSL, and the corresponding Gradle
 tasks will be added automatically.
 
-Groovy
 [source,groovy,subs="+attributes",role="primary"]
+.Groovy
 ----
 plugins {
     id 'org.unbroken-dome.helm' version '{project-version}'
@@ -21,8 +21,8 @@ helm {
 }
 ----
 
-Kotlin
 [source,kotlin,subs="+attributes",role="secondary"]
+.Kotlin
 ----
 plugins {
     id("org.unbroken-dome.helm") version "{project-version}"
