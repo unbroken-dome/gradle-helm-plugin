@@ -10,7 +10,6 @@ import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.toSerializa
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
 import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
-import org.unbrokendome.gradle.plugins.helm.publishing.util.toMultipartBody
 import org.unbrokendome.gradle.pluginutils.property
 import java.io.File
 import java.net.URI
@@ -22,6 +21,7 @@ interface GitlabHelmPublishingRepository : HelmPublishingRepository {
      * The ID of the Gitlab project.
      */
     val projectId: Property<Int>
+    val channelId: Property<String>
 }
 
 
@@ -33,36 +33,42 @@ private open class DefaultGitlabHelmPublishingRepository @Inject constructor(
     override val projectId: Property<Int> =
         objects.property()
 
+    override val channelId: Property<String> =
+            objects.property()
+
     override val publisherParams: PublisherParams
         get() = GitlabPublisherParams(
             url = requireNotNull(url.orNull) { "url is required for Gitlab publishing repository" },
             credentials = configuredCredentials.orNull?.toSerializable(),
-            projectId = requireNotNull(projectId.orNull) { "projectId is required for Gitlab publishing repository" }
+            projectId = requireNotNull(projectId.orNull) { "projectId is required for Gitlab publishing repository" },
+            channelId = requireNotNull(channelId.orNull)
         )
 
 
     private class GitlabPublisherParams(
         private val url: URI,
         private val credentials: SerializableCredentials?,
-        private var projectId: Int
+        private var projectId: Int,
+        private var channelId: String
     ) : PublisherParams {
 
         override fun createPublisher(): HelmChartPublisher =
-            GitlabPublisher(url, credentials, projectId)
+            GitlabPublisher(url, credentials, projectId, channelId)
     }
 
 
     private class GitlabPublisher(
         url: URI,
         credentials: SerializableCredentials?,
-        private val projectId: Int
+        private val projectId: Int,
+        private val channelId: String
     ) : AbstractHttpHelmChartPublisher(url, credentials) {
 
         override val uploadMethod: String
             get() = "POST"
 
         override fun uploadPath(chartName: String, chartVersion: String): String =
-            "/projects/$projectId/packages/helm/api/stable/charts"
+            "/projects/$projectId/packages/helm/api/$channelId/charts"
 
         override fun requestBody(chartFile: File): RequestBody =
             MultipartBody.Builder().run {

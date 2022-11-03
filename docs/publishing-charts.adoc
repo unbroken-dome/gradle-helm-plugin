@@ -291,7 +291,7 @@ https://help.sonatype.com/repomanager3/rest-and-integration-api/components-api#C
 
 === Gitlab Repositories
 
-The plugin provides direct support for Gitlab repositories. The Gitlab API `url` and the `projectId` must be set in the
+The plugin provides direct support for Gitlab repositories. The Gitlab API `url`, the `projectId` and the 'channelId' must be set in the
 repository configuration block.
 
 [source,groovy,role="primary"]
@@ -303,6 +303,9 @@ helm {
             gitlab {
                 url = uri('https://gitlab.example.com/api/v4')
                 projectId = 1234
+                channelId = 'stable'
+                // link:https://docs.gitlab.com/ee/user/packages/helm_repository/#release-channels[Gitlab documentation] is not clear
+                // which other channels are there but 'stable' and 'devel' should be thee in any case
             }
         }
     }
