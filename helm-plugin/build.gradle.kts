@@ -9,7 +9,7 @@ plugins {
 
 dependencies {
 
-    implementation("org.yaml:snakeyaml:1.27")
+    implementation("org.yaml:snakeyaml:1.33")
     implementation("org.json:json:20200518")
 
     implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.5.0")
