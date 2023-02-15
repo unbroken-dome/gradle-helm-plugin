@@ -10,12 +10,12 @@ plugins {
 dependencies {
 
     implementation("org.yaml:snakeyaml:1.33")
-    implementation("org.json:json:20200518")
+    implementation("org.json:json:20220320")
 
     implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.5.0")
 
     testImplementation("com.jayway.jsonpath:json-path:2.4.0")
-    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.12.7.1")
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2")
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.0")
