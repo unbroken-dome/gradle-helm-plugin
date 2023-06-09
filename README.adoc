@@ -72,5 +72,5 @@ Use the `helmPackage` task to build your chart.
 
 == Further Documentation
 
-* https://unbroken-dome.github.io/projects/gradle-helm-plugin/[User Manual]
-* https://unbroken-dome.github.io/projects/gradle-helm-plugin/dokka/gradle-helm-plugin/[API/DSL Documentation]
+* https://citi.github.io/projects/gradle-helm-plugin/[User Manual]
+* https://citi.github.io/projects/gradle-helm-plugin/dokka/gradle-helm-plugin/[API/DSL Documentation]
