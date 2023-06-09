@@ -1,7 +1,7 @@
-package org.unbrokendome.gradle.plugins.helm.command.internal
+package com.citi.gradle.plugins.helm.command.internal
 
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmOptions
+import com.citi.gradle.plugins.helm.command.HelmExecSpec
+import com.citi.gradle.plugins.helm.command.HelmOptions
 
 
 /**

@@ -1,6 +1,6 @@
 @file:JvmName("HelmPluginConstants")
 
-package org.unbrokendome.gradle.plugins.helm
+package com.citi.gradle.plugins.helm
 
 
 /**

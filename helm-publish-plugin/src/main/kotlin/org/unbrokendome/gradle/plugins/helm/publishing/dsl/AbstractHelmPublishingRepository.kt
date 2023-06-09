@@ -1,12 +1,12 @@
-package org.unbrokendome.gradle.plugins.helm.publishing.dsl
+package com.citi.gradle.plugins.helm.publishing.dsl
 
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.CredentialsContainerSupport
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.CredentialsFactory
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.DefaultCredentialsFactory
+import com.citi.gradle.plugins.helm.dsl.credentials.CredentialsContainer
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.CredentialsContainerSupport
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.CredentialsFactory
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.DefaultCredentialsFactory
 import org.unbrokendome.gradle.pluginutils.property
 import java.net.URI
 

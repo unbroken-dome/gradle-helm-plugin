@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty

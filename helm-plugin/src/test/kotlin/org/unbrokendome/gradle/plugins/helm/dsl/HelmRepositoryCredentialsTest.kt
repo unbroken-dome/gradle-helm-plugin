@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.dsl
+package com.citi.gradle.plugins.helm.dsl
 
 import assertk.all
 import assertk.assertThat
@@ -7,13 +7,13 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.credentials
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
+import com.citi.gradle.plugins.helm.HelmPlugin
+import com.citi.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.CredentialsContainer
+import com.citi.gradle.plugins.helm.dsl.credentials.PasswordCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.credentials
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.dsl.internal.repositories
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.fileValue
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent

@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.release.dsl
+package com.citi.gradle.plugins.helm.release.dsl
 
 import org.gradle.api.*
 import org.gradle.api.file.Directory
@@ -9,11 +9,11 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.internal.*
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.rules.ChartDirArtifactRule
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
+import com.citi.gradle.plugins.helm.command.internal.*
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.rules.ChartDirArtifactRule
 import org.unbrokendome.gradle.pluginutils.*
 import java.io.File
 import java.net.URI

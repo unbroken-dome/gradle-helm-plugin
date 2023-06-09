@@ -1,11 +1,11 @@
-package org.unbrokendome.gradle.plugins.helm.rules
+package com.citi.gradle.plugins.helm.rules
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChartInternal
-import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
-import org.unbrokendome.gradle.plugins.helm.tasks.HelmCollectChartDependencies
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.dsl.HelmChartInternal
+import com.citi.gradle.plugins.helm.dsl.dependencies.chartDependenciesConfigurationName
+import com.citi.gradle.plugins.helm.tasks.HelmCollectChartDependencies
 import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 

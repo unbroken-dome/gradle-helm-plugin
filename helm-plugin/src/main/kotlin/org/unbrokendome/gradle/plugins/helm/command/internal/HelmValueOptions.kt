@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command.internal
+package com.citi.gradle.plugins.helm.command.internal
 
 import groovy.lang.Closure
 import org.gradle.api.file.ConfigurableFileCollection
@@ -10,10 +10,10 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
 import org.gradle.util.GradleVersion
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
+import com.citi.gradle.plugins.helm.command.HelmExecSpec
+import com.citi.gradle.plugins.helm.command.HelmOptions
+import com.citi.gradle.plugins.helm.command.HelmValueOptions
 import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.mapProperty
 import java.util.concurrent.Callable

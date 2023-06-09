@@ -1,11 +1,11 @@
-package org.unbrokendome.gradle.plugins.helm.rules
+package com.citi.gradle.plugins.helm.rules
 
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
+import com.citi.gradle.plugins.helm.command.tasks.HelmAddRepository
+import com.citi.gradle.plugins.helm.dsl.HelmRepository
+import com.citi.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import org.unbrokendome.gradle.pluginutils.ifPresent
 import org.unbrokendome.gradle.pluginutils.rules.AbstractTaskRule
 import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern

@@ -3,15 +3,15 @@
 
 package org.gradle.kotlin.dsl
 
+import com.citi.gradle.plugins.helm.HELM_DEPENDENCIES_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.dsl.Filtering
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.dsl.Linting
+import com.citi.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.gradle.api.Action
 import org.gradle.api.plugins.ExtensionAware
-import org.unbrokendome.gradle.plugins.helm.HELM_DEPENDENCIES_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.dsl.dependencies.ChartDependencyHandler
 import org.unbrokendome.gradle.pluginutils.requiredExtension
 
 

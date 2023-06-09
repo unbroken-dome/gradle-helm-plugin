@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.spek
+package com.citi.gradle.plugins.helm.spek
 
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.dsl.GroupBody

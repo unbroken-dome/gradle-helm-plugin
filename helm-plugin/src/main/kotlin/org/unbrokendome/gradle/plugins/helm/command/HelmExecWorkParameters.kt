@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty

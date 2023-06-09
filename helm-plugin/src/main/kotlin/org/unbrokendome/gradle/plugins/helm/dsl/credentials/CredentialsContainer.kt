@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.credentials
+package com.citi.gradle.plugins.helm.dsl.credentials
 
 import groovy.lang.Closure
 import groovy.lang.Closure.DELEGATE_FIRST

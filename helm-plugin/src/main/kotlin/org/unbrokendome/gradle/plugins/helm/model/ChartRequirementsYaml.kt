@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.model
+package com.citi.gradle.plugins.helm.model
 
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider

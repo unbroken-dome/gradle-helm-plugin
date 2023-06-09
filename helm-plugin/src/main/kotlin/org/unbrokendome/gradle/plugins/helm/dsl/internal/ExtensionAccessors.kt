@@ -1,17 +1,17 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.internal
+package com.citi.gradle.plugins.helm.dsl.internal
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.unbrokendome.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_REPOSITORIES_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepositoryHandler
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
+import com.citi.gradle.plugins.helm.HELM_CHARTS_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_FILTERING_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_REPOSITORIES_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.dsl.Filtering
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.dsl.HelmExtension
+import com.citi.gradle.plugins.helm.dsl.HelmRepositoryHandler
+import com.citi.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.pluginutils.requiredExtension
 
 

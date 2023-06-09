@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command.tasks
+package com.citi.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.Task
 import org.gradle.api.file.RegularFile
@@ -7,7 +7,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.util.withLockFile
+import com.citi.gradle.plugins.helm.util.withLockFile
 import org.unbrokendome.gradle.pluginutils.listProperty
 import org.unbrokendome.gradle.pluginutils.property
 import java.time.Duration

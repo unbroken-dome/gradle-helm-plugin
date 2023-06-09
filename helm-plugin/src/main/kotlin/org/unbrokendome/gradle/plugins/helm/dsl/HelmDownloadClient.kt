@@ -1,11 +1,11 @@
-package org.unbrokendome.gradle.plugins.helm.dsl
+package com.citi.gradle.plugins.helm.dsl
 
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.unbrokendome.gradle.plugins.helm.command.rules.extractClientTaskName
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmExtractClient
+import com.citi.gradle.plugins.helm.command.rules.extractClientTaskName
+import com.citi.gradle.plugins.helm.command.tasks.HelmExtractClient
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty

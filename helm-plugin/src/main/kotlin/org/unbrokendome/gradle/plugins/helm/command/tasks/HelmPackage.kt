@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command.tasks
+package com.citi.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
@@ -10,8 +10,8 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptor
-import org.unbrokendome.gradle.plugins.helm.model.ChartDescriptorYaml
+import com.citi.gradle.plugins.helm.model.ChartDescriptor
+import com.citi.gradle.plugins.helm.model.ChartDescriptorYaml
 import org.unbrokendome.gradle.pluginutils.property
 
 

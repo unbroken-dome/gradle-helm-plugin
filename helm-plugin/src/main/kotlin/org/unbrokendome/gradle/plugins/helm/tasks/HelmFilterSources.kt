@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.tasks
+package com.citi.gradle.plugins.helm.tasks
 
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
@@ -7,10 +7,10 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.putFrom
-import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.createFiltering
-import org.unbrokendome.gradle.plugins.helm.util.filterYaml
+import com.citi.gradle.plugins.helm.HELM_GROUP
+import com.citi.gradle.plugins.helm.dsl.Filtering
+import com.citi.gradle.plugins.helm.dsl.createFiltering
+import com.citi.gradle.plugins.helm.util.filterYaml
 import org.unbrokendome.gradle.pluginutils.io.expand
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.versionProvider

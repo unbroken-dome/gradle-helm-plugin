@@ -1,8 +1,8 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal
+package com.citi.gradle.plugins.helm.dsl.credentials.internal
 
 import org.gradle.api.credentials.Credentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CertificateCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.CertificateCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import java.io.File
 import java.io.Serializable
 

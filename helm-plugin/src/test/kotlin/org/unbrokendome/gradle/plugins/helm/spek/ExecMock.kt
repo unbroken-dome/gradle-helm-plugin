@@ -1,15 +1,15 @@
-package org.unbrokendome.gradle.plugins.helm.spek
+package com.citi.gradle.plugins.helm.spek
 
 import org.gradle.api.Project
 import org.spekframework.spek2.dsl.LifecycleAware
 import org.spekframework.spek2.lifecycle.CachingMode
 import org.spekframework.spek2.lifecycle.MemoizedValue
-import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.DefaultExecutableGradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.ExecutableGradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.withStatefulVerification
+import com.citi.gradle.plugins.helm.command.HelmCommandsPlugin
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.testutil.exec.DefaultExecutableGradleExecMock
+import com.citi.gradle.plugins.helm.testutil.exec.ExecutableGradleExecMock
+import com.citi.gradle.plugins.helm.testutil.exec.GradleExecMock
+import com.citi.gradle.plugins.helm.testutil.exec.withStatefulVerification
 
 
 /**

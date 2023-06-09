@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.dsl
+package com.citi.gradle.plugins.helm.dsl
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project

@@ -1,13 +1,13 @@
-package org.unbrokendome.gradle.plugins.helm.publishing
+package com.citi.gradle.plugins.helm.publishing
 
 import assertk.assertThat
 import assertk.assertions.isSuccess
 import org.gradle.api.Task
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
+import com.citi.gradle.plugins.helm.HelmPlugin
+import com.citi.gradle.plugins.helm.dsl.HelmExtension
+import com.citi.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
 import org.unbrokendome.gradle.pluginutils.test.evaluate

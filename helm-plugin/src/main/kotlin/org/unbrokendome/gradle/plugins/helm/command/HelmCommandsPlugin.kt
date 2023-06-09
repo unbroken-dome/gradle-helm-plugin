@@ -1,17 +1,17 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
-import org.unbrokendome.gradle.plugins.helm.HELM_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
-import org.unbrokendome.gradle.plugins.helm.command.internal.conventionsFrom
-import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
-import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
-import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerCommandTask
-import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmServerOperationCommandTask
-import org.unbrokendome.gradle.plugins.helm.dsl.*
+import com.citi.gradle.plugins.helm.HELM_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.HELM_LINT_EXTENSION_NAME
+import com.citi.gradle.plugins.helm.command.internal.conventionsFrom
+import com.citi.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
+import com.citi.gradle.plugins.helm.command.tasks.AbstractHelmInstallationCommandTask
+import com.citi.gradle.plugins.helm.command.tasks.AbstractHelmServerCommandTask
+import com.citi.gradle.plugins.helm.command.tasks.AbstractHelmServerOperationCommandTask
+import com.citi.gradle.plugins.helm.dsl.*
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.durationProviderFromProjectProperty
 

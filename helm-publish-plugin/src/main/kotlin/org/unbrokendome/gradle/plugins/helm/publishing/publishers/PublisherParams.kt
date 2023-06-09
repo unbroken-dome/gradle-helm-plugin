@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.publishing.publishers
+package com.citi.gradle.plugins.helm.publishing.publishers
 
 import java.io.Serializable
 

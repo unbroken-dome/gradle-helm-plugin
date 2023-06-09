@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.dependencies
+package com.citi.gradle.plugins.helm.dsl.dependencies
 
 import org.gradle.api.artifacts.Configuration
 

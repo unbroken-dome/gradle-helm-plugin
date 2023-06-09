@@ -1,15 +1,15 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.workers.WorkerExecutor
 import org.json.JSONArray
 import org.json.JSONObject
-import org.unbrokendome.gradle.plugins.helm.command.internal.GlobalHelmOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmServerOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
-import org.unbrokendome.gradle.plugins.helm.model.Release
+import com.citi.gradle.plugins.helm.command.internal.GlobalHelmOptionsApplier
+import com.citi.gradle.plugins.helm.command.internal.HelmOptionsApplier
+import com.citi.gradle.plugins.helm.command.internal.HelmServerOptionsApplier
+import com.citi.gradle.plugins.helm.command.tasks.AbstractHelmCommandTask
+import com.citi.gradle.plugins.helm.model.Release
 
 
 /**

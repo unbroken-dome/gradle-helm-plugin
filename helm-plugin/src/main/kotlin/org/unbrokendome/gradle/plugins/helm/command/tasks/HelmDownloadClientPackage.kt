@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command.tasks
+package com.citi.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -9,9 +9,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.unbrokendome.gradle.plugins.helm.command.HelmDownloadClientPlugin
-import org.unbrokendome.gradle.plugins.helm.util.calculateDigestHex
-import org.unbrokendome.gradle.plugins.helm.util.formatDataSize
+import com.citi.gradle.plugins.helm.command.HelmDownloadClientPlugin
+import com.citi.gradle.plugins.helm.util.calculateDigestHex
+import com.citi.gradle.plugins.helm.util.formatDataSize
 import org.unbrokendome.gradle.pluginutils.SystemUtils
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty

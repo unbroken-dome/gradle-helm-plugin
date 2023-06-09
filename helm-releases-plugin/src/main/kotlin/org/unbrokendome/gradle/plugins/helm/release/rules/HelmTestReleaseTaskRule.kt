@@ -1,12 +1,12 @@
-package org.unbrokendome.gradle.plugins.helm.release.rules
+package com.citi.gradle.plugins.helm.release.rules
 
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.Task
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
-import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTest
-import org.unbrokendome.gradle.plugins.helm.release.dsl.HelmRelease
+import com.citi.gradle.plugins.helm.HELM_GROUP
+import com.citi.gradle.plugins.helm.command.tasks.HelmTest
+import com.citi.gradle.plugins.helm.release.dsl.HelmRelease
 import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 

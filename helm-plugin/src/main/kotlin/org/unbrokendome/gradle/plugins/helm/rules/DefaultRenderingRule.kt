@@ -1,8 +1,8 @@
-package org.unbrokendome.gradle.plugins.helm.rules
+package com.citi.gradle.plugins.helm.rules
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.internal.plugins.AbstractRule
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRendering
+import com.citi.gradle.plugins.helm.dsl.HelmRendering
 
 
 /**

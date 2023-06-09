@@ -1,10 +1,10 @@
-package org.unbrokendome.gradle.plugins.helm.command.rules
+package com.citi.gradle.plugins.helm.command.rules
 
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmDownloadClientPackage
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmExtractClient
+import com.citi.gradle.plugins.helm.command.tasks.HelmDownloadClientPackage
+import com.citi.gradle.plugins.helm.command.tasks.HelmExtractClient
 import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
 
 

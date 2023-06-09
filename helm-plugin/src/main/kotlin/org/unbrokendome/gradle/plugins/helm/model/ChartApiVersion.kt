@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.model
+package com.citi.gradle.plugins.helm.model
 
 internal object ChartApiVersion {
 

@@ -1,15 +1,15 @@
-package org.unbrokendome.gradle.plugins.helm.command.internal
+package com.citi.gradle.plugins.helm.command.internal
 
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallationOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallFromRepositoryOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmInstallationOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallationOptions
+import com.citi.gradle.plugins.helm.command.HelmExecSpec
+import com.citi.gradle.plugins.helm.command.HelmInstallFromRepositoryOptions
+import com.citi.gradle.plugins.helm.command.HelmInstallationOptions
+import com.citi.gradle.plugins.helm.command.HelmOptions
 import org.unbrokendome.gradle.pluginutils.property
 import java.net.URI
 

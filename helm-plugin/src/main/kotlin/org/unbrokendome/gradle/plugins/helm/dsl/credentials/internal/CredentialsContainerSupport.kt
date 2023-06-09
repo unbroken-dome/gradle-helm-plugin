@@ -1,12 +1,12 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal
+package com.citi.gradle.plugins.helm.dsl.credentials.internal
 
 import org.gradle.api.Action
 import org.gradle.api.credentials.Credentials
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.CredentialsContainer
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.PasswordCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.CredentialsContainer
+import com.citi.gradle.plugins.helm.dsl.credentials.PasswordCredentials
 import org.unbrokendome.gradle.pluginutils.property
 
 

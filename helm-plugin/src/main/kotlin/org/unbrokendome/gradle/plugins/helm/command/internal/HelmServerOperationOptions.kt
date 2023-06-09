@@ -1,16 +1,16 @@
-package org.unbrokendome.gradle.plugins.helm.command.internal
+package com.citi.gradle.plugins.helm.command.internal
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOperationOptions
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmServerOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
-import org.unbrokendome.gradle.plugins.helm.command.HelmOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOperationOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmServerOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmServerOperationOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmServerOptions
+import com.citi.gradle.plugins.helm.command.HelmExecSpec
+import com.citi.gradle.plugins.helm.command.HelmOptions
+import com.citi.gradle.plugins.helm.command.HelmServerOperationOptions
+import com.citi.gradle.plugins.helm.command.HelmServerOptions
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.toSimpleString
 import org.unbrokendome.gradle.pluginutils.withDefault

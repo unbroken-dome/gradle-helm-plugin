@@ -1,14 +1,14 @@
-package org.unbrokendome.gradle.plugins.helm.publishing.rules
+package com.citi.gradle.plugins.helm.publishing.rules
 
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskDependency
-import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
-import org.unbrokendome.gradle.plugins.helm.rules.AbstractHelmChartTaskRule
+import com.citi.gradle.plugins.helm.HELM_GROUP
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
+import com.citi.gradle.plugins.helm.publishing.dsl.publishConvention
+import com.citi.gradle.plugins.helm.rules.AbstractHelmChartTaskRule
 import org.unbrokendome.gradle.pluginutils.rules.RuleNamePattern
 
 

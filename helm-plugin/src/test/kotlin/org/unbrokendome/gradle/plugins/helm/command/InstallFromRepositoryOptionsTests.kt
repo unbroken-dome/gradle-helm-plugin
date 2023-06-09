@@ -1,10 +1,10 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.GradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.Invocation
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.eachInvocation
+import com.citi.gradle.plugins.helm.testutil.exec.GradleExecMock
+import com.citi.gradle.plugins.helm.testutil.exec.Invocation
+import com.citi.gradle.plugins.helm.testutil.exec.eachInvocation
 import java.net.URI
 
 

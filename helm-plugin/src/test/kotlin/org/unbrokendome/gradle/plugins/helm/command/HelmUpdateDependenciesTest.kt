@@ -1,13 +1,13 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
-import org.unbrokendome.gradle.plugins.helm.spek.ExecutionResultAwareSpek
-import org.unbrokendome.gradle.plugins.helm.spek.gradleExecMock
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.singleInvocation
-import org.unbrokendome.gradle.plugins.helm.testutil.exec.verifyNoInvocations
+import com.citi.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
+import com.citi.gradle.plugins.helm.spek.ExecutionResultAwareSpek
+import com.citi.gradle.plugins.helm.spek.gradleExecMock
+import com.citi.gradle.plugins.helm.testutil.exec.singleInvocation
+import com.citi.gradle.plugins.helm.testutil.exec.verifyNoInvocations
 import org.unbrokendome.gradle.pluginutils.test.TaskOutcome
 import org.unbrokendome.gradle.pluginutils.test.directory
 import org.unbrokendome.gradle.pluginutils.test.execute

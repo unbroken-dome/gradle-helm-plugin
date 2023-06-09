@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.release
+package com.citi.gradle.plugins.helm.release
 
 import assertk.all
 import assertk.assertThat
@@ -10,13 +10,13 @@ import org.gradle.api.Task
 import org.gradle.api.provider.Property
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTest
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUninstall
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.release.dsl.*
-import org.unbrokendome.gradle.plugins.helm.release.spek.propertyMappingInfo
-import org.unbrokendome.gradle.plugins.helm.release.spek.propertyMappingTests
+import com.citi.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
+import com.citi.gradle.plugins.helm.command.tasks.HelmTest
+import com.citi.gradle.plugins.helm.command.tasks.HelmUninstall
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.release.dsl.*
+import com.citi.gradle.plugins.helm.release.spek.propertyMappingInfo
+import com.citi.gradle.plugins.helm.release.spek.propertyMappingTests
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin

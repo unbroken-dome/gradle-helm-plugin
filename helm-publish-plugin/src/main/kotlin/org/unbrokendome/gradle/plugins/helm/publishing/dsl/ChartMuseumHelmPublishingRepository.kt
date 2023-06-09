@@ -1,12 +1,12 @@
-package org.unbrokendome.gradle.plugins.helm.publishing.dsl
+package com.citi.gradle.plugins.helm.publishing.dsl
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.SerializableCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.toSerializable
-import org.unbrokendome.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
-import org.unbrokendome.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
-import org.unbrokendome.gradle.plugins.helm.publishing.publishers.PublisherParams
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.SerializableCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.toSerializable
+import com.citi.gradle.plugins.helm.publishing.publishers.AbstractHttpHelmChartPublisher
+import com.citi.gradle.plugins.helm.publishing.publishers.HelmChartPublisher
+import com.citi.gradle.plugins.helm.publishing.publishers.PublisherParams
 import org.unbrokendome.gradle.pluginutils.listProperty
 import java.net.URI
 import javax.inject.Inject

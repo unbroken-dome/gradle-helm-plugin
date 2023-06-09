@@ -1,13 +1,13 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import assertk.assertThat
 import assertk.assertions.isSuccess
 import assertk.fail
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmExtractClient
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
+import com.citi.gradle.plugins.helm.command.tasks.HelmExtractClient
+import com.citi.gradle.plugins.helm.dsl.HelmExtension
+import com.citi.gradle.plugins.helm.dsl.Linting
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.gradleProject

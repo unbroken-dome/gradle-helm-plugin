@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.dsl
+package com.citi.gradle.plugins.helm.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -6,9 +6,9 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.unbrokendome.gradle.plugins.helm.command.*
-import org.unbrokendome.gradle.plugins.helm.command.internal.GlobalHelmOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmServerOptionsHolder
+import com.citi.gradle.plugins.helm.command.*
+import com.citi.gradle.plugins.helm.command.internal.GlobalHelmOptionsApplier
+import com.citi.gradle.plugins.helm.command.internal.HelmServerOptionsHolder
 import org.unbrokendome.gradle.pluginutils.*
 import javax.inject.Inject
 

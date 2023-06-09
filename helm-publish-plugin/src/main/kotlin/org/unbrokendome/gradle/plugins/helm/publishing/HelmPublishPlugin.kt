@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.publishing
+package com.citi.gradle.plugins.helm.publishing
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
@@ -7,20 +7,20 @@ import org.gradle.api.internal.HasConvention
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.TaskDependency
 import org.gradle.internal.reflect.Instantiator
-import org.unbrokendome.gradle.plugins.helm.HELM_GROUP
-import org.unbrokendome.gradle.plugins.helm.HelmPlugin
-import org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.charts
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmChartPublishConvention
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmChartPublishConvention
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.createHelmPublishingExtension
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.internal.repositories
-import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartTaskRule
-import org.unbrokendome.gradle.plugins.helm.publishing.rules.HelmPublishChartToRepositoryTaskRule
-import org.unbrokendome.gradle.plugins.helm.publishing.rules.publishTaskName
+import com.citi.gradle.plugins.helm.HELM_GROUP
+import com.citi.gradle.plugins.helm.HelmPlugin
+import com.citi.gradle.plugins.helm.command.HelmCommandsPlugin
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.dsl.internal.charts
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.publishing.dsl.HelmChartPublishConvention
+import com.citi.gradle.plugins.helm.publishing.dsl.HelmPublishingExtension
+import com.citi.gradle.plugins.helm.publishing.dsl.createHelmChartPublishConvention
+import com.citi.gradle.plugins.helm.publishing.dsl.createHelmPublishingExtension
+import com.citi.gradle.plugins.helm.publishing.dsl.internal.repositories
+import com.citi.gradle.plugins.helm.publishing.rules.HelmPublishChartTaskRule
+import com.citi.gradle.plugins.helm.publishing.rules.HelmPublishChartToRepositoryTaskRule
+import com.citi.gradle.plugins.helm.publishing.rules.publishTaskName
 import javax.inject.Inject
 
 

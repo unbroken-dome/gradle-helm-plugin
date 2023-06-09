@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command.tasks
+package com.citi.gradle.plugins.helm.command.tasks
 
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
@@ -13,12 +13,12 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.util.GradleVersion
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmInstallationOptionsApplier
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
+import com.citi.gradle.plugins.helm.command.HelmExecProviderSupport
+import com.citi.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsApplier
+import com.citi.gradle.plugins.helm.command.internal.HelmInstallationOptionsApplier
+import com.citi.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
 import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.mapProperty
 import org.unbrokendome.gradle.pluginutils.property

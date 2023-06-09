@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.dsl
+package com.citi.gradle.plugins.helm.dsl
 
 import org.gradle.api.Buildable
 import org.gradle.api.Named
@@ -8,9 +8,9 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskDependency
-import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
-import org.unbrokendome.gradle.plugins.helm.rules.renderTaskName
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
+import com.citi.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
+import com.citi.gradle.plugins.helm.rules.renderTaskName
 import org.unbrokendome.gradle.pluginutils.listProperty
 import org.unbrokendome.gradle.pluginutils.property
 import javax.inject.Inject

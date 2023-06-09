@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm
+package com.citi.gradle.plugins.helm
 
 import assertk.all
 import assertk.assertThat
@@ -7,15 +7,15 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Task
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmAddRepository
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmTemplate
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmExtension
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmRepository
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.charts
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.repositories
+import com.citi.gradle.plugins.helm.command.tasks.HelmAddRepository
+import com.citi.gradle.plugins.helm.command.tasks.HelmTemplate
+import com.citi.gradle.plugins.helm.dsl.Filtering
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.dsl.HelmExtension
+import com.citi.gradle.plugins.helm.dsl.HelmRepository
+import com.citi.gradle.plugins.helm.dsl.internal.charts
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.dsl.internal.repositories
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin

@@ -1,10 +1,10 @@
-package org.unbrokendome.gradle.plugins.helm.dsl.dependencies
+package com.citi.gradle.plugins.helm.dsl.dependencies
 
 import org.gradle.api.Project
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.rules.chartPackageTaskName
-import org.unbrokendome.gradle.plugins.helm.rules.chartPackagedArtifactConfigurationName
-import org.unbrokendome.gradle.plugins.helm.rules.dependenciesConfigurationName
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.rules.chartPackageTaskName
+import com.citi.gradle.plugins.helm.rules.chartPackagedArtifactConfigurationName
+import com.citi.gradle.plugins.helm.rules.dependenciesConfigurationName
 import javax.inject.Inject
 
 

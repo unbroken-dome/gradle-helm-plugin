@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.command
+package com.citi.gradle.plugins.helm.command
 
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -6,7 +6,7 @@ import org.gradle.process.ExecSpec
 import org.gradle.util.GradleVersion
 import org.gradle.workers.WorkerExecutor
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.command.internal.HelmOptionsApplier
+import com.citi.gradle.plugins.helm.command.internal.HelmOptionsApplier
 import org.unbrokendome.gradle.pluginutils.GradleVersions
 import java.io.ByteArrayOutputStream
 import java.io.File

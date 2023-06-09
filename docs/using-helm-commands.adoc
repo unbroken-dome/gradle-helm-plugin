@@ -18,7 +18,7 @@ for a full list of available tasks.
 .build.gradle
 [source,groovy]
 ----
-import org.unbrokendome.gradle.plugins.helm.command.tasks.*
+import com.citi.gradle.plugins.helm.command.tasks.*
 
 plugins {
     id 'org.unbroken-dome.helm-commands' version '<VERSION>'

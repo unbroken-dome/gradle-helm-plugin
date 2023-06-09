@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.publishing.publishers
+package com.citi.gradle.plugins.helm.publishing.publishers
 
 import okhttp3.Credentials
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -12,9 +12,9 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.tls.HandshakeCertificates
 import okhttp3.tls.HeldCertificate
 import org.slf4j.LoggerFactory
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.SerializableCertificateCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.SerializableCredentials
-import org.unbrokendome.gradle.plugins.helm.dsl.credentials.internal.SerializablePasswordCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.SerializableCertificateCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.SerializableCredentials
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.SerializablePasswordCredentials
 import java.io.File
 import java.net.URI
 

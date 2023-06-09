@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm
+package com.citi.gradle.plugins.helm
 
 import assertk.all
 import assertk.assertThat
@@ -14,17 +14,17 @@ import org.gradle.api.Task
 import org.gradle.kotlin.dsl.lint
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmLint
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmPackage
-import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
-import org.unbrokendome.gradle.plugins.helm.dsl.Filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.dsl.Linting
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.charts
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.filtering
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.helm
-import org.unbrokendome.gradle.plugins.helm.dsl.internal.lint
-import org.unbrokendome.gradle.plugins.helm.tasks.HelmFilterSources
+import com.citi.gradle.plugins.helm.command.tasks.HelmLint
+import com.citi.gradle.plugins.helm.command.tasks.HelmPackage
+import com.citi.gradle.plugins.helm.command.tasks.HelmUpdateDependencies
+import com.citi.gradle.plugins.helm.dsl.Filtering
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.dsl.Linting
+import com.citi.gradle.plugins.helm.dsl.internal.charts
+import com.citi.gradle.plugins.helm.dsl.internal.filtering
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.dsl.internal.lint
+import com.citi.gradle.plugins.helm.tasks.HelmFilterSources
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
 import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.dirValue

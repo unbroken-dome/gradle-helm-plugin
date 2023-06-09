@@ -1,4 +1,4 @@
-package org.unbrokendome.gradle.plugins.helm.release.tags
+package com.citi.gradle.plugins.helm.release.tags
 
 import assertk.all
 import assertk.assertThat
