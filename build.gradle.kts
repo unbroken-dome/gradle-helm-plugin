@@ -1,8 +1,8 @@
 plugins {
     kotlin("jvm") apply false
-    id("com.gradle.plugin-publish") version "0.12.0" apply false
+    id("com.gradle.plugin-publish") version "0.14.0" apply false
     id("org.jetbrains.dokka") version "1.4.32"
-    id("org.asciidoctor.jvm.convert") version "3.2.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
 
