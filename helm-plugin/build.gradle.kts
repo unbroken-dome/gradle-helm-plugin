@@ -28,12 +28,12 @@ gradlePlugin {
 
     plugins {
         create("helmCommandsPlugin") {
-            id = "org.unbroken-dome.helm-commands"
-            implementationClass = "org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin"
+            id = "com.citi.helm-commands"
+            implementationClass = "com.citi.gradle.plugins.helm.command.HelmCommandsPlugin"
         }
         create("helmPlugin") {
-            id = "org.unbroken-dome.helm"
-            implementationClass = "org.unbrokendome.gradle.plugins.helm.HelmPlugin"
+            id = "com.citi.helm"
+            implementationClass = "com.citi.gradle.plugins.helm.HelmPlugin"
         }
     }
 }

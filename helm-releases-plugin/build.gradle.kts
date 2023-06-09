@@ -20,8 +20,8 @@ gradlePlugin {
 
     plugins {
         create("helmReleasesPlugin") {
-            id = "org.unbroken-dome.helm-releases"
-            implementationClass = "org.unbrokendome.gradle.plugins.helm.release.HelmReleasesPlugin"
+            id = "com.citi.helm-releases"
+            implementationClass = "com.citi.gradle.plugins.helm.release.HelmReleasesPlugin"
         }
     }
 }
