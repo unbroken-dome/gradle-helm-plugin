@@ -1,5 +1,7 @@
 package com.citi.gradle.plugins.helm.command.tasks
 
+import java.io.File
+import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
@@ -12,18 +14,14 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
-import org.gradle.util.GradleVersion
 import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
 import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import com.citi.gradle.plugins.helm.command.HelmExecProviderSupport
 import com.citi.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsApplier
 import com.citi.gradle.plugins.helm.command.internal.HelmInstallationOptionsApplier
 import com.citi.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
-import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.mapProperty
 import org.unbrokendome.gradle.pluginutils.property
-import java.io.File
-import java.net.URI
 
 
 abstract class AbstractHelmInstallationCommandTask :
@@ -207,13 +205,7 @@ abstract class AbstractHelmInstallationCommandTask :
      * Not to be confused with [fileValues], which contains entries whose values are the contents of files.
      */
     @get:InputFiles
-    final override val valueFiles: ConfigurableFileCollection =
-        if (GradleVersion.current() >= GradleVersions.Version_5_3) {
-            project.objects.fileCollection()
-        } else {
-            @Suppress("DEPRECATION")
-            project.layout.configurableFiles()
-        }
+    final override val valueFiles: ConfigurableFileCollection = project.objects.fileCollection()
 
 
     /**

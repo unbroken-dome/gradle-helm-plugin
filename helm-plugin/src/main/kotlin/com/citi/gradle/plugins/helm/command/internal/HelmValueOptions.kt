@@ -1,6 +1,7 @@
 package com.citi.gradle.plugins.helm.command.internal
 
 import groovy.lang.Closure
+import java.util.concurrent.Callable
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.ProjectLayout
@@ -8,15 +9,12 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
-import org.gradle.util.GradleVersion
 import org.slf4j.LoggerFactory
 import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import com.citi.gradle.plugins.helm.command.HelmExecSpec
 import com.citi.gradle.plugins.helm.command.HelmOptions
 import com.citi.gradle.plugins.helm.command.HelmValueOptions
-import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.mapProperty
-import java.util.concurrent.Callable
 
 
 data class HelmValueOptionsHolder(
@@ -28,12 +26,7 @@ data class HelmValueOptionsHolder(
     constructor(objects: ObjectFactory, layout: ProjectLayout) : this(
         values = objects.mapProperty(),
         fileValues = objects.mapProperty(),
-        valueFiles = if (GradleVersion.current() >= GradleVersions.Version_5_3) {
-            objects.fileCollection()
-        } else {
-            @Suppress("DEPRECATION")
-            layout.configurableFiles()
-        }
+        valueFiles = objects.fileCollection()
     )
 }
 
