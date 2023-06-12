@@ -15,7 +15,6 @@ allprojects {
 
 
 subprojects {
-
     plugins.withType<JavaGradlePluginPlugin> {
         dependencies {
             "compileOnly"(kotlin("stdlib"))
@@ -33,7 +32,6 @@ subprojects {
 
 
     plugins.withId("org.jetbrains.kotlin.jvm") {
-
         configurations.all {
             resolutionStrategy.eachDependency {
                 if (requested.group == "org.jetbrains.kotlin") {
@@ -54,6 +52,11 @@ subprojects {
 
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             kotlinOptions.jvmTarget = "1.8"
+        }
+
+        tasks.withType<JavaCompile> {
+            sourceCompatibility = "1.8"
+            targetCompatibility = "1.8"
         }
 
         tasks.withType<Test> {
