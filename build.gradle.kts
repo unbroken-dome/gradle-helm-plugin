@@ -84,10 +84,15 @@ subprojects {
             "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.32")
         }
 
-        tasks.withType<Jar>().matching { it.name == "javadocJar" || it.name == "publishPluginJavaDocsJar" }
-            .all {
-                from(tasks.named("dokkaJavadoc"))
-            }
+        // have an option to disable Dokka task for local builds
+        if (project.property("com.citi.gradle.helm.plugin.dokka.disabled") == "true") {
+            logger.info("Dokka tasks are disabled")
+        } else {
+            tasks.withType<Jar>().matching { it.name == "javadocJar" || it.name == "publishPluginJavaDocsJar" }
+                .all {
+                    from(tasks.named("dokkaJavadoc"))
+                }
+        }
 
         tasks.withType<org.jetbrains.dokka.gradle.DokkaTask> {
             dokkaSourceSets.all {
