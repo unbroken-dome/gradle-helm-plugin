@@ -70,7 +70,6 @@ interface HelmChart : Named, Buildable {
      *
      * @see baseOutputDir
      */
-    @JvmDefault
     val outputDir: Provider<Directory>
         get() = baseOutputDir.flatMap { it.dir(chartName) }
 
@@ -78,7 +77,6 @@ interface HelmChart : Named, Buildable {
     /**
      * The name of the packaged chart file.
      */
-    @JvmDefault
     val packageFileName: Provider<String>
         get() = HelmPackage.packagedChartFileName(chartName, chartVersion)
 
@@ -100,7 +98,6 @@ interface HelmChart : Named, Buildable {
      *
      * @deprecated use [packageFile] instead
      */
-    @JvmDefault
     @Deprecated(message = "use packageFile", replaceWith = ReplaceWith("packageFile"))
     val packageOutputFile: Provider<RegularFile>
         get() = packageFile
@@ -152,7 +149,6 @@ interface HelmChart : Named, Buildable {
      *
      * @param action an [Action] to configure the renderings for this chart
      */
-    @JvmDefault
     fun renderings(action: Action<NamedDomainObjectContainer<HelmRendering>>) {
         action.execute(renderings)
     }

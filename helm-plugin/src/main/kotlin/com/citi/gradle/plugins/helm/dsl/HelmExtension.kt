@@ -29,7 +29,6 @@ interface HelmExtension : HelmExecProvider, ConfigurableGlobalHelmOptions, Confi
      *
      * @param configureAction an [Action] that modifies the [HelmDownloadClient] settings
      */
-    @JvmDefault
     fun downloadClient(configureAction: Action<HelmDownloadClient>) {
         configureAction.execute(downloadClient)
     }

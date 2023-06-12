@@ -32,7 +32,6 @@ interface HelmRepositoryHandler : NamedDomainObjectContainer<HelmRepository> {
      *
      * @param name the name under which to register the repository, defaults to "stable"
      */
-    @JvmDefault
     @Suppress("unused")
     fun helmStable(name: String = HELM_STABLE_REPOSITORY_NAME) {
         register(name) { repo ->
@@ -48,7 +47,6 @@ interface HelmRepositoryHandler : NamedDomainObjectContainer<HelmRepository> {
      *
      * @param name the name under which to register the repository, defaults to "incubator"
      */
-    @JvmDefault
     @Suppress("unused")
     fun helmIncubator(name: String = HELM_INCUBATOR_REPOSITORY_NAME) {
         register(name) { repo ->
@@ -64,7 +62,6 @@ interface HelmRepositoryHandler : NamedDomainObjectContainer<HelmRepository> {
      *
      * @param name the name under which to register the repository, defaults to "bitnami"
      */
-    @JvmDefault
     @Suppress("unused")
     fun bitnami(name: String = BITNAMI_REPOSITORY_NAME) {
         register(name) { repo ->

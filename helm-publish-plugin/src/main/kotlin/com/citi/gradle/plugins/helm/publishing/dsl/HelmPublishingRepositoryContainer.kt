@@ -11,7 +11,6 @@ import javax.inject.Inject
 
 interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<HelmPublishingRepository> {
 
-    @JvmDefault
     fun artifactory(
         name: String,
         configuration: Action<ArtifactoryHelmPublishingRepository>
@@ -19,14 +18,12 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         create(name, ArtifactoryHelmPublishingRepository::class.java, configuration)
 
 
-    @JvmDefault
     fun artifactory(
         configuration: Action<ArtifactoryHelmPublishingRepository>
     ): ArtifactoryHelmPublishingRepository =
         artifactory("default", configuration)
 
 
-    @JvmDefault
     fun chartMuseum(
         name: String,
         configuration: Action<ChartMuseumHelmPublishingRepository>
@@ -34,14 +31,12 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         create(name, ChartMuseumHelmPublishingRepository::class.java, configuration)
 
 
-    @JvmDefault
     fun chartMuseum(
         configuration: Action<ChartMuseumHelmPublishingRepository>
     ): ChartMuseumHelmPublishingRepository =
         chartMuseum("default", configuration)
 
 
-    @JvmDefault
     fun harbor(
         name: String,
         configuration: Action<HarborHelmPublishingRepository>
@@ -49,13 +44,11 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         create(name, HarborHelmPublishingRepository::class.java, configuration)
 
 
-    @JvmDefault
     fun harbor(
         configuration: Action<HarborHelmPublishingRepository>
     ): HarborHelmPublishingRepository =
         harbor("default", configuration)
 
-    @JvmDefault
     fun nexus(
         name: String,
         configuration: Action<NexusHelmPublishingRepository>
@@ -63,20 +56,17 @@ interface HelmPublishingRepositoryContainer : PolymorphicDomainObjectContainer<H
         create(name, NexusHelmPublishingRepository::class.java, configuration)
 
 
-    @JvmDefault
     fun nexus(
         configuration: Action<NexusHelmPublishingRepository>
     ): NexusHelmPublishingRepository =
         nexus("default", configuration)
 
-    @JvmDefault
     fun gitlab(
         name: String,
         configuration: Action<GitlabHelmPublishingRepository>
     ): GitlabHelmPublishingRepository =
         create(name, GitlabHelmPublishingRepository::class.java, configuration)
 
-    @JvmDefault
     fun gitlab(
         configuration: Action<GitlabHelmPublishingRepository>
     ): GitlabHelmPublishingRepository =

@@ -67,7 +67,6 @@ interface Linting : ConfigurableHelmValueOptions {
      * If no configurations are added to this container, the plugin will assume a single configuration named
      * "default" with no additional values.
      */
-    @JvmDefault
     fun configurations(configureAction: Action<NamedDomainObjectContainer<Configuration>>) =
         configurations.also { configureAction.execute(it) }
 }

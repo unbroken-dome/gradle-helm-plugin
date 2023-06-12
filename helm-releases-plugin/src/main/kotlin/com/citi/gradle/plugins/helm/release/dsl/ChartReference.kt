@@ -14,7 +14,6 @@ interface ChartReference : Buildable {
     val chartLocation: String
 
 
-    @JvmDefault
     override fun getBuildDependencies(): TaskDependency =
         TaskDependency { emptySet() }
 }

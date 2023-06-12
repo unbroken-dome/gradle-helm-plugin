@@ -83,7 +83,6 @@ interface HelmReleaseTarget : Named, ConfigurableHelmInstallationOptions, Config
      *
      * @param configureAction an [Action] to configure testing options for this release target
      */
-    @JvmDefault
     fun test(configureAction: Action<ConfigurableHelmReleaseTestOptions>) {
         configureAction.execute(this.test)
     }

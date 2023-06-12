@@ -107,7 +107,6 @@ interface CredentialsContainer {
      * @throws IllegalArgumentException if `type` is of a different type to the credentials previously
      *         specified for this repository
      */
-    @JvmDefault
     fun <T : Credentials> credentials(
         @DelegatesTo.Target type: Class<T>,
         @DelegatesTo(strategy = DELEGATE_FIRST, genericTypeIndex = 0) configClosure: Closure<*>
@@ -155,7 +154,6 @@ interface CredentialsContainer {
      * @throws IllegalStateException when the credentials assigned to this service are not of
      *         type [PasswordCredentials]
      */
-    @JvmDefault
     fun credentials(
         @DelegatesTo(PasswordCredentials::class, strategy = DELEGATE_FIRST) configClosure: Closure<*>
     ) {
