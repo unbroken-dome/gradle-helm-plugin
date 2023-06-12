@@ -1,16 +1,14 @@
 package com.citi.gradle.plugins.helm.command
 
-import org.gradle.api.Action
-import org.gradle.api.Project
-import org.gradle.process.ExecSpec
-import org.gradle.util.GradleVersion
-import org.gradle.workers.WorkerExecutor
-import org.slf4j.LoggerFactory
-import com.citi.gradle.plugins.helm.command.internal.HelmOptionsApplier
-import org.unbrokendome.gradle.pluginutils.GradleVersions
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.UUID
+import org.gradle.api.Action
+import org.gradle.api.Project
+import org.gradle.process.ExecSpec
+import org.gradle.workers.WorkerExecutor
+import org.slf4j.LoggerFactory
+import com.citi.gradle.plugins.helm.command.internal.HelmOptionsApplier
 
 
 /**
@@ -98,10 +96,8 @@ internal class HelmExecProviderSupport(
 
 
     private fun shouldExecInWorker(): Boolean =
-        // Even though the new worker API exists since Gradle 5.6, it is only possible to inject an
-        // ExecOperations service into the work action since Gradle 6.0, which we need to call an external
-        // process from the work action. For earlier Gradle versions, we will call exec in-process.
-        workerExecutor != null && GradleVersion.current() >= GradleVersions.Version_6_0
+        // workerExecutor might not exist when Gradle Daemon is disabled: https://docs.gradle.org/current/userguide/gradle_daemon.html#sec:disabling_the_daemon
+        workerExecutor != null
 
 
     override fun execHelmCaptureOutput(
