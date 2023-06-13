@@ -1,10 +1,10 @@
 package com.citi.gradle.plugins.helm.rules
 
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Project
 import com.citi.gradle.plugins.helm.HELM_MAIN_CHART_NAME
 import com.citi.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
+import org.gradle.api.Rule
 
 
 /**
@@ -18,7 +18,7 @@ import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
 internal class MainChartRule(
     private val project: Project,
     private val charts: NamedDomainObjectContainer<HelmChart>
-) : AbstractRule() {
+) : Rule {
 
     override fun getDescription(): String =
         "main chart"

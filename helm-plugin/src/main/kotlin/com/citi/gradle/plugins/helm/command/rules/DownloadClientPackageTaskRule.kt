@@ -1,11 +1,11 @@
 package com.citi.gradle.plugins.helm.command.rules
 
+import com.citi.gradle.plugins.helm.command.tasks.HelmDownloadClientPackage
+import java.net.URI
 import org.gradle.api.Project
+import org.gradle.api.Rule
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
-import com.citi.gradle.plugins.helm.command.tasks.HelmDownloadClientPackage
-import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
-import java.net.URI
 
 
 /**
@@ -15,7 +15,7 @@ internal class DownloadClientPackageTaskRule(
     private val project: Project,
     private val baseUrl: Provider<URI>,
     private val downloadDir: Provider<Directory>
-) : AbstractRule() {
+) : Rule {
 
     private val regex = Regex('^' + downloadClientTaskName("(.*)") + '$')
 

@@ -1,11 +1,11 @@
 package com.citi.gradle.plugins.helm.command.rules
 
-import org.gradle.api.Project
-import org.gradle.api.file.Directory
-import org.gradle.api.provider.Provider
 import com.citi.gradle.plugins.helm.command.tasks.HelmDownloadClientPackage
 import com.citi.gradle.plugins.helm.command.tasks.HelmExtractClient
-import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
+import org.gradle.api.Project
+import org.gradle.api.Rule
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.Provider
 
 
 /**
@@ -14,7 +14,7 @@ import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
 internal class ExtractClientTaskRule(
     private val project: Project,
     private val baseExtractDir: Provider<Directory>
-) : AbstractRule() {
+) : Rule {
 
     private val regex = Regex('^' + extractClientTaskName("(.*)") + '$')
 

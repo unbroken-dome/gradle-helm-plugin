@@ -1,8 +1,8 @@
 package com.citi.gradle.plugins.helm.rules
 
 import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.internal.plugins.AbstractRule
 import com.citi.gradle.plugins.helm.dsl.HelmRendering
+import org.gradle.api.Rule
 
 
 /**
@@ -10,7 +10,7 @@ import com.citi.gradle.plugins.helm.dsl.HelmRendering
  */
 internal class DefaultRenderingRule(
     private val renderings: NamedDomainObjectContainer<HelmRendering>
-) : AbstractRule() {
+) : Rule {
 
     override fun getDescription(): String {
         return "default rendering"

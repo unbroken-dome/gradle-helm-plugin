@@ -1,9 +1,9 @@
 package com.citi.gradle.plugins.helm.release.rules
 
-import org.gradle.api.NamedDomainObjectContainer
 import com.citi.gradle.plugins.helm.HELM_DEFAULT_RELEASE_TARGET
 import com.citi.gradle.plugins.helm.release.dsl.HelmReleaseTarget
-import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Rule
 
 
 /**
@@ -11,7 +11,7 @@ import org.unbrokendome.gradle.pluginutils.rules.AbstractRule
  */
 internal class DefaultReleaseTargetRule(
     private val releaseTargets: NamedDomainObjectContainer<HelmReleaseTarget>
-) : AbstractRule() {
+) : Rule {
 
     override fun getDescription(): String =
         "default release target"
