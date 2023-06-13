@@ -18,7 +18,7 @@ subprojects {
 
     plugins.withType<JavaGradlePluginPlugin> {
         dependencies {
-            "compileOnly"(kotlin("stdlib-jdk8"))
+            "compileOnly"(kotlin("stdlib"))
         }
 
         with(the<GradlePluginDevelopmentExtension>()) {
@@ -43,7 +43,7 @@ subprojects {
         }
 
         dependencies {
-            "testImplementation"(kotlin("stdlib-jdk8"))
+            "testImplementation"(kotlin("stdlib"))
             "testImplementation"(kotlin("reflect"))
 
             "testImplementation"("com.willowtreeapps.assertk:assertk-jvm:0.26.1")
