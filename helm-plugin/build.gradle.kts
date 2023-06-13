@@ -25,27 +25,16 @@ dependencies {
 
 
 gradlePlugin {
-
     plugins {
         create("helmCommandsPlugin") {
             id = "com.citi.helm-commands"
+            displayName = "Helm Commands plugin"
             implementationClass = "com.citi.gradle.plugins.helm.command.HelmCommandsPlugin"
         }
         create("helmPlugin") {
             id = "com.citi.helm"
-            implementationClass = "com.citi.gradle.plugins.helm.HelmPlugin"
-        }
-    }
-}
-
-
-pluginBundle {
-    (plugins) {
-        "helmCommandsPlugin" {
-            displayName = "Helm Commands plugin"
-        }
-        "helmPlugin" {
             displayName = "Helm plugin"
+            implementationClass = "com.citi.gradle.plugins.helm.HelmPlugin"
         }
     }
 }

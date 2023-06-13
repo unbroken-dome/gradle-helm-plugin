@@ -17,20 +17,11 @@ dependencies {
 
 
 gradlePlugin {
-
     plugins {
         create("helmReleasesPlugin") {
             id = "com.citi.helm-releases"
-            implementationClass = "com.citi.gradle.plugins.helm.release.HelmReleasesPlugin"
-        }
-    }
-}
-
-
-pluginBundle {
-    (plugins) {
-        "helmReleasesPlugin" {
             displayName = "Helm Releases Plugin"
+            implementationClass = "com.citi.gradle.plugins.helm.release.HelmReleasesPlugin"
         }
     }
 }
