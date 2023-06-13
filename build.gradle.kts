@@ -45,10 +45,10 @@ subprojects {
             "testImplementation"(kotlin("stdlib-jdk8"))
             "testImplementation"(kotlin("reflect"))
 
-            "testImplementation"("com.willowtreeapps.assertk:assertk-jvm:0.23")
-            "testImplementation"("io.mockk:mockk:1.10.0")
-            "testImplementation"("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
-            "testRuntimeOnly"("org.spekframework.spek2:spek-runner-junit5:2.0.9")
+            "testImplementation"("com.willowtreeapps.assertk:assertk-jvm:0.26.1")
+            "testImplementation"("io.mockk:mockk:1.13.5")
+            "testImplementation"("org.spekframework.spek2:spek-dsl-jvm:2.0.19")
+            "testRuntimeOnly"("org.spekframework.spek2:spek-runner-junit5:2.0.19")
         }
 
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

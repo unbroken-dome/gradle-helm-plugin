@@ -11,11 +11,11 @@ dependencies {
 
     implementation(project(":helm-plugin"))
 
-    implementation("com.squareup.okhttp3:okhttp:4.9.0") {
+    implementation("com.squareup.okhttp3:okhttp:4.11.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
-    implementation("com.squareup.okhttp3:okhttp-tls:4.9.0") {
+    implementation("com.squareup.okhttp3:okhttp-tls:4.11.0") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
