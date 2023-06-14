@@ -4,6 +4,8 @@ spek = "2.0.19"
 unbrokenDome = "0.5.0"
 okhttp = "4.11.0"
 jackson = "2.15.2"
+# No need to keep the same Kotlin version with Gradle, at least because kotlin runtime is a transitive dependency of okhttp
+kotlin = "1.8.21"
 
 [libraries]
 snakeyaml = "org.yaml:snakeyaml:2.0"
@@ -24,6 +26,8 @@ spekRunner = { module = "org.spekframework.spek2:spek-runner-junit5", version.re
 
 [plugins]
 gradlePublish = { id = "com.gradle.plugin-publish", version = "1.2.0" }
+dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "3.3.2" }
 benManesVersions = { id = "com.github.ben-manes.versions", version = "0.47.0" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.13.2" }

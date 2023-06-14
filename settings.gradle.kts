@@ -4,13 +4,6 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
-
-    resolutionStrategy.eachPlugin {
-        if (requested.id.namespace == "org.jetbrains.kotlin" ||
-                requested.id.namespace.orEmpty().startsWith("org.jetbrains.kotlin.")) {
-            useVersion(embeddedKotlinVersion)
-        }
-    }
 }
 
 
