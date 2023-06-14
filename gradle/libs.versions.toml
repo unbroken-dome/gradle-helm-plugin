@@ -1,0 +1,28 @@
+[versions]
+dokka = "1.8.20"
+spek = "2.0.19"
+unbrokenDome = "0.5.0"
+okhttp = "4.11.0"
+jackson = "2.15.2"
+
+[libraries]
+snakeyaml = "org.yaml:snakeyaml:2.0"
+assertk = "com.willowtreeapps.assertk:assertk-jvm:0.26.1"
+mockk = "io.mockk:mockk:1.13.5"
+tabbedCodeExtension = "com.bmuschko:asciidoctorj-tabbed-code-extension:0.3"
+orgJson = "org.json:json:20230227"
+jsonPath = "com.jayway.jsonpath:json-path:2.8.0"
+jacksonDataBind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jacksonDataFormatYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+okHttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okHttpTls = { module = "com.squareup.okhttp3:okhttp-tls", version.ref = "okhttp" }
+okHttpMockWebServer = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
+unbrokenDomePluginUtils = { module = "org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils", version.ref = "unbrokenDome" }
+unbrokenDomeTestUtils = { module = "org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils", version.ref = "unbrokenDome" }
+spekDsl = { module = "org.spekframework.spek2:spek-dsl-jvm", version.ref = "spek" }
+spekRunner = { module = "org.spekframework.spek2:spek-runner-junit5", version.ref = "spek" }
+
+[plugins]
+gradlePublish = { id = "com.gradle.plugin-publish", version = "1.2.0" }
+asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "3.3.2" }
+benManesVersions = { id = "com.github.ben-manes.versions", version = "0.47.0" }

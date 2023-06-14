@@ -11,18 +11,18 @@ dependencies {
 
     implementation(project(":helm-plugin"))
 
-    implementation("com.squareup.okhttp3:okhttp:4.11.0") {
+    implementation(libs.okHttp) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
-    implementation("com.squareup.okhttp3:okhttp-tls:4.11.0") {
+    implementation(libs.okHttpTls) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
 
-    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.5.0")
+    implementation(libs.unbrokenDomePluginUtils)
 
-    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.5.0")
+    testImplementation(libs.unbrokenDomeTestUtils)
 }
 
 

@@ -1,9 +1,9 @@
 plugins {
     kotlin("jvm") apply false
-    id("com.gradle.plugin-publish") version "1.2.0" apply false
+    alias(libs.plugins.gradlePublish) apply false
     id("org.jetbrains.dokka") version embeddedKotlinVersion
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
-    id("com.github.ben-manes.versions") version "0.47.0"
+    alias(libs.plugins.asciidoctor)
+    alias(libs.plugins.benManesVersions)
 }
 
 
@@ -44,10 +44,10 @@ subprojects {
             "testImplementation"(kotlin("stdlib"))
             "testImplementation"(kotlin("reflect"))
 
-            "testImplementation"("com.willowtreeapps.assertk:assertk-jvm:0.26.1")
-            "testImplementation"("io.mockk:mockk:1.13.5")
-            "testImplementation"("org.spekframework.spek2:spek-dsl-jvm:2.0.19")
-            "testRuntimeOnly"("org.spekframework.spek2:spek-runner-junit5:2.0.19")
+            "testImplementation"(libs.snakeyaml)
+            "testImplementation"(libs.mockk)
+            "testImplementation"(libs.spekDsl)
+            "testRuntimeOnly"(libs.spekRunner)
         }
 
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -84,7 +84,7 @@ subprojects {
     plugins.withId("org.jetbrains.dokka") {
 
         dependencies {
-            "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.32")
+            "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:$embeddedKotlinVersion")
         }
 
         // have an option to disable Dokka task for local builds
@@ -149,7 +149,7 @@ subprojects {
 val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
-    asciidoctorExt("com.bmuschko:asciidoctorj-tabbed-code-extension:0.3")
+    asciidoctorExt(libs.tabbedCodeExtension)
 }
 
 

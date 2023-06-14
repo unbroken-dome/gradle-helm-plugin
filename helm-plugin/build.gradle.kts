@@ -9,18 +9,18 @@ plugins {
 
 dependencies {
 
-    implementation("org.yaml:snakeyaml:2.0")
-    implementation("org.json:json:20230227")
+    implementation(libs.snakeyaml)
+    implementation(libs.orgJson)
 
-    implementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-utils:0.5.0")
+    implementation(libs.unbrokenDomePluginUtils)
 
-    testImplementation("com.jayway.jsonpath:json-path:2.8.0")
-    testImplementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2")
+    testImplementation(libs.jsonPath)
+    testImplementation(libs.jacksonDataBind)
+    testImplementation(libs.jacksonDataFormatYaml)
 
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+    testImplementation(libs.okHttpMockWebServer)
 
-    testImplementation("org.unbroken-dome.gradle-plugin-utils:gradle-plugin-test-utils:0.5.0")
+    testImplementation(libs.unbrokenDomeTestUtils)
 }
 
 
