@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ImplicitDefaultLocale:DataSizeFormatter.kt$String.format("%.1f GB", gb)</ID>
+    <ID>ImplicitDefaultLocale:DataSizeFormatter.kt$String.format("%.1f KB", kb)</ID>
+    <ID>ImplicitDefaultLocale:DataSizeFormatter.kt$String.format("%.1f MB", mb)</ID>
+    <ID>ImplicitDefaultLocale:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$String.format("%.1f", progress)</ID>
+    <ID>LongParameterList:HelmChart.kt$DefaultHelmChart$( private val name: String, project: Project, baseOutputDir: Provider&lt;Directory>, globalRenderBaseOutputDir: Provider&lt;Directory>, filteredSourcesBaseDir: Provider&lt;Directory>, dependenciesBaseDir: Provider&lt;Directory>, objects: ObjectFactory )</ID>
+    <ID>MagicNumber:DataSizeFormatter.kt$0.1f</ID>
+    <ID>MagicNumber:DataSizeFormatter.kt$10</ID>
+    <ID>MagicNumber:DigestUtils.kt$4</ID>
+    <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$10.0</ID>
+    <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$1000</ID>
+    <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$64</ID>
+    <ID>MaxLineLength:ChartModelDependencies.kt$internal</ID>
+    <ID>MaxLineLength:HelmExecWorkAction.kt$HelmExecWorkAction$logger.info("Executing: {}\n with environment: {}", maskCommandLine(spec.commandLine), spec.environment)</ID>
+    <ID>MaxLineLength:HelmPackage.kt$HelmPackage$requireNotNull(it.version) { "Chart version must either be present in Chart.yaml, or specified explicitly" }</ID>
+    <ID>MemberNameEqualsClassName:HelmPackage.kt$HelmPackage$@TaskAction fun helmPackage()</ID>
+    <ID>NestedBlockDepth:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$private fun downloadFile(url: URI, targetFile: File)</ID>
+    <ID>NestedBlockDepth:YamlTransformingReader.kt$AbstractYamlTransformingReader.MappingState$override fun handleEvent(event: Event, writer: Writer): ParseState?</ID>
+    <ID>ReturnCount:HelmAddRepository.kt$HelmAddRepository$private fun checkUpToDate(task: Task): Boolean</ID>
+    <ID>ReturnCount:HelmInstallOrUpgrade.kt$HelmInstallOrUpgrade$private fun shouldUseInstallReplace(): Boolean</ID>
+    <ID>ReturnCount:HelmUpdateRepositories.kt$HelmUpdateRepositories$private fun checkUpToDate(task: Task): Boolean</ID>
+    <ID>SerialVersionUIDInSerializableClass:SerializableCredentials.kt$SerializableCredentials : Serializable</ID>
+    <ID>TooGenericExceptionCaught:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$ex: Exception</ID>
+    <ID>TooManyFunctions:HelmExecProvider.kt$HelmExecProviderSupport : HelmExecProvider</ID>
+    <ID>TooManyFunctions:HelmPlugin.kt$HelmPlugin : Plugin</ID>
+    <ID>TopLevelPropertyNaming:DataSizeFormatter.kt$private const val BytesPerGB = 1024L * 1024L * 1024L</ID>
+    <ID>TopLevelPropertyNaming:DataSizeFormatter.kt$private const val BytesPerKB = 1024L</ID>
+    <ID>TopLevelPropertyNaming:DataSizeFormatter.kt$private const val BytesPerMB = 1024L * 1024L</ID>
+    <ID>TopLevelPropertyNaming:DigestUtils.kt$private const val DefaultBufferSize = DEFAULT_BUFFER_SIZE</ID>
+    <ID>TopLevelPropertyNaming:DigestUtils.kt$private const val DefaultDigestAlgorithm = "SHA-256"</ID>
+    <ID>UnusedPrivateProperty:HelmValueOptions.kt$HelmValueOptionsHolder$layout: ProjectLayout</ID>
+    <ID>UseCheckOrError:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$throw IllegalStateException("SHA-256 digest mismatch on downloaded file $targetFile")</ID>
+    <ID>UseCheckOrError:SerializableCredentials.kt$throw IllegalStateException("Unsupported credentials type: ${javaClass.name}")</ID>
+    <ID>UseCheckOrError:YamlTransformingReader.kt$throw IllegalStateException("Buffer unavailable")</ID>
+    <ID>WildcardImport:HelmChart.kt$import org.gradle.api.*</ID>
+    <ID>WildcardImport:HelmCommandsPlugin.kt$import com.citi.gradle.plugins.helm.dsl.*</ID>
+    <ID>WildcardImport:HelmExtension.kt$import com.citi.gradle.plugins.helm.command.*</ID>
+    <ID>WildcardImport:HelmExtension.kt$import org.unbrokendome.gradle.pluginutils.*</ID>
+    <ID>WildcardImport:HelmExtractClient.kt$import org.gradle.api.tasks.*</ID>
+    <ID>WildcardImport:HelmFilterSources.kt$import org.gradle.api.tasks.*</ID>
+    <ID>WildcardImport:HelmInstallationOptions.kt$import com.citi.gradle.plugins.helm.command.*</ID>
+    <ID>WildcardImport:HelmLint.kt$import org.gradle.api.tasks.*</ID>
+    <ID>WildcardImport:HelmPlugin.kt$import com.citi.gradle.plugins.helm.dsl.*</ID>
+    <ID>WildcardImport:HelmPlugin.kt$import com.citi.gradle.plugins.helm.rules.*</ID>
+    <ID>WildcardImport:HelmPluginTest.kt$import assertk.assertions.*</ID>
+    <ID>WildcardImport:HelmPluginTest.kt$import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*</ID>
+    <ID>WildcardImport:HelmTemplate.kt$import org.gradle.api.tasks.*</ID>
+    <ID>WildcardImport:HelmUpdateDependencies.kt$import org.gradle.api.tasks.*</ID>
+    <ID>WildcardImport:YamlTransformingReader.kt$import org.yaml.snakeyaml.events.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

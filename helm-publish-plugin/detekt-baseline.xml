@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:AbstractHttpHelmChartPublisher.kt$AbstractHttpHelmChartPublisher$200</ID>
+    <ID>MagicNumber:AbstractHttpHelmChartPublisher.kt$AbstractHttpHelmChartPublisher$299</ID>
+    <ID>MaxLineLength:HarborHelmPublishingRepository.kt$DefaultHarborHelmPublishingRepository$projectName = requireNotNull(projectName.orNull) { "projectName is required for Harbor publishing repository" }</ID>
+    <ID>MaxLineLength:HelmPublishingRepositoryContainer.kt$internal</ID>
+  </CurrentIssues>
+</SmellBaseline>
