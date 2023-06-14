@@ -1,0 +1,42 @@
+name: Pre Merge Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gradle:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        jdk: [ 8, 11, 17 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle#using-the-gradle-starter-workflow
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # https://github.com/marketplace/actions/setup-java-jdk
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'oracle'
+
+      # https://github.com/marketplace/actions/gradle-wrapper-validation
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      # https://github.com/marketplace/actions/gradle-build-action
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+          arguments: build
