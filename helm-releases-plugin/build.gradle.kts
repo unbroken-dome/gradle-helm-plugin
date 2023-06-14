@@ -4,6 +4,7 @@ plugins {
     id("com.gradle.plugin-publish")
     id("org.jetbrains.dokka")
     id("maven-publish")
+    alias(libs.plugins.binaryCompatibilityValidator)
 }
 
 

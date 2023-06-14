@@ -26,3 +26,4 @@ spekRunner = { module = "org.spekframework.spek2:spek-runner-junit5", version.re
 gradlePublish = { id = "com.gradle.plugin-publish", version = "1.2.0" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "3.3.2" }
 benManesVersions = { id = "com.github.ben-manes.versions", version = "0.47.0" }
+binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.13.2" }

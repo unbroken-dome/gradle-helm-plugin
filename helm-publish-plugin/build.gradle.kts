@@ -4,6 +4,7 @@ plugins {
     id("com.gradle.plugin-publish")
     id("org.jetbrains.dokka")
     id("maven-publish")
+    alias(libs.plugins.binaryCompatibilityValidator)
 }
 
 
@@ -33,4 +34,8 @@ gradlePlugin {
             implementationClass = "com.citi.gradle.plugins.helm.publishing.HelmPublishPlugin"
         }
     }
+}
+
+apiValidation {
+    ignoredPackages.add("com.citi.gradle.plugins.helm.publishing.dsl.internal")
 }
