@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.binaryCompatibilityValidator)
 }
 
+val functionalTest by sourceSets.creating
 
 dependencies {
 
@@ -24,10 +25,15 @@ dependencies {
     implementation(libs.unbrokenDomePluginUtils)
 
     testImplementation(libs.unbrokenDomeTestUtils)
+
+    "functionalTestImplementation"(libs.kotestAssertions)
+    "functionalTestImplementation"(libs.junitApi)
+    "functionalTestRuntimeOnly"(libs.junitEngine)
 }
 
 
 gradlePlugin {
+    testSourceSets(functionalTest)
     plugins {
         create("helmPublishPlugin") {
             id = "com.citi.helm-publish"
@@ -38,4 +44,16 @@ gradlePlugin {
 
 apiValidation {
     ignoredPackages.add("com.citi.gradle.plugins.helm.publishing.dsl.internal")
+}
+
+val functionalTestTask = tasks.register<Test>("functionalTest") {
+    description = "Runs the integration tests."
+    group = "verification"
+    testClassesDirs = functionalTest.output.classesDirs
+    classpath = functionalTest.runtimeClasspath
+    mustRunAfter(tasks.test)
+}
+
+tasks.build {
+    dependsOn(functionalTestTask)
 }
