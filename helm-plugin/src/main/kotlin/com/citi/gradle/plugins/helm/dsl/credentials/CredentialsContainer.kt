@@ -1,12 +1,12 @@
 package com.citi.gradle.plugins.helm.dsl.credentials
 
+import com.citi.gradle.plugins.helm.dsl.credentials.internal.toAction
 import groovy.lang.Closure
 import groovy.lang.Closure.DELEGATE_FIRST
 import groovy.lang.DelegatesTo
 import org.gradle.api.Action
 import org.gradle.api.credentials.Credentials
 import org.gradle.api.provider.Provider
-import org.gradle.util.ConfigureUtil
 import kotlin.reflect.KClass
 
 
@@ -107,11 +107,15 @@ interface CredentialsContainer {
      * @throws IllegalArgumentException if `type` is of a different type to the credentials previously
      *         specified for this repository
      */
+    @Deprecated(
+        message = "The function is deprecated: Gradle doesn't recommend to pass `Closure<*>` as input parameter. Nothing needs to changed for Groovy users, please use overloaded method in Java/Kotlin",
+        replaceWith = ReplaceWith("credentials")
+    )
     fun <T : Credentials> credentials(
         @DelegatesTo.Target type: Class<T>,
         @DelegatesTo(strategy = DELEGATE_FIRST, genericTypeIndex = 0) configClosure: Closure<*>
     ) {
-        credentials(type, ConfigureUtil.configureUsing(configClosure))
+        credentials(type, configClosure.toAction())
     }
 
 
@@ -154,10 +158,14 @@ interface CredentialsContainer {
      * @throws IllegalStateException when the credentials assigned to this service are not of
      *         type [PasswordCredentials]
      */
+    @Deprecated(
+        message = "The function is deprecated: Gradle doesn't recommend to pass `Closure<*>` as input parameter. Nothing needs to changed for Groovy users, please use overloaded method in Java/Kotlin",
+        replaceWith = ReplaceWith("credentials")
+    )
     fun credentials(
         @DelegatesTo(PasswordCredentials::class, strategy = DELEGATE_FIRST) configClosure: Closure<*>
     ) {
-        credentials(ConfigureUtil.configureUsing(configClosure))
+        credentials(configClosure.toAction())
     }
 
 
