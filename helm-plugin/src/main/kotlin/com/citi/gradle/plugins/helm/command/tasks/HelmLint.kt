@@ -8,11 +8,11 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.gradle.util.GFileUtils
 import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import com.citi.gradle.plugins.helm.command.HelmExecProviderSupport
 import com.citi.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
 import com.citi.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
+import java.time.Instant
 import org.unbrokendome.gradle.pluginutils.ifPresent
 import org.unbrokendome.gradle.pluginutils.property
 
@@ -119,12 +119,20 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
             args(chartDir)
         }
 
-        outputMarkerFile.ifPresent {
-            GFileUtils.touch(it.asFile)
-        }
+        updateOutputMarker()
     }
-
 
     override val execProviderSupport: HelmExecProviderSupport
         get() = super.execProviderSupport.addOptionsApplier(HelmValueOptionsApplier)
+
+
+    private fun updateOutputMarker() {
+        outputMarkerFile.ifPresent { regularFile ->
+            // file content is current time in milliseconds,
+            // so we assume that lint task doesn't finish more frequent that once per millisecond
+            val timeMarker = Instant.now().toEpochMilli().toString()
+
+            regularFile.asFile.writeText(timeMarker)
+        }
+    }
 }
