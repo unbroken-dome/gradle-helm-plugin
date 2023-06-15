@@ -5,7 +5,6 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
@@ -102,11 +101,10 @@ private open class DefaultHelmReleaseTarget
 @Inject constructor(
     private val name: String,
     private val globalSelectTagsExpression: TagExpression,
-    objects: ObjectFactory,
-    layout: ProjectLayout
+    objects: ObjectFactory
 ) : HelmReleaseTarget, HelmReleaseTargetInternal,
     ConfigurableHelmInstallationOptions by HelmInstallationOptionsHolder(objects),
-    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects, layout) {
+    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
 
     private var localSelectTagsExpression: TagExpression =
         TagExpression.alwaysMatch()

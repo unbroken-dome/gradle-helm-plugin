@@ -3,7 +3,6 @@ package com.citi.gradle.plugins.helm.dsl
 import org.gradle.api.Buildable
 import org.gradle.api.Named
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -81,9 +80,8 @@ private open class DefaultHelmRendering
 @Inject constructor(
     private val name: String,
     private val chartName: String,
-    objects: ObjectFactory,
-    layout: ProjectLayout
-) : HelmRendering, ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects, layout) {
+    objects: ObjectFactory
+) : HelmRendering, ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
 
     final override fun getName(): String =
         name
