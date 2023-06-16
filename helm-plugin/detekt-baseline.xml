@@ -2,13 +2,8 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ImplicitDefaultLocale:DataSizeFormatter.kt$String.format("%.1f GB", gb)</ID>
-    <ID>ImplicitDefaultLocale:DataSizeFormatter.kt$String.format("%.1f KB", kb)</ID>
-    <ID>ImplicitDefaultLocale:DataSizeFormatter.kt$String.format("%.1f MB", mb)</ID>
     <ID>ImplicitDefaultLocale:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$String.format("%.1f", progress)</ID>
     <ID>LongParameterList:HelmChart.kt$DefaultHelmChart$( private val name: String, project: Project, baseOutputDir: Provider&lt;Directory>, globalRenderBaseOutputDir: Provider&lt;Directory>, filteredSourcesBaseDir: Provider&lt;Directory>, dependenciesBaseDir: Provider&lt;Directory>, objects: ObjectFactory )</ID>
-    <ID>MagicNumber:DataSizeFormatter.kt$0.1f</ID>
-    <ID>MagicNumber:DataSizeFormatter.kt$10</ID>
     <ID>MagicNumber:DigestUtils.kt$4</ID>
     <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$64</ID>
     <ID>MaxLineLength:ChartModelDependencies.kt$internal</ID>
@@ -24,9 +19,6 @@
     <ID>TooGenericExceptionCaught:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$ex: Exception</ID>
     <ID>TooManyFunctions:HelmExecProvider.kt$HelmExecProviderSupport : HelmExecProvider</ID>
     <ID>TooManyFunctions:HelmPlugin.kt$HelmPlugin : Plugin</ID>
-    <ID>TopLevelPropertyNaming:DataSizeFormatter.kt$private const val BytesPerGB = 1024L * 1024L * 1024L</ID>
-    <ID>TopLevelPropertyNaming:DataSizeFormatter.kt$private const val BytesPerKB = 1024L</ID>
-    <ID>TopLevelPropertyNaming:DataSizeFormatter.kt$private const val BytesPerMB = 1024L * 1024L</ID>
     <ID>TopLevelPropertyNaming:DigestUtils.kt$private const val DefaultBufferSize = DEFAULT_BUFFER_SIZE</ID>
     <ID>TopLevelPropertyNaming:DigestUtils.kt$private const val DefaultDigestAlgorithm = "SHA-256"</ID>
     <ID>UnusedPrivateProperty:HelmValueOptions.kt$HelmValueOptionsHolder$layout: ProjectLayout</ID>

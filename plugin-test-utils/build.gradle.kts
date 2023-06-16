@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
     api(gradleTestKit())
-    api(libs.kotestAssertions)
-    api(libs.junit)
+    api(libs.bundles.defaultTests)
     runtimeOnly(libs.junitEngine)
 }
