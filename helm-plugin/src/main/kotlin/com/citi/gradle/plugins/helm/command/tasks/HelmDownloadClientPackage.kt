@@ -27,7 +27,11 @@ import java.net.URI
 abstract class HelmDownloadClientPackage : DefaultTask() {
 
     companion object {
-
+        /**
+         * 1.02 == 102%
+         * 0.3 == 30%
+         */
+        private const val percentRatio = 100
         private const val BufferSize = 10 * 1024
         private const val ConnectTimeoutMilliseconds = 30 * 1000
         private const val ReadTimeoutMilliseconds = 30 * 1000
@@ -262,7 +266,7 @@ abstract class HelmDownloadClientPackage : DefaultTask() {
                         if (totalBytesTransferred >= nextProgressThreshold) {
                             nextProgressThreshold = minOf(contentLength, nextProgressThreshold + ProgressChunkSize)
 
-                            val progress = ((totalBytesTransferred * 1000) / contentLength).toDouble() / 10.0
+                            val progress = (totalBytesTransferred.toDouble() / contentLength) * percentRatio
                             logger.info(
                                 "Downloaded ${formatDataSize(totalBytesTransferred)} of ${formatDataSize(contentLength)} " +
                                         "(${String.format("%.1f", progress)})"
