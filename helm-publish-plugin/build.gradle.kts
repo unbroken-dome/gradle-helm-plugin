@@ -28,6 +28,7 @@ dependencies {
     testImplementation(libs.unbrokenDomeTestUtils)
 
     "functionalTestImplementation"(project(":plugin-test-utils"))
+    "functionalTestImplementation"(libs.okHttpMockWebServer)
 }
 
 

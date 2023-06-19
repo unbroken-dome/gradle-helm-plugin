@@ -1,0 +1,1 @@
+Special file to play role as a archive. It isn't valid tgz file of course.
