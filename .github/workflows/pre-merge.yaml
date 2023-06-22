@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.jdk }}
-          distribution: 'oracle'
+          distribution: 'temurin'
 
       # https://github.com/marketplace/actions/gradle-wrapper-validation
       - name: Validate Gradle wrapper
