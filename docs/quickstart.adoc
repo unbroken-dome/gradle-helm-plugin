@@ -1,12 +1,12 @@
 = Quick Start
 
-Apply the `org.unbroken-dome.helm` plugin to your Gradle project:
+Apply the `com.citi.helm` plugin to your Gradle project:
 
 [source,groovy,role="primary",subs="+attributes"]
 .Groovy
 ----
 plugins {
-    id 'org.unbroken-dome.helm' version '{project-version}'
+    id 'com.citi.helm' version '{project-version}'
 }
 ----
 
@@ -14,7 +14,7 @@ plugins {
 .Kotlin
 ----
 plugins {
-    id("org.unbroken-dome.helm") version "{project-version}"
+    id("com.citi.helm") version "{project-version}"
 }
 ----
 
