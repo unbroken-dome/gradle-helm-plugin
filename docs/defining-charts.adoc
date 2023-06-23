@@ -7,7 +7,7 @@ Groovy
 [source,groovy,subs="+attributes",role="primary"]
 ----
 plugins {
-    id 'org.unbroken-dome.helm' version '{project-version}'
+    id 'com.citi.helm' version '{project-version}'
 }
 
 helm {
@@ -25,7 +25,7 @@ Kotlin
 [source,kotlin,subs="+attributes",role="secondary"]
 ----
 plugins {
-    id("org.unbroken-dome.helm") version "{project-version}"
+    id("com.citi.helm") version "{project-version}"
 }
 
 helm {

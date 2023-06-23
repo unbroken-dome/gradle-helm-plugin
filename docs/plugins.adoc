@@ -2,7 +2,7 @@
 
 The _gradle-helm-plugin_ library provides several Gradle plugins, with different use cases for each.
 
-All plugins IDs are prefixed the namespace `org.unbroken-dome`.
+All plugins IDs are prefixed the namespace `com.citi`.
 
 
 == `helm-commands`
@@ -19,7 +19,7 @@ Use this if you want to use Helm CLI commands directly as tasks, without any of 
 .Groovy
 ----
 plugins {
-    id 'org.unbroken-dome.helm-commands' version '{project-version}'
+    id 'com.citi.helm-commands' version '{project-version}'
 }
 ----
 
@@ -27,7 +27,7 @@ plugins {
 .Kotlin
 ----
 plugins {
-    id("org.unbroken-dome.helm-commands") version "{project-version}"
+    id("com.citi.helm-commands") version "{project-version}"
 }
 ----
 
@@ -44,7 +44,7 @@ This is the main plugin of the suite. It enables a variety of extra DSL blocks i
 .Groovy
 ----
 plugins {
-    id 'org.unbroken-dome.helm' version '{project-version}'
+    id 'com.citi.helm' version '{project-version}'
 }
 ----
 
@@ -52,7 +52,7 @@ plugins {
 .Kotlin
 ----
 plugins {
-    id("org.unbroken-dome.helm") version "{project-version}"
+    id("com.citi.helm") version "{project-version}"
 }
 ----
 
@@ -67,7 +67,7 @@ It enables the `helm.publishing` DSL block and adds publishing tasks for each ch
 .Groovy
 ----
 plugins {
-    id 'org.unbroken-dome.helm-publish' version '{project-version}'
+    id 'com.citi.helm-publish' version '{project-version}'
 }
 ----
 
@@ -75,7 +75,7 @@ plugins {
 .Kotlin
 ----
 plugins {
-    id("org.unbroken-dome.helm-publish") version "{project-version}"
+    id("com.citi.helm-publish") version "{project-version}"
 }
 ----
 
@@ -91,7 +91,7 @@ It enables the `helm.releases` DSL block, where you can declare your releases us
 .Groovy
 ----
 plugins {
-    id 'org.unbroken-dome.helm-releases' version '{project-version}'
+    id 'com.citi.helm-releases' version '{project-version}'
 }
 ----
 
@@ -99,6 +99,6 @@ plugins {
 .Kotlin
 ----
 plugins {
-    id("org.unbroken-dome.helm-releases") version "{project-version}"
+    id("com.citi.helm-releases") version "{project-version}"
 }
 ----
