@@ -1,0 +1,942 @@
+public final class com/citi/gradle/plugins/helm/HelmPlugin : org/gradle/api/Plugin {
+	public static final field addRepositoriesTaskName Ljava/lang/String;
+	public static final field updateRepositoriesTaskName Ljava/lang/String;
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public final class com/citi/gradle/plugins/helm/HelmPluginConstants {
+	public static final field HELM_ACTIVE_RELEASE_TARGET_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_CHARTS_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_DEFAULT_RELEASE_TARGET Ljava/lang/String;
+	public static final field HELM_DEPENDENCIES_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_FILTERING_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_GROUP Ljava/lang/String;
+	public static final field HELM_LINT_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_MAIN_CHART_NAME Ljava/lang/String;
+	public static final field HELM_RELEASES_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_RELEASE_TARGETS_EXTENSION_NAME Ljava/lang/String;
+	public static final field HELM_REPOSITORIES_EXTENSION_NAME Ljava/lang/String;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableGlobalHelmOptions : com/citi/gradle/plugins/helm/command/ConfigurableHelmOptions, com/citi/gradle/plugins/helm/command/GlobalHelmOptions {
+	public abstract fun getDebug ()Lorg/gradle/api/provider/Property;
+	public abstract fun getExecutable ()Lorg/gradle/api/provider/Property;
+	public abstract fun getExtraArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getXdgCacheHome ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getXdgConfigHome ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getXdgDataHome ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallFromRepositoryOptions : com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions, com/citi/gradle/plugins/helm/command/HelmInstallFromRepositoryOptions {
+	public abstract fun getCaFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getCertFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getKeyFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getPassword ()Lorg/gradle/api/provider/Property;
+	public abstract fun getRepository ()Lorg/gradle/api/provider/Property;
+	public abstract fun getUsername ()Lorg/gradle/api/provider/Property;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions : com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions, com/citi/gradle/plugins/helm/command/HelmInstallationOptions {
+	public abstract fun getAtomic ()Lorg/gradle/api/provider/Property;
+	public abstract fun getCreateNamespace ()Lorg/gradle/api/provider/Property;
+	public abstract fun getDevel ()Lorg/gradle/api/provider/Property;
+	public abstract fun getVerify ()Lorg/gradle/api/provider/Property;
+	public abstract fun getVersion ()Lorg/gradle/api/provider/Property;
+	public abstract fun getWait ()Lorg/gradle/api/provider/Property;
+	public abstract fun getWaitForJobs ()Lorg/gradle/api/provider/Property;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableHelmOptions : com/citi/gradle/plugins/helm/command/HelmOptions {
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions : com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions, com/citi/gradle/plugins/helm/command/HelmServerOperationOptions {
+	public abstract fun getDryRun ()Lorg/gradle/api/provider/Property;
+	public abstract fun getNoHooks ()Lorg/gradle/api/provider/Property;
+	public abstract fun getRemoteTimeout ()Lorg/gradle/api/provider/Property;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions : com/citi/gradle/plugins/helm/command/ConfigurableHelmOptions, com/citi/gradle/plugins/helm/command/HelmServerOptions {
+	public abstract fun getKubeConfig ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getKubeContext ()Lorg/gradle/api/provider/Property;
+	public abstract fun getNamespace ()Lorg/gradle/api/provider/Property;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions : com/citi/gradle/plugins/helm/command/ConfigurableHelmOptions, com/citi/gradle/plugins/helm/command/HelmValueOptions {
+	public abstract fun getFileValues ()Lorg/gradle/api/provider/MapProperty;
+	public abstract fun getValueFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getValues ()Lorg/gradle/api/provider/MapProperty;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/GlobalHelmOptions : com/citi/gradle/plugins/helm/command/HelmOptions {
+	public abstract fun getDebug ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getExecutable ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getExtraArgs ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getXdgCacheHome ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getXdgConfigHome ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getXdgDataHome ()Lorg/gradle/api/provider/Provider;
+}
+
+public final class com/citi/gradle/plugins/helm/command/HelmCommandsPlugin : org/gradle/api/Plugin {
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmExecProvider {
+	public abstract fun execHelm (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)V
+	public abstract fun execHelmCaptureOutput (Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/HelmExecProvider$DefaultImpls {
+	public static synthetic fun execHelm$default (Lcom/citi/gradle/plugins/helm/command/HelmExecProvider;Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;ILjava/lang/Object;)V
+	public static synthetic fun execHelmCaptureOutput$default (Lcom/citi/gradle/plugins/helm/command/HelmExecProvider;Ljava/lang/String;Ljava/lang/String;Lorg/gradle/api/Action;ILjava/lang/Object;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/HelmExecProviderKt {
+	public static final fun execHelm (Lcom/citi/gradle/plugins/helm/command/HelmExecProvider;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun execHelm$default (Lcom/citi/gradle/plugins/helm/command/HelmExecProvider;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmExecSpec {
+	public abstract fun args (Ljava/lang/Iterable;)V
+	public abstract fun args (Lorg/gradle/api/provider/Provider;)V
+	public abstract fun args ([Ljava/lang/Object;)V
+	public abstract fun assertSuccess (Z)V
+	public abstract fun environment (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)V
+	public abstract fun executable (Ljava/lang/String;)V
+	public abstract fun flag (Ljava/lang/String;Lorg/gradle/api/provider/Provider;Z)V
+	public abstract fun flag (Ljava/lang/String;ZZ)V
+	public abstract fun option (Ljava/lang/String;Ljava/lang/Object;)V
+	public abstract fun option (Ljava/lang/String;Lorg/gradle/api/provider/Provider;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/HelmExecSpec$DefaultImpls {
+	public static fun args (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lorg/gradle/api/provider/Provider;)V
+	public static fun args (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;[Ljava/lang/Object;)V
+	public static synthetic fun assertSuccess$default (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;ZILjava/lang/Object;)V
+	public static fun flag (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Ljava/lang/String;Lorg/gradle/api/provider/Provider;Z)V
+	public static fun flag (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Ljava/lang/String;ZZ)V
+	public static synthetic fun flag$default (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Ljava/lang/String;Lorg/gradle/api/provider/Provider;ZILjava/lang/Object;)V
+	public static synthetic fun flag$default (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Ljava/lang/String;ZZILjava/lang/Object;)V
+	public static fun option (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Ljava/lang/String;Ljava/lang/Object;)V
+	public static fun option (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Ljava/lang/String;Lorg/gradle/api/provider/Provider;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmInstallFromRepositoryOptions : com/citi/gradle/plugins/helm/command/HelmInstallationOptions {
+	public abstract fun getCaFile ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getCertFile ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getKeyFile ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getPassword ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getRepository ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getUsername ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmInstallationOptions : com/citi/gradle/plugins/helm/command/HelmServerOperationOptions {
+	public abstract fun getAtomic ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getCreateNamespace ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getDevel ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getVerify ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getVersion ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getWait ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getWaitForJobs ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmOptions {
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmServerOperationOptions : com/citi/gradle/plugins/helm/command/HelmServerOptions {
+	public abstract fun getDryRun ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getNoHooks ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getRemoteTimeout ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmServerOptions : com/citi/gradle/plugins/helm/command/HelmOptions {
+	public abstract fun getKubeConfig ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getKubeContext ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getNamespace ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/HelmValueOptions : com/citi/gradle/plugins/helm/command/HelmOptions {
+	public abstract fun getFileValues ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getValueFiles ()Lorg/gradle/api/file/FileCollection;
+	public abstract fun getValues ()Lorg/gradle/api/provider/Provider;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/DelegateGlobalHelmOptions : com/citi/gradle/plugins/helm/command/GlobalHelmOptions {
+	public fun <init> (Lorg/gradle/api/provider/Provider;)V
+	public fun getDebug ()Lorg/gradle/api/provider/Provider;
+	public fun getExecutable ()Lorg/gradle/api/provider/Provider;
+	public fun getExtraArgs ()Lorg/gradle/api/provider/Provider;
+	public fun getXdgCacheHome ()Lorg/gradle/api/provider/Provider;
+	public fun getXdgConfigHome ()Lorg/gradle/api/provider/Provider;
+	public fun getXdgDataHome ()Lorg/gradle/api/provider/Provider;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/GlobalHelmOptionsApplier : com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public static final field INSTANCE Lcom/citi/gradle/plugins/helm/command/internal/GlobalHelmOptionsApplier;
+	public fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/GlobalHelmOptionsKt {
+	public static final fun conventionsFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableGlobalHelmOptions;Lcom/citi/gradle/plugins/helm/command/GlobalHelmOptions;)Lcom/citi/gradle/plugins/helm/command/ConfigurableGlobalHelmOptions;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsApplier : com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public static final field INSTANCE Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsApplier;
+	public fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsHolder : com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallFromRepositoryOptions, com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions {
+	public fun <init> (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/file/RegularFileProperty;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun component2 ()Lorg/gradle/api/provider/Property;
+	public final fun component3 ()Lorg/gradle/api/provider/Property;
+	public final fun component4 ()Lorg/gradle/api/provider/Property;
+	public final fun component5 ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun component6 ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun component7 ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun copy (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/file/RegularFileProperty;)Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsHolder;
+	public static synthetic fun copy$default (Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsHolder;Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/file/RegularFileProperty;ILjava/lang/Object;)Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsHolder;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAtomic ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getAtomic ()Lorg/gradle/api/provider/Provider;
+	public fun getCaFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getCaFile ()Lorg/gradle/api/provider/Provider;
+	public fun getCertFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getCertFile ()Lorg/gradle/api/provider/Provider;
+	public fun getCreateNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getCreateNamespace ()Lorg/gradle/api/provider/Provider;
+	public fun getDevel ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDevel ()Lorg/gradle/api/provider/Provider;
+	public fun getDryRun ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDryRun ()Lorg/gradle/api/provider/Provider;
+	public fun getKeyFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKeyFile ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeConfig ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKubeConfig ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeContext ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getKubeContext ()Lorg/gradle/api/provider/Provider;
+	public fun getNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNamespace ()Lorg/gradle/api/provider/Provider;
+	public fun getNoHooks ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNoHooks ()Lorg/gradle/api/provider/Provider;
+	public fun getPassword ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getPassword ()Lorg/gradle/api/provider/Provider;
+	public fun getRemoteTimeout ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getRemoteTimeout ()Lorg/gradle/api/provider/Provider;
+	public fun getRepository ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getRepository ()Lorg/gradle/api/provider/Provider;
+	public fun getUsername ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getUsername ()Lorg/gradle/api/provider/Provider;
+	public fun getVerify ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getVerify ()Lorg/gradle/api/provider/Provider;
+	public fun getVersion ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getVersion ()Lorg/gradle/api/provider/Provider;
+	public fun getWait ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getWait ()Lorg/gradle/api/provider/Provider;
+	public fun getWaitForJobs ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getWaitForJobs ()Lorg/gradle/api/provider/Provider;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmInstallFromRepositoryOptionsKt {
+	public static final fun setFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmInstallFromRepositoryOptions;Lcom/citi/gradle/plugins/helm/command/HelmInstallFromRepositoryOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsApplier : com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public static final field INSTANCE Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsApplier;
+	public fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsHolder : com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions, com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions {
+	public fun <init> (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun component2 ()Lorg/gradle/api/provider/Property;
+	public final fun component3 ()Lorg/gradle/api/provider/Property;
+	public final fun component4 ()Lorg/gradle/api/provider/Property;
+	public final fun component5 ()Lorg/gradle/api/provider/Property;
+	public final fun component6 ()Lorg/gradle/api/provider/Property;
+	public final fun component7 ()Lorg/gradle/api/provider/Property;
+	public final fun component8 ()Lorg/gradle/api/provider/Property;
+	public final fun copy (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;)Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsHolder;
+	public static synthetic fun copy$default (Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsHolder;Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;ILjava/lang/Object;)Lcom/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsHolder;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAtomic ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getAtomic ()Lorg/gradle/api/provider/Provider;
+	public fun getCreateNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getCreateNamespace ()Lorg/gradle/api/provider/Provider;
+	public fun getDevel ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDevel ()Lorg/gradle/api/provider/Provider;
+	public fun getDryRun ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDryRun ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeConfig ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKubeConfig ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeContext ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getKubeContext ()Lorg/gradle/api/provider/Provider;
+	public fun getNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNamespace ()Lorg/gradle/api/provider/Provider;
+	public fun getNoHooks ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNoHooks ()Lorg/gradle/api/provider/Provider;
+	public fun getRemoteTimeout ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getRemoteTimeout ()Lorg/gradle/api/provider/Provider;
+	public fun getVerify ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getVerify ()Lorg/gradle/api/provider/Provider;
+	public fun getVersion ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getVersion ()Lorg/gradle/api/provider/Provider;
+	public fun getWait ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getWait ()Lorg/gradle/api/provider/Provider;
+	public fun getWaitForJobs ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getWaitForJobs ()Lorg/gradle/api/provider/Provider;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmInstallationOptionsKt {
+	public static final fun conventionsFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions;Lcom/citi/gradle/plugins/helm/command/HelmInstallationOptions;)V
+	public static final fun setFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmInstallationOptions;Lcom/citi/gradle/plugins/helm/command/HelmInstallationOptions;)V
+	public static final fun withDefaults (Lcom/citi/gradle/plugins/helm/command/HelmInstallationOptions;Lcom/citi/gradle/plugins/helm/command/HelmInstallationOptions;Lorg/gradle/api/provider/ProviderFactory;)Lcom/citi/gradle/plugins/helm/command/HelmInstallationOptions;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public abstract fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsApplier : com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public static final field INSTANCE Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsApplier;
+	public fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsHolder : com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions, com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions {
+	public fun <init> (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun component2 ()Lorg/gradle/api/provider/Property;
+	public final fun component3 ()Lorg/gradle/api/provider/Property;
+	public final fun component4 ()Lorg/gradle/api/provider/Property;
+	public final fun copy (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;)Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsHolder;
+	public static synthetic fun copy$default (Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsHolder;Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;Lorg/gradle/api/provider/Property;ILjava/lang/Object;)Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsHolder;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getDryRun ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDryRun ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeConfig ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKubeConfig ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeContext ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getKubeContext ()Lorg/gradle/api/provider/Provider;
+	public fun getNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNamespace ()Lorg/gradle/api/provider/Provider;
+	public fun getNoHooks ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNoHooks ()Lorg/gradle/api/provider/Provider;
+	public fun getRemoteTimeout ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getRemoteTimeout ()Lorg/gradle/api/provider/Provider;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmServerOperationOptionsKt {
+	public static final fun conventionsFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;Lcom/citi/gradle/plugins/helm/command/HelmServerOperationOptions;)Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;
+	public static final fun setFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;Lcom/citi/gradle/plugins/helm/command/HelmServerOperationOptions;)Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions;
+	public static final fun withDefaults (Lcom/citi/gradle/plugins/helm/command/HelmServerOperationOptions;Lcom/citi/gradle/plugins/helm/command/HelmServerOperationOptions;Lorg/gradle/api/provider/ProviderFactory;)Lcom/citi/gradle/plugins/helm/command/HelmServerOperationOptions;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmServerOptionsApplier : com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public static final field INSTANCE Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOptionsApplier;
+	public fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmServerOptionsHolder : com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun <init> (Lorg/gradle/api/provider/Property;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/provider/Property;)V
+	public final fun component1 ()Lorg/gradle/api/provider/Property;
+	public final fun component2 ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun component3 ()Lorg/gradle/api/provider/Property;
+	public final fun copy (Lorg/gradle/api/provider/Property;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/provider/Property;)Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOptionsHolder;
+	public static synthetic fun copy$default (Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOptionsHolder;Lorg/gradle/api/provider/Property;Lorg/gradle/api/file/RegularFileProperty;Lorg/gradle/api/provider/Property;ILjava/lang/Object;)Lcom/citi/gradle/plugins/helm/command/internal/HelmServerOptionsHolder;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getKubeConfig ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKubeConfig ()Lorg/gradle/api/provider/Provider;
+	public fun getKubeContext ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getKubeContext ()Lorg/gradle/api/provider/Provider;
+	public fun getNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNamespace ()Lorg/gradle/api/provider/Provider;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmServerOptionsKt {
+	public static final fun conventionsFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;Lcom/citi/gradle/plugins/helm/command/HelmServerOptions;)Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;
+	public static final fun setFrom (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;Lcom/citi/gradle/plugins/helm/command/HelmServerOptions;)Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions;
+	public static final fun withDefaults (Lcom/citi/gradle/plugins/helm/command/HelmServerOptions;Lcom/citi/gradle/plugins/helm/command/HelmServerOptions;Lorg/gradle/api/provider/ProviderFactory;)Lcom/citi/gradle/plugins/helm/command/HelmServerOptions;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmValueOptionsApplier : com/citi/gradle/plugins/helm/command/internal/HelmOptionsApplier {
+	public static final field INSTANCE Lcom/citi/gradle/plugins/helm/command/internal/HelmValueOptionsApplier;
+	public fun apply (Lcom/citi/gradle/plugins/helm/command/HelmExecSpec;Lcom/citi/gradle/plugins/helm/command/HelmOptions;)V
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmValueOptionsHolder : com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/file/ProjectLayout;)V
+	public fun <init> (Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/file/ConfigurableFileCollection;)V
+	public final fun component1 ()Lorg/gradle/api/provider/MapProperty;
+	public final fun component2 ()Lorg/gradle/api/provider/MapProperty;
+	public final fun component3 ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public final fun copy (Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/file/ConfigurableFileCollection;)Lcom/citi/gradle/plugins/helm/command/internal/HelmValueOptionsHolder;
+	public static synthetic fun copy$default (Lcom/citi/gradle/plugins/helm/command/internal/HelmValueOptionsHolder;Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/provider/MapProperty;Lorg/gradle/api/file/ConfigurableFileCollection;ILjava/lang/Object;)Lcom/citi/gradle/plugins/helm/command/internal/HelmValueOptionsHolder;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getFileValues ()Lorg/gradle/api/provider/MapProperty;
+	public synthetic fun getFileValues ()Lorg/gradle/api/provider/Provider;
+	public fun getValueFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public synthetic fun getValueFiles ()Lorg/gradle/api/file/FileCollection;
+	public fun getValues ()Lorg/gradle/api/provider/MapProperty;
+	public synthetic fun getValues ()Lorg/gradle/api/provider/Provider;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/command/internal/HelmValueOptionsKt {
+	public static final fun mergeValues (Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions;Lcom/citi/gradle/plugins/helm/command/HelmValueOptions;)Lcom/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions;
+}
+
+public abstract class com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask : org/gradle/api/DefaultTask, com/citi/gradle/plugins/helm/command/GlobalHelmOptions {
+	public fun <init> ()V
+	protected final fun execHelm (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun execHelm$default (Lcom/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	protected final fun execHelmCaptureOutput (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
+	public static synthetic fun execHelmCaptureOutput$default (Lcom/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public final fun getDebug ()Lorg/gradle/api/provider/Provider;
+	public final fun getExecutable ()Lorg/gradle/api/provider/Provider;
+	public final fun getExtraArgs ()Lorg/gradle/api/provider/Provider;
+	protected final fun getRegistryConfigFile ()Lorg/gradle/api/provider/Provider;
+	protected final fun getRepositoryCacheDir ()Lorg/gradle/api/provider/Provider;
+	protected final fun getRepositoryConfigFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getXdgCacheHome ()Lorg/gradle/api/provider/Provider;
+	public final fun getXdgConfigHome ()Lorg/gradle/api/provider/Provider;
+	public final fun getXdgDataHome ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract class com/citi/gradle/plugins/helm/command/tasks/AbstractHelmDependenciesTask : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask {
+	public fun <init> ()V
+	public fun getChartDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getSubchartsDir ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract class com/citi/gradle/plugins/helm/command/tasks/AbstractHelmInstallationCommandTask : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerOperationCommandTask, com/citi/gradle/plugins/helm/command/ConfigurableHelmInstallFromRepositoryOptions, com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions {
+	public fun <init> ()V
+	public final fun from (Ljava/lang/Object;)V
+	public final fun getAtomic ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getAtomic ()Lorg/gradle/api/provider/Provider;
+	public final fun getCaFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getCaFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getCertFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getCertFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getChart ()Lorg/gradle/api/provider/Property;
+	public final fun getCreateNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getCreateNamespace ()Lorg/gradle/api/provider/Provider;
+	public final fun getDevel ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDevel ()Lorg/gradle/api/provider/Provider;
+	public final fun getFileValues ()Lorg/gradle/api/provider/MapProperty;
+	public synthetic fun getFileValues ()Lorg/gradle/api/provider/Provider;
+	public final fun getKeyFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKeyFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getPassword ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getPassword ()Lorg/gradle/api/provider/Provider;
+	public fun getReleaseName ()Lorg/gradle/api/provider/Property;
+	public final fun getRepository ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getRepository ()Lorg/gradle/api/provider/Provider;
+	public final fun getUsername ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getUsername ()Lorg/gradle/api/provider/Provider;
+	public final fun getValueFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public synthetic fun getValueFiles ()Lorg/gradle/api/file/FileCollection;
+	public final fun getValues ()Lorg/gradle/api/provider/MapProperty;
+	public synthetic fun getValues ()Lorg/gradle/api/provider/Provider;
+	public final fun getVerify ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getVerify ()Lorg/gradle/api/provider/Provider;
+	public fun getVersion ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getVersion ()Lorg/gradle/api/provider/Provider;
+	public final fun getWait ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getWait ()Lorg/gradle/api/provider/Provider;
+	public final fun getWaitForJobs ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getWaitForJobs ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract class com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerCommandTask : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask, com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions {
+	public fun <init> ()V
+	public final fun getKubeConfig ()Lorg/gradle/api/file/RegularFileProperty;
+	public synthetic fun getKubeConfig ()Lorg/gradle/api/provider/Provider;
+	public final fun getKubeContext ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getKubeContext ()Lorg/gradle/api/provider/Provider;
+	public final fun getNamespace ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNamespace ()Lorg/gradle/api/provider/Provider;
+}
+
+public abstract class com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerOperationCommandTask : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerCommandTask, com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOperationOptions {
+	public fun <init> ()V
+	public final fun getDryRun ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getDryRun ()Lorg/gradle/api/provider/Provider;
+	public final fun getNoHooks ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getNoHooks ()Lorg/gradle/api/provider/Provider;
+	public final fun getRemoteTimeout ()Lorg/gradle/api/provider/Property;
+	public synthetic fun getRemoteTimeout ()Lorg/gradle/api/provider/Provider;
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmAddRepository : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask {
+	public fun <init> ()V
+	public final fun addRepository ()V
+	public final fun getCaFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getCertificateFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getFailIfExists ()Lorg/gradle/api/provider/Property;
+	public final fun getKeyFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getPassword ()Lorg/gradle/api/provider/Property;
+	public final fun getRepositoryName ()Lorg/gradle/api/provider/Property;
+	public final fun getUrl ()Lorg/gradle/api/provider/Property;
+	public final fun getUsername ()Lorg/gradle/api/provider/Property;
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmBuildDependencies : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmDependenciesTask {
+	public fun <init> ()V
+	public final fun buildDependencies ()V
+}
+
+public abstract class com/citi/gradle/plugins/helm/command/tasks/HelmDownloadClientPackage : org/gradle/api/DefaultTask {
+	public static final field Companion Lcom/citi/gradle/plugins/helm/command/tasks/HelmDownloadClientPackage$Companion;
+	public fun <init> ()V
+	public final fun downloadClientPackage ()V
+	public final fun getBaseUrl ()Lorg/gradle/api/provider/Property;
+	public final fun getDestinationDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getDownloadUrl ()Lorg/gradle/api/provider/Provider;
+	public final fun getOutputFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getSha256SumFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getSha256SumUrl ()Lorg/gradle/api/provider/Provider;
+	public final fun getVersion ()Lorg/gradle/api/provider/Property;
+}
+
+public final class com/citi/gradle/plugins/helm/command/tasks/HelmDownloadClientPackage$Companion {
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmExtractClient : org/gradle/api/DefaultTask {
+	public fun <init> ()V
+	public final fun extractClient ()V
+	public final fun getArchiveFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getBaseDestinationDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getDestinationDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getExecutable ()Lorg/gradle/api/provider/Provider;
+	public final fun getVersion ()Lorg/gradle/api/provider/Property;
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmInstall : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmInstallationCommandTask {
+	public fun <init> ()V
+	public final fun getReplace ()Lorg/gradle/api/provider/Property;
+	public final fun install ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmInstallOrUpgrade : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmInstallationCommandTask {
+	public fun <init> ()V
+	public final fun getHistoryMax ()Lorg/gradle/api/provider/Property;
+	public final fun getReplace ()Lorg/gradle/api/provider/Property;
+	public final fun getResetValues ()Lorg/gradle/api/provider/Property;
+	public final fun getReuseValues ()Lorg/gradle/api/provider/Property;
+	public final fun installOrUpgrade ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmLint : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask, com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions {
+	public fun <init> ()V
+	public final fun getChartDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getFileValues ()Lorg/gradle/api/provider/MapProperty;
+	public synthetic fun getFileValues ()Lorg/gradle/api/provider/Provider;
+	public final fun getOutputMarkerFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getStrict ()Lorg/gradle/api/provider/Property;
+	public final fun getValueFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public synthetic fun getValueFiles ()Lorg/gradle/api/file/FileCollection;
+	public final fun getValues ()Lorg/gradle/api/provider/MapProperty;
+	public synthetic fun getValues ()Lorg/gradle/api/provider/Provider;
+	public final fun getWithSubcharts ()Lorg/gradle/api/provider/Property;
+	public final fun lint ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmPackage : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask {
+	public fun <init> ()V
+	public final fun getAppVersion ()Lorg/gradle/api/provider/Property;
+	public final fun getChartFileName ()Lorg/gradle/api/provider/Provider;
+	public final fun getChartName ()Lorg/gradle/api/provider/Property;
+	public final fun getChartOutputPath ()Lorg/gradle/api/provider/Provider;
+	public final fun getChartVersion ()Lorg/gradle/api/provider/Property;
+	public final fun getDestinationDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getPackageFile ()Lorg/gradle/api/provider/Provider;
+	public final fun getSourceDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getUpdateDependencies ()Lorg/gradle/api/provider/Property;
+	public final fun helmPackage ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmStatus : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerCommandTask {
+	public fun <init> ()V
+	public final fun getOutputFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public final fun getOutputFormat ()Lorg/gradle/api/provider/Property;
+	public final fun getReleaseName ()Lorg/gradle/api/provider/Property;
+	public final fun getRevision ()Lorg/gradle/api/provider/Property;
+	public final fun status ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmTemplate : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmInstallationCommandTask {
+	public fun <init> ()V
+	public final fun getApiVersions ()Lorg/gradle/api/provider/ListProperty;
+	public final fun getIsUpgrade ()Lorg/gradle/api/provider/Property;
+	public final fun getOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public fun getReleaseName ()Lorg/gradle/api/provider/Property;
+	public final fun getReplace ()Lorg/gradle/api/provider/Property;
+	public final fun getShowOnly ()Lorg/gradle/api/provider/ListProperty;
+	public final fun getUseReleaseNameInOutputPath ()Lorg/gradle/api/provider/Property;
+	public final fun getValidate ()Lorg/gradle/api/provider/Property;
+	public final fun renderTemplate ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmTest : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerCommandTask {
+	public fun <init> ()V
+	public final fun getReleaseName ()Lorg/gradle/api/provider/Property;
+	public final fun getRemoteTimeout ()Lorg/gradle/api/provider/Property;
+	public final fun getShowLogs ()Lorg/gradle/api/provider/Property;
+	public final fun test ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmUninstall : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmServerOperationCommandTask {
+	public fun <init> ()V
+	public final fun getKeepHistory ()Lorg/gradle/api/provider/Property;
+	public final fun getReleaseName ()Lorg/gradle/api/provider/Property;
+	public final fun getWait ()Lorg/gradle/api/provider/Property;
+	public final fun uninstallRelease ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmUpdateDependencies : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmDependenciesTask {
+	public fun <init> ()V
+	public final fun getSkipRefresh ()Lorg/gradle/api/provider/Property;
+	public final fun updateDependencies ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmUpdateRepositories : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmCommandTask {
+	public fun <init> ()V
+	public final fun getRepositoryCacheTtl ()Lorg/gradle/api/provider/Property;
+	public final fun getRepositoryNames ()Lorg/gradle/api/provider/ListProperty;
+	public final fun updateRepositories ()V
+}
+
+public class com/citi/gradle/plugins/helm/command/tasks/HelmUpgrade : com/citi/gradle/plugins/helm/command/tasks/AbstractHelmInstallationCommandTask {
+	public fun <init> ()V
+	public final fun getHistoryMax ()Lorg/gradle/api/provider/Property;
+	public final fun getInstall ()Lorg/gradle/api/provider/Property;
+	public final fun getResetValues ()Lorg/gradle/api/provider/Property;
+	public final fun getReuseValues ()Lorg/gradle/api/provider/Property;
+	public final fun upgradeRelease ()V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/Filtering {
+	public static final field Companion Lcom/citi/gradle/plugins/helm/dsl/Filtering$Companion;
+	public static fun getDEFAULT_FILE_PATTERNS ()Ljava/util/List;
+	public abstract fun getEnabled ()Lorg/gradle/api/provider/Property;
+	public abstract fun getFilePatterns ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getFileValues ()Lorg/gradle/api/provider/MapProperty;
+	public abstract fun getValues ()Lorg/gradle/api/provider/MapProperty;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/Filtering$Companion {
+	public final fun getDEFAULT_FILE_PATTERNS ()Ljava/util/List;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/HelmChart : org/gradle/api/Buildable, org/gradle/api/Named {
+	public abstract fun extraFiles (Lorg/gradle/api/Action;)V
+	public abstract fun getBaseOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getChartName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getChartVersion ()Lorg/gradle/api/provider/Property;
+	public abstract fun getExtraFiles ()Lorg/gradle/api/file/CopySpec;
+	public abstract fun getOutputDir ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getOverrideChartInfo ()Lorg/gradle/api/provider/Property;
+	public abstract fun getPackageFile ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getPackageFileName ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getPackageOutputFile ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getRenderBaseOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getRenderings ()Lorg/gradle/api/NamedDomainObjectContainer;
+	public abstract fun getSourceDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun renderings (Lorg/gradle/api/Action;)V
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/HelmChart$DefaultImpls {
+	public static fun extraFiles (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Lorg/gradle/api/Action;)V
+	public static fun getOutputDir (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Lorg/gradle/api/provider/Provider;
+	public static fun getPackageFileName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Lorg/gradle/api/provider/Provider;
+	public static fun getPackageOutputFile (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Lorg/gradle/api/provider/Provider;
+	public static fun renderings (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Lorg/gradle/api/Action;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/HelmDownloadClient {
+	public static final field Companion Lcom/citi/gradle/plugins/helm/dsl/HelmDownloadClient$Companion;
+	public static fun getDEFAULT_HELM_CLIENT_VERSION ()Ljava/lang/String;
+	public abstract fun getEnabled ()Lorg/gradle/api/provider/Property;
+	public abstract fun getVersion ()Lorg/gradle/api/provider/Property;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/HelmDownloadClient$Companion {
+	public final fun getDEFAULT_HELM_CLIENT_VERSION ()Ljava/lang/String;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/HelmExtension : com/citi/gradle/plugins/helm/command/ConfigurableGlobalHelmOptions, com/citi/gradle/plugins/helm/command/ConfigurableHelmServerOptions, com/citi/gradle/plugins/helm/command/HelmExecProvider {
+	public abstract fun downloadClient (Lorg/gradle/api/Action;)V
+	public abstract fun getDownloadClient ()Lcom/citi/gradle/plugins/helm/dsl/HelmDownloadClient;
+	public abstract fun getOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getRenderOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/HelmExtension$DefaultImpls {
+	public static fun downloadClient (Lcom/citi/gradle/plugins/helm/dsl/HelmExtension;Lorg/gradle/api/Action;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/HelmRendering : com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions, org/gradle/api/Buildable, org/gradle/api/Named {
+	public static final field Companion Lcom/citi/gradle/plugins/helm/dsl/HelmRendering$Companion;
+	public abstract fun getApiVersions ()Lorg/gradle/api/provider/ListProperty;
+	public static fun getDEFAULT_RENDERING_NAME ()Ljava/lang/String;
+	public abstract fun getOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public abstract fun getReleaseName ()Lorg/gradle/api/provider/Property;
+	public abstract fun getShowOnly ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getUseReleaseNameInOutputPath ()Lorg/gradle/api/provider/Property;
+	public abstract fun getValidate ()Lorg/gradle/api/provider/Property;
+	public abstract fun isUpgrade ()Lorg/gradle/api/provider/Property;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/HelmRendering$Companion {
+	public final fun getDEFAULT_RENDERING_NAME ()Ljava/lang/String;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/HelmRepository : com/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer, org/gradle/api/Named {
+	public abstract fun getCaFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getUrl ()Lorg/gradle/api/provider/Property;
+	public abstract fun url (Ljava/lang/Object;)V
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/HelmRepository$DefaultImpls {
+	public static fun credentials (Lcom/citi/gradle/plugins/helm/dsl/HelmRepository;Lgroovy/lang/Closure;)V
+	public static fun credentials (Lcom/citi/gradle/plugins/helm/dsl/HelmRepository;Ljava/lang/Class;Lgroovy/lang/Closure;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler : org/gradle/api/NamedDomainObjectContainer {
+	public abstract fun bitnami (Ljava/lang/String;)V
+	public abstract fun helmIncubator (Ljava/lang/String;)V
+	public abstract fun helmStable (Ljava/lang/String;)V
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler$DefaultImpls {
+	public static fun bitnami (Lcom/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler;Ljava/lang/String;)V
+	public static synthetic fun bitnami$default (Lcom/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler;Ljava/lang/String;ILjava/lang/Object;)V
+	public static fun helmIncubator (Lcom/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler;Ljava/lang/String;)V
+	public static synthetic fun helmIncubator$default (Lcom/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler;Ljava/lang/String;ILjava/lang/Object;)V
+	public static fun helmStable (Lcom/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler;Ljava/lang/String;)V
+	public static synthetic fun helmStable$default (Lcom/citi/gradle/plugins/helm/dsl/HelmRepositoryHandler;Ljava/lang/String;ILjava/lang/Object;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/Linting : com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions {
+	public abstract fun configurations (Lorg/gradle/api/Action;)Lorg/gradle/api/NamedDomainObjectContainer;
+	public abstract fun getConfigurations ()Lorg/gradle/api/NamedDomainObjectContainer;
+	public abstract fun getEnabled ()Lorg/gradle/api/provider/Property;
+	public abstract fun getStrict ()Lorg/gradle/api/provider/Property;
+	public abstract fun getWithSubcharts ()Lorg/gradle/api/provider/Property;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/Linting$Configuration : com/citi/gradle/plugins/helm/command/ConfigurableHelmValueOptions, org/gradle/api/Named {
+	public static final field Companion Lcom/citi/gradle/plugins/helm/dsl/Linting$Configuration$Companion;
+	public static fun getDEFAULT_CONFIGURATION_NAME ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/Linting$Configuration$Companion {
+	public final fun getDEFAULT_CONFIGURATION_NAME ()Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/Linting$DefaultImpls {
+	public static fun configurations (Lcom/citi/gradle/plugins/helm/dsl/Linting;Lorg/gradle/api/Action;)Lorg/gradle/api/NamedDomainObjectContainer;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/credentials/CertificateCredentials : org/gradle/api/credentials/Credentials {
+	public abstract fun getCertificateFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public abstract fun getKeyFile ()Lorg/gradle/api/file/RegularFileProperty;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer {
+	public abstract fun credentials (Lgroovy/lang/Closure;)V
+	public abstract fun credentials (Ljava/lang/Class;Lgroovy/lang/Closure;)V
+	public abstract fun credentials (Ljava/lang/Class;Lorg/gradle/api/Action;)V
+	public abstract fun credentials (Lorg/gradle/api/Action;)V
+	public abstract fun getConfiguredCredentials ()Lorg/gradle/api/provider/Provider;
+	public abstract fun getCredentials ()Lcom/citi/gradle/plugins/helm/dsl/credentials/PasswordCredentials;
+	public abstract fun getCredentials (Ljava/lang/Class;)Lorg/gradle/api/credentials/Credentials;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer$DefaultImpls {
+	public static fun credentials (Lcom/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer;Lgroovy/lang/Closure;)V
+	public static fun credentials (Lcom/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer;Ljava/lang/Class;Lgroovy/lang/Closure;)V
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainerKt {
+	public static final fun credentials (Lcom/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer;Lkotlin/jvm/functions/Function1;)V
+	public static final fun credentials (Lcom/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer;Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/credentials/PasswordCredentials : org/gradle/api/credentials/Credentials {
+	public abstract fun getPassword ()Lorg/gradle/api/provider/Property;
+	public abstract fun getUsername ()Lorg/gradle/api/provider/Property;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/internal/CredentialsContainerSupport : com/citi/gradle/plugins/helm/dsl/credentials/CredentialsContainer {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lcom/citi/gradle/plugins/helm/dsl/credentials/internal/CredentialsFactory;)V
+	public fun credentials (Lgroovy/lang/Closure;)V
+	public fun credentials (Ljava/lang/Class;Lgroovy/lang/Closure;)V
+	public fun credentials (Ljava/lang/Class;Lorg/gradle/api/Action;)V
+	public fun credentials (Lorg/gradle/api/Action;)V
+	public fun getConfiguredCredentials ()Lorg/gradle/api/provider/Provider;
+	public fun getCredentials ()Lcom/citi/gradle/plugins/helm/dsl/credentials/PasswordCredentials;
+	public fun getCredentials (Ljava/lang/Class;)Lorg/gradle/api/credentials/Credentials;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/credentials/internal/CredentialsFactory {
+	public abstract fun create (Ljava/lang/Class;)Lorg/gradle/api/credentials/Credentials;
+	public abstract fun getPublicType (Lorg/gradle/api/credentials/Credentials;)Ljava/lang/Class;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/internal/DefaultCredentialsFactory : com/citi/gradle/plugins/helm/dsl/credentials/internal/CredentialsFactory {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun create (Ljava/lang/Class;)Lorg/gradle/api/credentials/Credentials;
+	public fun getPublicType (Lorg/gradle/api/credentials/Credentials;)Ljava/lang/Class;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCertificateCredentials : com/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCredentials {
+	public fun <init> (Ljava/io/File;Ljava/io/File;)V
+	public final fun getCertificateFile ()Ljava/io/File;
+	public final fun getKeyFile ()Ljava/io/File;
+}
+
+public abstract class com/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCredentials : java/io/Serializable {
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCredentialsKt {
+	public static final fun toSerializable (Lcom/citi/gradle/plugins/helm/dsl/credentials/CertificateCredentials;)Lcom/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCertificateCredentials;
+	public static final fun toSerializable (Lcom/citi/gradle/plugins/helm/dsl/credentials/PasswordCredentials;)Lcom/citi/gradle/plugins/helm/dsl/credentials/internal/SerializablePasswordCredentials;
+	public static final fun toSerializable (Lorg/gradle/api/credentials/Credentials;)Lcom/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCredentials;
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/credentials/internal/SerializablePasswordCredentials : com/citi/gradle/plugins/helm/dsl/credentials/internal/SerializableCredentials {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getPassword ()Ljava/lang/String;
+	public final fun getUsername ()Ljava/lang/String;
+}
+
+public abstract interface class com/citi/gradle/plugins/helm/dsl/dependencies/ChartDependencyHandler {
+	public abstract fun add (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)V
+	public abstract fun add (Ljava/lang/String;Ljava/lang/String;)V
+	public abstract fun add (Ljava/util/Map;)V
+}
+
+public final class com/citi/gradle/plugins/helm/dsl/dependencies/ChartDependencyHandler$DefaultImpls {
+	public static fun add (Lcom/citi/gradle/plugins/helm/dsl/dependencies/ChartDependencyHandler;Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)V
+	public static fun add (Lcom/citi/gradle/plugins/helm/dsl/dependencies/ChartDependencyHandler;Ljava/util/Map;)V
+	public static synthetic fun add$default (Lcom/citi/gradle/plugins/helm/dsl/dependencies/ChartDependencyHandler;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)V
+}
+
+public abstract class com/citi/gradle/plugins/helm/rules/AbstractHelmChartTaskRule : org/unbrokendome/gradle/pluginutils/rules/AbstractTaskRule {
+	public fun <init> (Ljava/lang/Class;Lorg/gradle/api/tasks/TaskContainer;Lorg/gradle/api/NamedDomainObjectCollection;Lorg/unbrokendome/gradle/pluginutils/rules/RuleNamePattern;)V
+	protected abstract fun configureFrom (Lorg/gradle/api/Task;Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)V
+}
+
+public abstract class com/citi/gradle/plugins/helm/rules/AbstractHelmChartTaskRuleOuterInner : org/unbrokendome/gradle/pluginutils/rules/AbstractPatternRuleOuterInner {
+	public fun <init> (Ljava/lang/Class;Lorg/gradle/api/tasks/TaskContainer;Lorg/gradle/api/NamedDomainObjectCollection;Lkotlin/jvm/functions/Function1;Lorg/unbrokendome/gradle/pluginutils/rules/RuleNamePattern2;)V
+	protected abstract fun configureFrom (Lorg/gradle/api/Task;Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Lorg/gradle/api/Named;)V
+}
+
+public final class com/citi/gradle/plugins/helm/rules/AddRepositoryTaskRuleKt {
+	public static final fun getRegisterTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmRepository;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/ChartDirArtifactRule : org/unbrokendome/gradle/pluginutils/rules/AbstractPatternRule {
+	public static final field Companion Lcom/citi/gradle/plugins/helm/rules/ChartDirArtifactRule$Companion;
+	public fun <init> (Lorg/gradle/api/artifacts/ConfigurationContainer;Lorg/gradle/api/tasks/TaskContainer;Lorg/gradle/api/NamedDomainObjectCollection;)V
+	public synthetic fun configureFrom (Ljava/lang/Object;Lorg/gradle/api/Named;)V
+}
+
+public final class com/citi/gradle/plugins/helm/rules/ChartDirArtifactRule$Companion {
+	public final fun getConfigurationName (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/ChartDirArtifactRuleKt {
+	public static final fun getDirArtifactConfigurationName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/ChartPackagedArtifactRuleKt {
+	public static final fun getPackagedArtifactConfigurationName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/CollectChartSourcesTaskRuleKt {
+	public static final fun getCollectChartSourcesTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/FilterChartSourcesTaskRuleKt {
+	public static final fun getFilterSourcesTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/LintTaskRuleKt {
+	public static final fun getLintTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/LintWithConfigurationTaskRuleKt {
+	public static final fun lintTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/PackageTaskRuleKt {
+	public static final fun getPackageTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public final class com/citi/gradle/plugins/helm/rules/UpdateDependenciesTaskRuleKt {
+	public static final fun getUpdateDependenciesTaskName (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Ljava/lang/String;
+}
+
+public class com/citi/gradle/plugins/helm/tasks/HelmCollectChartDependencies : org/gradle/api/DefaultTask {
+	public fun <init> ()V
+	public final fun collectDependencies ()V
+	public final fun getDependencies ()Lorg/gradle/api/file/FileCollection;
+	public final fun getOutputDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun setDependencies (Lorg/gradle/api/file/FileCollection;)V
+}
+
+public class com/citi/gradle/plugins/helm/tasks/HelmFilterSources : org/gradle/api/DefaultTask {
+	public fun <init> ()V
+	public final fun filterSources ()V
+	public final fun filtering (Lorg/gradle/api/Action;)V
+	public final fun getChartName ()Lorg/gradle/api/provider/Property;
+	public final fun getChartVersion ()Lorg/gradle/api/provider/Property;
+	public final fun getConfiguredChartName ()Lorg/gradle/api/provider/Property;
+	public final fun getFiltering ()Lcom/citi/gradle/plugins/helm/dsl/Filtering;
+	public final fun getOverrideChartInfo ()Lorg/gradle/api/provider/Property;
+	public final fun getSourceDir ()Lorg/gradle/api/file/DirectoryProperty;
+	public final fun getTargetDir ()Lorg/gradle/api/file/DirectoryProperty;
+}
+
+public final class com/citi/gradle/plugins/helm/util/DigestUtilsKt {
+	public static final fun calculateDigest (Ljava/io/File;Ljava/lang/String;I)[B
+	public static final fun calculateDigest (Ljava/nio/channels/ReadableByteChannel;Ljava/lang/String;I)[B
+	public static final fun calculateDigest (Ljava/nio/file/Path;Ljava/lang/String;I)[B
+	public static synthetic fun calculateDigest$default (Ljava/io/File;Ljava/lang/String;IILjava/lang/Object;)[B
+	public static synthetic fun calculateDigest$default (Ljava/nio/channels/ReadableByteChannel;Ljava/lang/String;IILjava/lang/Object;)[B
+	public static synthetic fun calculateDigest$default (Ljava/nio/file/Path;Ljava/lang/String;IILjava/lang/Object;)[B
+	public static final fun calculateDigestHex (Ljava/io/File;Ljava/lang/String;I)Ljava/lang/String;
+	public static final fun calculateDigestHex (Ljava/nio/file/Path;Ljava/lang/String;I)Ljava/lang/String;
+	public static synthetic fun calculateDigestHex$default (Ljava/io/File;Ljava/lang/String;IILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun calculateDigestHex$default (Ljava/nio/file/Path;Ljava/lang/String;IILjava/lang/Object;)Ljava/lang/String;
+}
+
+public final class org/gradle/kotlin/dsl/HelmPluginExtensionAccessors {
+	public static final fun dependencies (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Lorg/gradle/api/Action;)V
+	public static final fun filtering (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Lorg/gradle/api/Action;)V
+	public static final fun getDependencies (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Lcom/citi/gradle/plugins/helm/dsl/dependencies/ChartDependencyHandler;
+	public static final fun getFiltering (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Lcom/citi/gradle/plugins/helm/dsl/Filtering;
+	public static final fun getLint (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;)Lcom/citi/gradle/plugins/helm/dsl/Linting;
+	public static final fun lint (Lcom/citi/gradle/plugins/helm/dsl/HelmChart;Lorg/gradle/api/Action;)V
+}
+
+public final class org/gradle/kotlin/dsl/MapPropertyExtensionsKt {
+	public static final fun putFrom (Lorg/gradle/api/provider/MapProperty;Ljava/lang/Object;Lorg/gradle/api/provider/Provider;)V
+}
+
