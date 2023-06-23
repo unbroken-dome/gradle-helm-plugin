@@ -44,7 +44,7 @@ subprojects {
             "testImplementation"(kotlin("stdlib"))
             "testImplementation"(kotlin("reflect"))
 
-            "testImplementation"(libs.snakeyaml)
+            "testImplementation"(libs.assertk)
             "testImplementation"(libs.mockk)
             "testImplementation"(libs.spekDsl)
             "testRuntimeOnly"(libs.spekRunner)
