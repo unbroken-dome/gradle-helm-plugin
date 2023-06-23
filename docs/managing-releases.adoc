@@ -14,7 +14,7 @@ Apply the `helm-releases` plugin to your project:
 .Groovy
 ----
 plugins {
-    id 'org.unbroken-dome.helm-releases' version '{project-version}'
+    id 'com.citi.helm-releases' version '{project-version}'
 }
 ----
 
@@ -22,7 +22,7 @@ plugins {
 .Kotlin
 ----
 plugins {
-    id("org.unbroken-dome.helm-releases") version "{project-version}"
+    id("com.citi.helm-releases") version "{project-version}"
 }
 ----
 
