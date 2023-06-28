@@ -264,10 +264,8 @@ abstract class HelmDownloadClientPackage : DefaultTask() {
 
                             val progress = ((totalBytesTransferred * 1000) / contentLength).toDouble() / 10.0
                             logger.info(
-                                "Downloaded {} of {} ({})",
-                                formatDataSize(totalBytesTransferred),
-                                formatDataSize(contentLength),
-                                String.format("%.1f", progress)
+                                "Downloaded ${formatDataSize(totalBytesTransferred)} of ${formatDataSize(contentLength)} " +
+                                        "(${String.format("%.1f", progress)})"
                             )
                         }
                     }
