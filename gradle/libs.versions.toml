@@ -29,6 +29,7 @@ junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref =
 junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 
 [plugins]
+detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.0" }
 gradlePublish = { id = "com.gradle.plugin-publish", version = "1.2.0" }
 dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

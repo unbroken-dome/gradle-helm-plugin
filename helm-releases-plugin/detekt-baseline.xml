@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ReturnCount:TagExpressionParser.kt$TagExpressionParser$private fun parse(tokens: List&lt;Token>): TagExpression</ID>
+    <ID>ThrowsCount:TagExpressionParser.kt$TagExpressionParser$private fun parse(tokens: List&lt;Token>): TagExpression</ID>
+    <ID>ThrowsCount:TagExpressionParser.kt$TagExpressionParser$private fun reduceBinaryExpression( tokens: List&lt;Token>, operatorToken: ScanToken, combiner: BinaryOperator&lt;TagExpression> ): List&lt;Token>?</ID>
+    <ID>TooManyFunctions:HelmRelease.kt$HelmReleaseProperties : NamedConfigurableHelmInstallFromRepositoryOptionsConfigurableHelmValueOptions</ID>
+    <ID>WildcardImport:HelmRelease.kt$import com.citi.gradle.plugins.helm.command.internal.*</ID>
+    <ID>WildcardImport:HelmRelease.kt$import org.gradle.api.*</ID>
+    <ID>WildcardImport:HelmRelease.kt$import org.unbrokendome.gradle.pluginutils.*</ID>
+    <ID>WildcardImport:HelmReleasesPlugin.kt$import com.citi.gradle.plugins.helm.*</ID>
+    <ID>WildcardImport:HelmReleasesPlugin.kt$import com.citi.gradle.plugins.helm.release.rules.*</ID>
+    <ID>WildcardImport:HelmReleasesPlugin.kt$import org.gradle.api.*</ID>
+    <ID>WildcardImport:HelmReleasesPluginTest.kt$import com.citi.gradle.plugins.helm.release.dsl.*</ID>
+    <ID>WildcardImport:HelmReleasesPluginTest.kt$import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*</ID>
+  </CurrentIssues>
+</SmellBaseline>
