@@ -10,8 +10,6 @@
     <ID>MagicNumber:DataSizeFormatter.kt$0.1f</ID>
     <ID>MagicNumber:DataSizeFormatter.kt$10</ID>
     <ID>MagicNumber:DigestUtils.kt$4</ID>
-    <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$10.0</ID>
-    <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$1000</ID>
     <ID>MagicNumber:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$64</ID>
     <ID>MaxLineLength:ChartModelDependencies.kt$internal</ID>
     <ID>MaxLineLength:HelmExecWorkAction.kt$HelmExecWorkAction$logger.info("Executing: {}\n with environment: {}", maskCommandLine(spec.commandLine), spec.environment)</ID>
