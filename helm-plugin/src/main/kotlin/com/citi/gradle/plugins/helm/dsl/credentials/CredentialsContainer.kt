@@ -9,6 +9,8 @@ import org.gradle.api.credentials.Credentials
 import org.gradle.api.provider.Provider
 import kotlin.reflect.KClass
 
+private const val deprecationMessage = "The function is deprecated: Gradle doesn't recommend to pass `Closure<*>` as input parameter. " +
+        "Nothing needs to changed for Groovy users, please use overloaded method in Java/Kotlin"
 
 /**
  * Holds credentials to access a remote service.
@@ -17,7 +19,6 @@ import kotlin.reflect.KClass
  * (which unfortunately cannot be extended with new credential types).
  */
 interface CredentialsContainer {
-
     /**
      * Returns the username/password credentials used to authenticate to this service.
      *
@@ -108,7 +109,7 @@ interface CredentialsContainer {
      *         specified for this repository
      */
     @Deprecated(
-        message = "The function is deprecated: Gradle doesn't recommend to pass `Closure<*>` as input parameter. Nothing needs to changed for Groovy users, please use overloaded method in Java/Kotlin",
+        message = deprecationMessage,
         replaceWith = ReplaceWith("credentials")
     )
     fun <T : Credentials> credentials(
@@ -159,7 +160,7 @@ interface CredentialsContainer {
      *         type [PasswordCredentials]
      */
     @Deprecated(
-        message = "The function is deprecated: Gradle doesn't recommend to pass `Closure<*>` as input parameter. Nothing needs to changed for Groovy users, please use overloaded method in Java/Kotlin",
+        message = deprecationMessage,
         replaceWith = ReplaceWith("credentials")
     )
     fun credentials(

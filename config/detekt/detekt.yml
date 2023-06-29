@@ -1,0 +1,9 @@
+# Detekt configuration overrides
+# Full documentation is here: https://detekt.dev/docs/gettingstarted/gradle/
+# To see defaults, remove this file and execute `./gradlew detektGenerateConfig`
+
+style:
+  MaxLineLength:
+    active: true
+    # Allow longer lines than usual for convenience.
+    maxLineLength: 180
