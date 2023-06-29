@@ -27,9 +27,7 @@ dependencies {
 
     testImplementation(libs.unbrokenDomeTestUtils)
 
-    "functionalTestImplementation"(libs.kotestAssertions)
-    "functionalTestImplementation"(libs.junitApi)
-    "functionalTestRuntimeOnly"(libs.junitEngine)
+    "functionalTestImplementation"(project(":plugin-test-utils"))
 }
 
 
@@ -53,6 +51,11 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
     testClassesDirs = functionalTest.output.classesDirs
     classpath = functionalTest.runtimeClasspath
     mustRunAfter(tasks.test)
+
+    val urlOverrideProperty = "com.citi.gradle.helm.plugin.distribution.url.prefix"
+    findProperty(urlOverrideProperty)?.let { urlOverride ->
+        systemProperty(urlOverrideProperty, urlOverride)
+    }
 }
 
 tasks.build {

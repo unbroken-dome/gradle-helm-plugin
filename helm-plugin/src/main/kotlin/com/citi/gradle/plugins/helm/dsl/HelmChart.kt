@@ -1,6 +1,5 @@
 package com.citi.gradle.plugins.helm.dsl
 
-import org.gradle.api.*
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
@@ -20,6 +19,11 @@ import com.citi.gradle.plugins.helm.rules.packageTaskName
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.versionProvider
 import javax.inject.Inject
+import org.gradle.api.Action
+import org.gradle.api.Buildable
+import org.gradle.api.Named
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
 
 
 /**

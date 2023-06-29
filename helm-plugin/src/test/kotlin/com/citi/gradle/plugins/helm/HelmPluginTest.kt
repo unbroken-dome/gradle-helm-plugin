@@ -2,11 +2,13 @@ package com.citi.gradle.plugins.helm
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.*
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.Task
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
+import assertk.assertions.containsOnly
+import assertk.assertions.each
+import assertk.assertions.extracting
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isSuccess
+import assertk.assertions.prop
 import com.citi.gradle.plugins.helm.command.tasks.HelmAddRepository
 import com.citi.gradle.plugins.helm.command.tasks.HelmTemplate
 import com.citi.gradle.plugins.helm.dsl.Filtering
@@ -16,11 +18,20 @@ import com.citi.gradle.plugins.helm.dsl.HelmRepository
 import com.citi.gradle.plugins.helm.dsl.internal.charts
 import com.citi.gradle.plugins.helm.dsl.internal.helm
 import com.citi.gradle.plugins.helm.dsl.internal.repositories
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*
+import java.net.URI
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Task
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsItem
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasTaskDependencies
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.isPresent
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.taskDependencies
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
 import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
-import java.net.URI
 
 
 object HelmPluginTest : Spek({

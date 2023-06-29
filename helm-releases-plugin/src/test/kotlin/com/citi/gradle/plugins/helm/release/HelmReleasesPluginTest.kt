@@ -4,25 +4,37 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.isSuccess
 import assertk.assertions.prop
+import com.citi.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
+import com.citi.gradle.plugins.helm.command.tasks.HelmTest
+import com.citi.gradle.plugins.helm.command.tasks.HelmUninstall
+import com.citi.gradle.plugins.helm.dsl.internal.helm
+import com.citi.gradle.plugins.helm.release.dsl.HelmRelease
+import com.citi.gradle.plugins.helm.release.dsl.HelmReleaseTarget
+import com.citi.gradle.plugins.helm.release.dsl.activeReleaseTarget
+import com.citi.gradle.plugins.helm.release.dsl.releaseTargets
+import com.citi.gradle.plugins.helm.release.dsl.releases
+import com.citi.gradle.plugins.helm.release.spek.propertyMappingInfo
+import com.citi.gradle.plugins.helm.release.spek.propertyMappingTests
+import java.net.URI
+import java.time.Duration
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.provider.Property
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import com.citi.gradle.plugins.helm.command.tasks.HelmInstallOrUpgrade
-import com.citi.gradle.plugins.helm.command.tasks.HelmTest
-import com.citi.gradle.plugins.helm.command.tasks.HelmUninstall
-import com.citi.gradle.plugins.helm.dsl.internal.helm
-import com.citi.gradle.plugins.helm.release.dsl.*
-import com.citi.gradle.plugins.helm.release.spek.propertyMappingInfo
-import com.citi.gradle.plugins.helm.release.spek.propertyMappingTests
-import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.cast
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.containsTask
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.doesNotContainItem
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.doesNotHaveTaskDependency
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtension
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasExtensionNamed
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasOnlyTaskDependency
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasTaskDependency
+import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.hasValueEqualTo
 import org.unbrokendome.gradle.pluginutils.test.evaluate
 import org.unbrokendome.gradle.pluginutils.test.spek.applyPlugin
 import org.unbrokendome.gradle.pluginutils.test.spek.setupGradleProject
-import java.net.URI
-import java.time.Duration
 
 
 object HelmReleasesPluginTest : Spek({

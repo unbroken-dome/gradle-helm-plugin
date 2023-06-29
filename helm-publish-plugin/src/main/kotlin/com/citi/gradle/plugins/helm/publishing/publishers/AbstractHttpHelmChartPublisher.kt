@@ -82,7 +82,7 @@ internal abstract class AbstractHttpHelmChartPublisher(
         httpClient.newCall(request)
             .execute()
             .use { response ->
-                if (response.code !in 200..299) {
+                if (!response.isSuccessful) {
                     throw HttpResponseException(uploadMethod, uploadUrl, response.code, response.message)
                 }
             }
