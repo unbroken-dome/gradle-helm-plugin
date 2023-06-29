@@ -33,20 +33,5 @@
     <ID>UseCheckOrError:HelmDownloadClientPackage.kt$HelmDownloadClientPackage$throw IllegalStateException("SHA-256 digest mismatch on downloaded file $targetFile")</ID>
     <ID>UseCheckOrError:SerializableCredentials.kt$throw IllegalStateException("Unsupported credentials type: ${javaClass.name}")</ID>
     <ID>UseCheckOrError:YamlTransformingReader.kt$throw IllegalStateException("Buffer unavailable")</ID>
-    <ID>WildcardImport:HelmChart.kt$import org.gradle.api.*</ID>
-    <ID>WildcardImport:HelmCommandsPlugin.kt$import com.citi.gradle.plugins.helm.dsl.*</ID>
-    <ID>WildcardImport:HelmExtension.kt$import com.citi.gradle.plugins.helm.command.*</ID>
-    <ID>WildcardImport:HelmExtension.kt$import org.unbrokendome.gradle.pluginutils.*</ID>
-    <ID>WildcardImport:HelmExtractClient.kt$import org.gradle.api.tasks.*</ID>
-    <ID>WildcardImport:HelmFilterSources.kt$import org.gradle.api.tasks.*</ID>
-    <ID>WildcardImport:HelmInstallationOptions.kt$import com.citi.gradle.plugins.helm.command.*</ID>
-    <ID>WildcardImport:HelmLint.kt$import org.gradle.api.tasks.*</ID>
-    <ID>WildcardImport:HelmPlugin.kt$import com.citi.gradle.plugins.helm.dsl.*</ID>
-    <ID>WildcardImport:HelmPlugin.kt$import com.citi.gradle.plugins.helm.rules.*</ID>
-    <ID>WildcardImport:HelmPluginTest.kt$import assertk.assertions.*</ID>
-    <ID>WildcardImport:HelmPluginTest.kt$import org.unbrokendome.gradle.pluginutils.test.assertions.assertk.*</ID>
-    <ID>WildcardImport:HelmTemplate.kt$import org.gradle.api.tasks.*</ID>
-    <ID>WildcardImport:HelmUpdateDependencies.kt$import org.gradle.api.tasks.*</ID>
-    <ID>WildcardImport:YamlTransformingReader.kt$import org.yaml.snakeyaml.events.*</ID>
   </CurrentIssues>
 </SmellBaseline>

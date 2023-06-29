@@ -1,6 +1,23 @@
 package com.citi.gradle.plugins.helm.release.dsl
 
-import org.gradle.api.*
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
+import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
+import com.citi.gradle.plugins.helm.command.internal.HelmInstallFromRepositoryOptionsHolder
+import com.citi.gradle.plugins.helm.command.internal.HelmValueOptionsHolder
+import com.citi.gradle.plugins.helm.command.internal.mergeValues
+import com.citi.gradle.plugins.helm.command.internal.setFrom
+import com.citi.gradle.plugins.helm.command.internal.withDefaults
+import com.citi.gradle.plugins.helm.dsl.HelmChart
+import com.citi.gradle.plugins.helm.rules.ChartDirArtifactRule
+import java.io.File
+import java.net.URI
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
+import org.gradle.api.Action
+import org.gradle.api.Named
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
@@ -9,16 +26,13 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.slf4j.LoggerFactory
-import com.citi.gradle.plugins.helm.command.ConfigurableHelmInstallFromRepositoryOptions
-import com.citi.gradle.plugins.helm.command.ConfigurableHelmValueOptions
-import com.citi.gradle.plugins.helm.command.internal.*
-import com.citi.gradle.plugins.helm.dsl.HelmChart
-import com.citi.gradle.plugins.helm.rules.ChartDirArtifactRule
-import org.unbrokendome.gradle.pluginutils.*
-import java.io.File
-import java.net.URI
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
+import org.unbrokendome.gradle.pluginutils.andThen
+import org.unbrokendome.gradle.pluginutils.asFile
+import org.unbrokendome.gradle.pluginutils.capitalizeWords
+import org.unbrokendome.gradle.pluginutils.combine
+import org.unbrokendome.gradle.pluginutils.listProperty
+import org.unbrokendome.gradle.pluginutils.property
+import org.unbrokendome.gradle.pluginutils.setProperty
 
 
 /**
