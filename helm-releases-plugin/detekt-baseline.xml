@@ -2,8 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ReturnCount:TagExpressionParser.kt$TagExpressionParser$private fun parse(tokens: List&lt;Token>): TagExpression</ID>
-    <ID>ThrowsCount:TagExpressionParser.kt$TagExpressionParser$private fun parse(tokens: List&lt;Token>): TagExpression</ID>
     <ID>ThrowsCount:TagExpressionParser.kt$TagExpressionParser$private fun reduceBinaryExpression( tokens: List&lt;Token>, operatorToken: ScanToken, combiner: BinaryOperator&lt;TagExpression> ): List&lt;Token>?</ID>
     <ID>TooManyFunctions:HelmRelease.kt$HelmReleaseProperties : NamedConfigurableHelmInstallFromRepositoryOptionsConfigurableHelmValueOptions</ID>
   </CurrentIssues>

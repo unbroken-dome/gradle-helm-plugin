@@ -90,32 +90,37 @@ internal object TagExpressionParser {
      * @return the parsed [TagExpression]
      */
     private fun parse(tokens: List<Token>): TagExpression {
-        if (tokens.isEmpty()) return TagExpression.alwaysMatch()
+        return when (tokens.isEmpty()) {
+            true -> TagExpression.alwaysMatch()
+            false -> try {
+                when (tokens.size) {
+                    1 -> when (val firstToken = tokens.first()) {
+                        is ExpressionToken -> firstToken.expression
+                        else -> throw ParseException("unexpected token ${tokens.first()}", 0)
+                    }
 
-        try {
-            if (tokens.size == 1) {
-                return (tokens.first() as? ExpressionToken)?.expression
-                    ?: throw ParseException("unexpected token ${tokens.first()}", 0)
-            }
+                    else -> {
+                        val reducedTokens = tokens
+                            .reduceWith { reduceParentheses(it) }
+                            .reduceWith { reduceNotExpression(it) }
+                            .reduceWith { reduceAndExpression(it) }
+                            .reduceWith { reduceOrExpression(it) }
 
-            val reducedTokens = tokens
-                .reduceWith { reduceParentheses(it) }
-                .reduceWith { reduceNotExpression(it) }
-                .reduceWith { reduceAndExpression(it) }
-                .reduceWith { reduceOrExpression(it) }
-
-            return reducedTokens
-                .map { token ->
-                    // At this point we should have only ExpressionTokens left, otherwise throw an exception
-                    ((token as? ExpressionToken)
-                        ?: throw ParseException("unexpected token $token", 0))
-                        .expression
+                        reducedTokens
+                            .map { token ->
+                                // At this point we should have only ExpressionTokens left, otherwise throw an exception
+                                when (token) {
+                                    is ExpressionToken -> token.expression
+                                    else -> throw ParseException("unexpected token $token", 0)
+                                }
+                            }
+                            // having multiple ExpressionTokens left is ok, just combine them with OR
+                            .reduce { t1, t2 -> t1.or(t2) }
+                    }
                 }
-                // having multiple ExpressionTokens left is ok, just combine them with OR
-                .reduce { t1, t2 -> t1.or(t2) }
-
-        } catch (e: ParseException) {
-            throw IllegalArgumentException("Invalid tag expression: ${e.message}", e)
+            } catch (e: ParseException) {
+                throw IllegalArgumentException("Invalid tag expression: ${e.message}", e)
+            }
         }
     }
 
