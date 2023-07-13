@@ -10,7 +10,7 @@ import org.gradle.api.provider.Provider
 import kotlin.reflect.KClass
 
 private const val deprecationMessage = "The function is deprecated: Gradle doesn't recommend to pass `Closure<*>` as input parameter. " +
-        "Nothing needs to changed for Groovy users, please use overloaded method in Java/Kotlin"
+        "Nothing needs to be changed for Groovy users, please use overloaded method in Java/Kotlin"
 
 /**
  * Holds credentials to access a remote service.
