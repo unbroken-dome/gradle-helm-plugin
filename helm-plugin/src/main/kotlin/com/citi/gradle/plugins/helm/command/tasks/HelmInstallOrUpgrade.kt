@@ -89,24 +89,45 @@ open class HelmInstallOrUpgrade : AbstractHelmInstallationCommandTask() {
         }
     }
 
-
     private fun shouldUseInstallReplace(): Boolean {
-        if (replace.get()) {
-            return true
+        val status = when (replace.get()) {
+            true -> InstallationStatus.ReplaceWasRequestedByUser
+            false -> when (val release = helmCommandSupport.getRelease(releaseName)) {
+                null -> InstallationStatus.ReleaseNotExist
+                else -> when (release.status) {
+                    ReleaseStatus.FAILED -> InstallationStatus.PreviousReleaseWasFailed
+                    else -> InstallationStatus.PreviousReleaseWasInstalled
+                }
+            }
         }
 
-        val release = helmCommandSupport.getRelease(releaseName)
+        logReplacingStatus(status)
 
-        if (release == null) {
-            logger.info("Release \"{}\" does not exist. Using 'helm upgrade --install' to install it.")
-            return false
+        return when (status) {
+            InstallationStatus.PreviousReleaseWasFailed, InstallationStatus.ReplaceWasRequestedByUser -> true
+            InstallationStatus.PreviousReleaseWasInstalled, InstallationStatus.ReleaseNotExist -> false
         }
+    }
 
-        if (release.status == ReleaseStatus.FAILED) {
-            logger.info("Release \"{}\" has previously failed. Using 'helm install --replace' to install it.")
-            return true
+    private fun logReplacingStatus(status: InstallationStatus) {
+        return when (status) {
+            InstallationStatus.PreviousReleaseWasInstalled, InstallationStatus.ReplaceWasRequestedByUser -> Unit
+            InstallationStatus.ReleaseNotExist -> logger.info(
+                "Release \"{}\" does not exist. Using 'helm upgrade --install' to install it.",
+                releaseName
+            )
+
+            InstallationStatus.PreviousReleaseWasFailed -> logger.info(
+                "Release \"{}\" has previously failed. Using 'helm install --replace' to install it.",
+                releaseName
+            )
         }
+    }
 
-        return false
+    private enum class InstallationStatus {
+        ReplaceWasRequestedByUser,
+        ReleaseNotExist,
+        PreviousReleaseWasFailed,
+        PreviousReleaseWasInstalled
     }
 }
