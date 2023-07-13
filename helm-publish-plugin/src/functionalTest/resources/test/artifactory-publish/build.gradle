@@ -1,0 +1,24 @@
+plugins {
+    id 'com.citi.helm'
+    id 'com.citi.helm-publish'
+}
+
+helm {
+    charts {
+        main {
+
+        }
+    }
+    publishing {
+        repositories {
+            artifactory  {
+                url = uri("http://localhost:$serverPort/artifactory/folder1/folder2")
+
+                credentials {
+                    username = 'testUserName'
+                    password = 'testPassword'
+                }
+            }
+        }
+    }
+}

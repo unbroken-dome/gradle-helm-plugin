@@ -37,3 +37,12 @@ Therefore, tests covering entire plugin (plus potential different gradle version
 different source set and to different task. Please run `./gradlew functionalTest` task for that purpose.
 
 Functional tests download distribution archives from `https://services.gradle.org/distributions`. If you'd like to use another web server (for example, corporate artifacts provider) - please configure gradle property `com.citi.gradle.helm.plugin.distribution.url.prefix` in `~/.gradle/gradle.properties`
+
+### Helm executable replacement
+
+We don't need to use Helm executable to validate some parts of the plugin. For
+example, [helm-publish](../helm-publish-plugin) plugin doesn't need to build any chart.
+
+To simulate helm, tests use `.bat` and `.sh` files (for
+example, [helm-create-tgz.sh](../helm-publish-plugin/src/functionalTest/resources/executable/helm-create-tgz.sh)).
+They don't build charts. Instead, they only put some files into the destination folder (e.g. simulate chart building).
