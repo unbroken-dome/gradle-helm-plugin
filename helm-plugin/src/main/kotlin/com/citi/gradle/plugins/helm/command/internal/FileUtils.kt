@@ -9,13 +9,16 @@ internal inline fun <R> deleteFileOnException(file: File, logger: Logger, functi
     try {
         return function()
     } catch (throwable: Throwable) {
-        deleteFileSafe(file, logger)
+        deleteFileIfExists(file, logger)
 
         throw throwable;
     }
 }
 
-internal fun deleteFileSafe(file: File, logger: Logger) {
+/**
+ * This is a separate function to offload inline method above (so, to avoid copying bytecode we just call this method)
+ */
+internal fun deleteFileIfExists(file: File, logger: Logger) {
     if (file.exists()) {
         file.delete()
     }

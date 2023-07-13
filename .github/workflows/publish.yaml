@@ -1,0 +1,54 @@
+name: Plugin publish
+
+# This workflow is strictly manual
+# https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow
+on:
+  workflow_dispatch:
+    inputs:
+      gradle_org_publication_key:
+        description: 'Api Key from Gradle.Org used for plugin publication. See https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#publish_your_plugin_to_the_plugin_portal'
+        required: true
+        type: string
+      gradle_org_publication_secret:
+        description: 'Secret Key from Gradle.Org used for plugin publication. See https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#publish_your_plugin_to_the_plugin_portal'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  gradle:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-latest
+    steps:
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle#using-the-gradle-starter-workflow
+      - name: Branch Check
+        if: github.ref != 'refs/heads/master'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('This workflow must run on master branch only')
+
+      # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle#using-the-gradle-starter-workflow
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # https://github.com/marketplace/actions/setup-java-jdk
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      # https://github.com/marketplace/actions/gradle-wrapper-validation
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      # https://github.com/marketplace/actions/gradle-build-action
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+          arguments: publishPlugins -Pgradle.publish.key=${{ inputs.gradle_org_publication_key }} -Pgradle.publish.secret=${{ inputs.gradle_org_publication_secret }}
