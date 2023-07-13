@@ -1,10 +1,5 @@
 package com.citi.gradle.plugins.helm.util
 
-private const val BytesPerKB = 1024L
-private const val BytesPerMB = 1024L * 1024L
-private const val BytesPerGB = 1024L * 1024L * 1024L
-
-
 /**
  * Formats the given amount of bytes according to its order of magnitude.
  *
@@ -17,21 +12,33 @@ private const val BytesPerGB = 1024L * 1024L * 1024L
  * @return the formatted string
  */
 internal fun formatDataSize(bytes: Long): String {
-    return when {
-        bytes < BytesPerKB -> {
-            "$bytes B"
-        }
-        bytes < BytesPerMB -> {
-            val kb = (bytes * 10 / BytesPerKB).toFloat() * 0.1f
-            String.format("%.1f KB", kb)
-        }
-        bytes < BytesPerGB -> {
-            val mb = (bytes * 10 / BytesPerMB).toFloat() * 0.1f
-            String.format("%.1f MB", mb)
-        }
-        else -> {
-            val gb = (bytes * 10 / BytesPerGB).toFloat() * 0.1f
-            String.format("%.1f GB", gb)
-        }
+    val bestUnit = when {
+        bytes < UnitOfMeasurement.Kilobytes.bytesInUnit -> UnitOfMeasurement.Bytes
+        bytes < UnitOfMeasurement.MegaBytes.bytesInUnit -> UnitOfMeasurement.Kilobytes
+        bytes < UnitOfMeasurement.Gigabytes.bytesInUnit -> UnitOfMeasurement.MegaBytes
+        else -> UnitOfMeasurement.Gigabytes
+    }
+
+    return bestUnit.formatValue(bytes)
+}
+
+private const val UNIT_DIVIDER = 1024L
+
+private enum class UnitOfMeasurement(private val unitName: String, val bytesInUnit: Long) {
+    Bytes("B", 1),
+    Kilobytes("KB", UNIT_DIVIDER),
+    MegaBytes("MB", UNIT_DIVIDER * UNIT_DIVIDER),
+    Gigabytes("GB", UNIT_DIVIDER * UNIT_DIVIDER * UNIT_DIVIDER);
+
+    private companion object {
+        private const val numberFormat = "%.1f"
+    }
+
+    private val bytesInUnitFloat = bytesInUnit.toFloat()
+
+    fun formatValue(value: Long): String {
+        val divided = value / bytesInUnitFloat
+
+        return "${String.format(numberFormat, divided)} $unitName"
     }
 }

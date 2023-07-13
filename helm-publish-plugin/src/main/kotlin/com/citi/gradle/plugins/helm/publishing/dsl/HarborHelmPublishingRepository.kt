@@ -39,8 +39,12 @@ private open class DefaultHarborHelmPublishingRepository
 
     override val publisherParams: PublisherParams
         get() = HarborPublisherParams(
-            url = requireNotNull(url.orNull) { "url is required for Harbor publishing repository" },
-            projectName = requireNotNull(projectName.orNull) { "projectName is required for Harbor publishing repository" },
+            url = requireNotNull(url.orNull) {
+                "url is required for Harbor publishing repository"
+            },
+            projectName = requireNotNull(projectName.orNull) {
+                "projectName is required for Harbor publishing repository"
+            },
             credentials = configuredCredentials.orNull?.toSerializable()
         )
 

@@ -36,3 +36,6 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "3.3.2" }
 benManesVersions = { id = "com.github.ben-manes.versions", version = "0.47.0" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.13.2" }
+
+[bundles]
+defaultTests = ["junit", "kotestAssertions"]

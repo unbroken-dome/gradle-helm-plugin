@@ -23,6 +23,8 @@ dependencies {
     testImplementation(libs.okHttpMockWebServer)
 
     testImplementation(libs.unbrokenDomeTestUtils)
+    testImplementation(libs.bundles.defaultTests)
+    testRuntimeOnly(libs.junitEngine)
 }
 
 

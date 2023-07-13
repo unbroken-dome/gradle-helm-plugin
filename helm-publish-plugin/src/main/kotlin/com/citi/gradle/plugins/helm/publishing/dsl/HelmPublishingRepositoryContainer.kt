@@ -111,5 +111,7 @@ private open class DefaultHelmPublishingRepositoryContainer
 }
 
 
-internal fun ObjectFactory.newHelmPublishingRepositoryContainer(instantiator: Instantiator): HelmPublishingRepositoryContainer =
+internal fun ObjectFactory.newHelmPublishingRepositoryContainer(
+    instantiator: Instantiator
+): HelmPublishingRepositoryContainer =
     newInstance(DefaultHelmPublishingRepositoryContainer::class.java, instantiator)
