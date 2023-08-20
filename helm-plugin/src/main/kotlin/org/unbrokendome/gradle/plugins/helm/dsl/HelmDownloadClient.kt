@@ -9,8 +9,8 @@ import org.unbrokendome.gradle.plugins.helm.command.tasks.HelmExtractClient
 import org.unbrokendome.gradle.pluginutils.booleanProviderFromProjectProperty
 import org.unbrokendome.gradle.pluginutils.property
 import org.unbrokendome.gradle.pluginutils.providerFromProjectProperty
+import java.net.URI
 import javax.inject.Inject
-
 
 /**
  * Configures downloading of the Helm client executable, as an alternative to specifying the path to a
@@ -26,6 +26,12 @@ interface HelmDownloadClient {
          */
         @JvmStatic
         val DEFAULT_HELM_CLIENT_VERSION = "3.7.1"
+
+        /**
+         * Default base URL of the Helm client executable.
+         */
+        @JvmStatic
+        val DEFAULT_HELM_CLIENT_BASE_URL = URI("https://get.helm.sh/")
     }
 
     /**
@@ -43,6 +49,13 @@ interface HelmDownloadClient {
      * @see DEFAULT_HELM_CLIENT_VERSION
      */
     val version: Property<String>
+
+    /**
+     * The base URL of the location to download the client from. Defaults to {@code https://get.helm.sh/}.
+     *
+     * @see DEFAULT_HELM_CLIENT_BASE_URL
+     */
+    val baseUrl: Property<URI>
 }
 
 
@@ -83,6 +96,25 @@ internal open class DefaultHelmDownloadClient
                 )
             )
 
+    override val baseUrl: Property<URI> =
+        project.objects.property<URI>()
+            .convention(
+                project.uriProviderFromProjectProperty(
+                    "helm.client.download.baseUrl", HelmDownloadClient.DEFAULT_HELM_CLIENT_BASE_URL
+                )
+            )
+
+    private fun Project.uriProviderFromProjectProperty(
+        propertyName: String, defaultValue: URI? = null
+    ): Provider<URI> =
+        provider {
+            project.findProperty(propertyName)?.let { value ->
+                when (value) {
+                    is String -> URI(value)
+                    else -> throw IllegalArgumentException("Value cannot be converted to a URI: $value")
+                }
+            } ?: defaultValue
+        }
 
     override val extractClientTask: Provider<HelmExtractClient> =
         version.flatMap { version ->
