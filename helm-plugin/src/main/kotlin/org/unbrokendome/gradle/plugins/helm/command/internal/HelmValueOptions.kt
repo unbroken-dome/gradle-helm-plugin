@@ -8,13 +8,11 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.resources.TextResource
-import org.gradle.util.GradleVersion
 import org.slf4j.LoggerFactory
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecSpec
 import org.unbrokendome.gradle.plugins.helm.command.HelmOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmValueOptions
-import org.unbrokendome.gradle.pluginutils.GradleVersions
 import org.unbrokendome.gradle.pluginutils.mapProperty
 import java.util.concurrent.Callable
 
@@ -28,12 +26,7 @@ data class HelmValueOptionsHolder(
     constructor(objects: ObjectFactory, layout: ProjectLayout) : this(
         values = objects.mapProperty(),
         fileValues = objects.mapProperty(),
-        valueFiles = if (GradleVersion.current() >= GradleVersions.Version_5_3) {
-            objects.fileCollection()
-        } else {
-            @Suppress("DEPRECATION")
-            layout.configurableFiles()
-        }
+        valueFiles = objects.fileCollection()
     )
 }
 

@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") apply false
-    id("com.gradle.plugin-publish") version "0.12.0" apply false
+    id("com.gradle.plugin-publish") version "0.21.0" apply false
     id("org.jetbrains.dokka") version "1.4.32"
     id("org.asciidoctor.jvm.convert") version "3.2.0"
 }
@@ -27,6 +27,9 @@ subprojects {
         with(the<JavaPluginExtension>()) {
             withSourcesJar()
             withJavadocJar()
+
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
 
