@@ -6,13 +6,6 @@ plugins {
 }
 
 
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-
-
 subprojects {
 
     plugins.withType<JavaGradlePluginPlugin> {

@@ -14,6 +14,14 @@ pluginManagement {
 }
 
 
+dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
+    repositories {
+        mavenCentral()
+    }
+}
+
+
 rootProject.name = "gradle-helm-plugin-parent"
 
 include(
