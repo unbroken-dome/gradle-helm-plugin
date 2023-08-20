@@ -28,7 +28,6 @@ interface ChartDependencyHandler {
      *
      * @param chart the [HelmChart] object representing the dependency
      */
-    @JvmDefault
     fun add(chart: HelmChart) =
         add(chart = chart.name)
 
@@ -50,7 +49,6 @@ interface ChartDependencyHandler {
      *
      * @param notation a [Map] containing the dependency properties
      */
-    @JvmDefault
     fun add(notation: Map<*, *>) = add(
         chart = notation["chart"]?.toString() ?: "main",
         project = notation["project"]?.toString()

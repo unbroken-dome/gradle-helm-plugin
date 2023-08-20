@@ -60,7 +60,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * @param name the name of the chart inside the Gradle project
      * @return a [ChartReference] that can be used as a value for the [chart] property
      */
-    @JvmDefault
     fun chart(name: String): ChartReference =
         chart(project = null, chart = name)
 
@@ -81,7 +80,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * @param notation a [Map] containing the chart reference properties
      * @return a [ChartReference] that can be used as a value for the [chart] property
      */
-    @JvmDefault
     fun chart(notation: Map<*, *>): ChartReference =
         chart(
             project = notation["project"]?.toString(),
@@ -170,7 +168,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      */
     @Suppress("DEPRECATION", "DeprecatedCallableAddReplaceWith")
     @Deprecated(message = "use release tags instead")
-    @JvmDefault
     fun dependsOn(releaseName: String) {
         this.dependsOn.add(releaseName)
     }
@@ -184,7 +181,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      */
     @Suppress("DEPRECATION", "DeprecatedCallableAddReplaceWith")
     @Deprecated(message = "use release tags instead")
-    @JvmDefault
     fun dependsOn(vararg releaseNames: String) {
         this.dependsOn.addAll(*releaseNames)
     }
@@ -205,7 +201,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * @param paths Additional installation dependencies.
      *              May contain any of the notations supported by [Task.dependsOn].
      */
-    @JvmDefault
     fun installDependsOn(paths: Iterable<Any>) {
         this.installDependsOn.addAll(paths)
     }
@@ -217,7 +212,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * @param paths Additional installation dependencies.
      *              May contain any of the notations supported by [Task.dependsOn].
      */
-    @JvmDefault
     fun installDependsOn(vararg paths: Any) {
         installDependsOn(paths.toList())
     }
@@ -238,7 +232,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * @param releaseNames names of releases that this release must be installed after
      * @see Task.mustRunAfter
      */
-    @JvmDefault
     fun mustInstallAfter(vararg releaseNames: String) {
         mustInstallAfter.addAll(releaseNames.toList())
     }
@@ -259,7 +252,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      * @param releaseNames names of releases that this release must be uninstalled after
      * @see Task.mustRunAfter
      */
-    @JvmDefault
     fun mustUninstallAfter(vararg releaseNames: String) {
         mustUninstallAfter.addAll(releaseNames.toList())
     }
@@ -276,7 +268,6 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      *
      * @param configureAction an [Action] to configure testing options for this release
      */
-    @JvmDefault
     fun test(configureAction: Action<ConfigurableHelmReleaseTestOptions>) {
         configureAction.execute(this.test)
     }
@@ -307,7 +298,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      *
      * @param tags the tags to use for this release
      */
-    @JvmDefault
     fun tags(tags: Iterable<String>) {
         this.tags.addAll(tags)
     }
@@ -321,7 +311,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      *
      * @param tags the tags to use for this release
      */
-    @JvmDefault
     fun tags(vararg tags: String) {
         tags(tags.toList())
     }
@@ -350,7 +339,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      *
      * @param directories the directories to add. Each entry is evaluated as per [Project.file].
      */
-    @JvmDefault
     fun valuesDirs(vararg directories: Any) {
         valuesDirs(directories.toList())
     }
@@ -361,7 +349,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      *
      * @param directory the directory to add. It is evaluated as per [Project.file].
      */
-    @JvmDefault
     fun valuesDir(directory: Any) {
         valuesDirs(listOf(directory))
     }
@@ -388,7 +375,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      * @param targets the names of release targets
      * @param action the target-specific configuration to apply
      */
-    @JvmDefault
     fun forTargets(vararg targets: String, action: Action<TargetSpecific>) =
         forTargets(targets.toList(), action)
 
@@ -402,7 +388,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      * @param target the name of the release target
      * @param action the target-specific configuration to apply
      */
-    @JvmDefault
     fun forTarget(target: String, action: Action<TargetSpecific>) =
         forTargets(listOf(target), action)
 
@@ -415,7 +400,6 @@ interface HelmRelease : Named, HelmReleaseProperties, ConfigurableHelmInstallFro
      *
      * @param action the target-specific configuration to apply
      */
-    @JvmDefault
     fun forAnyTarget(action: Action<TargetSpecific>) =
         forTarget("", action)
 
