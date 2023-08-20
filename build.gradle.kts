@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+
 plugins {
     kotlin("jvm") apply false
     id("com.gradle.plugin-publish") version "1.2.1" apply false
@@ -8,26 +10,26 @@ plugins {
 
 subprojects {
 
-    plugins.withType<JavaGradlePluginPlugin> {
-        dependencies {
-            "compileOnly"(kotlin("stdlib-jdk8"))
-        }
+    plugins.withType<JavaPlugin> {
 
-        with(the<GradlePluginDevelopmentExtension>()) {
-            isAutomatedPublishing = true
-        }
-
-        with(the<JavaPluginExtension>()) {
+        configure<JavaPluginExtension> {
             withSourcesJar()
             withJavadocJar()
-
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
 
 
     plugins.withId("org.jetbrains.kotlin.jvm") {
+
+        configure<KotlinJvmProjectExtension> {
+
+            jvmToolchain(11)
+
+            compilerOptions {
+                freeCompilerArgs.add("-Xjvm-default=all")
+            }
+        }
+
 
         configurations.all {
             resolutionStrategy.eachDependency {
@@ -38,7 +40,9 @@ subprojects {
         }
 
         dependencies {
-            "testImplementation"(kotlin("stdlib-jdk8"))
+            "compileOnly"(kotlin("stdlib"))
+
+            "testImplementation"(kotlin("stdlib"))
             "testImplementation"(kotlin("reflect"))
 
             "testImplementation"("com.willowtreeapps.assertk:assertk-jvm:0.23")
@@ -47,10 +51,6 @@ subprojects {
             "testRuntimeOnly"("org.spekframework.spek2:spek-runner-junit5:2.0.9")
         }
 
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions.jvmTarget = "1.8"
-            kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
-        }
 
         tasks.withType<Test> {
             // always execute tests
@@ -129,6 +129,7 @@ subprojects {
         with(the<GradlePluginDevelopmentExtension>()) {
             website.set(githubUrl)
             vcsUrl.set(githubUrl)
+            isAutomatedPublishing = true
 
             plugins.all {
                 tags.add("helm")
