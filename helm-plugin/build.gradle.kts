@@ -30,22 +30,15 @@ gradlePlugin {
         create("helmCommandsPlugin") {
             id = "org.unbroken-dome.helm-commands"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.command.HelmCommandsPlugin"
+            displayName = "Helm Commands plugin"
+            description = "A plugin to execute Helm commands from Gradle. This serves as the basis for other " +
+                    "Helm-related plugins. Usually you want to use the org.unbroken-dome.helm plugin instead."
         }
         create("helmPlugin") {
             id = "org.unbroken-dome.helm"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.HelmPlugin"
-        }
-    }
-}
-
-
-pluginBundle {
-    (plugins) {
-        "helmCommandsPlugin" {
-            displayName = "Helm Commands plugin"
-        }
-        "helmPlugin" {
             displayName = "Helm plugin"
+            description = "A Gradle plugin that allows building Helm charts from Gradle build scripts."
         }
     }
 }

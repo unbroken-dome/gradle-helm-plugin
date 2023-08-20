@@ -32,15 +32,8 @@ gradlePlugin {
         create("helmPublishPlugin") {
             id = "org.unbroken-dome.helm-publish"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.publishing.HelmPublishPlugin"
-        }
-    }
-}
-
-
-pluginBundle {
-    (plugins) {
-        "helmPublishPlugin" {
             displayName = "Helm Publish Plugin"
+            description = "A Gradle plugin for publishing Helm charts to repositories."
         }
     }
 }

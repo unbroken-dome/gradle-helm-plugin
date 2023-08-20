@@ -22,15 +22,8 @@ gradlePlugin {
         create("helmReleasesPlugin") {
             id = "org.unbroken-dome.helm-releases"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.release.HelmReleasesPlugin"
-        }
-    }
-}
-
-
-pluginBundle {
-    (plugins) {
-        "helmReleasesPlugin" {
             displayName = "Helm Releases Plugin"
+            description = "A Gradle plugin that manages Helm releases on a Kubernetes cluster."
         }
     }
 }

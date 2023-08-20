@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") apply false
-    id("com.gradle.plugin-publish") version "0.21.0" apply false
+    id("com.gradle.plugin-publish") version "1.2.1" apply false
     id("org.jetbrains.dokka")
     id("org.asciidoctor.jvm.convert") version "3.2.0"
 }
@@ -121,16 +121,18 @@ subprojects {
     }
 
 
-    plugins.withId("com.gradle.plugin-publish") {
+    plugins.withType<JavaGradlePluginPlugin>() {
 
         val githubUrl = project.extra["github.url"] as String
 
-        with(the<com.gradle.publish.PluginBundleExtension>()) {
+        @Suppress("UnstableApiUsage")
+        with(the<GradlePluginDevelopmentExtension>()) {
+            website.set(githubUrl)
+            vcsUrl.set(githubUrl)
 
-            website = githubUrl
-            vcsUrl = githubUrl
-            description = "A suite of Gradle plugins for building, publishing and managing Helm charts."
-            tags = listOf("helm")
+            plugins.all {
+                tags.add("helm")
+            }
         }
     }
 }
