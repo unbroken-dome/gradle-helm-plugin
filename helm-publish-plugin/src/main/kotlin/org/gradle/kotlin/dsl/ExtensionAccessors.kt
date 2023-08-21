@@ -21,7 +21,7 @@ val HelmChart.publishing: HelmChartPublishingExtension
  */
 @Deprecated(
     message = "Use publishing extension",
-    replaceWith = ReplaceWith("publishing.autoCreateTasks")
+    replaceWith = ReplaceWith("publishing.enabled")
 )
 val HelmChart.publish: Property<Boolean>
-    get() = publishing.autoCreateTasks
+    get() = publishing.enabled

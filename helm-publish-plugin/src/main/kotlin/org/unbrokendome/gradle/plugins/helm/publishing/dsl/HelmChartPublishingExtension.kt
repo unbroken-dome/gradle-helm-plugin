@@ -16,14 +16,14 @@ interface HelmChartPublishingExtension {
      *
      * Defaults to `true`.
      */
-    val autoCreateTasks: Property<Boolean>
+    val enabled: Property<Boolean>
 }
 
 
 private open class DefaultHelmChartPublishingExtension
 @Inject constructor(objectFactory: ObjectFactory) : HelmChartPublishingExtension {
 
-    override val autoCreateTasks: Property<Boolean> =
+    override val enabled: Property<Boolean> =
         objectFactory.property<Boolean>()
             .convention(true)
 }

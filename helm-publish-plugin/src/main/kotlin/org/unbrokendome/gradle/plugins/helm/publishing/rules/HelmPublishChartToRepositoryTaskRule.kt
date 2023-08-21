@@ -2,9 +2,9 @@ package org.unbrokendome.gradle.plugins.helm.publishing.rules
 
 import org.gradle.api.NamedDomainObjectCollection
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.kotlin.dsl.publishing
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
 import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmPublishingRepository
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
 import org.unbrokendome.gradle.plugins.helm.publishing.tasks.HelmPublishChart
 import org.unbrokendome.gradle.plugins.helm.rules.packagedArtifactConfigurationName
 import org.unbrokendome.gradle.pluginutils.rules.AbstractTaskRule2
@@ -35,13 +35,12 @@ internal class HelmPublishChartToRepositoryTaskRule(
 ) : AbstractTaskRule2<HelmChart, HelmPublishingRepository, HelmPublishChart>(
     HelmPublishChart::class.java, tasks, charts, repositories, namePattern
 ) {
-
     @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun HelmPublishChart.configureFrom(chart: HelmChart, repository: HelmPublishingRepository) {
 
         description = "Publishes the ${chart.name} chart to the ${repository.name} repository."
 
-        onlyIf { chart.publishConvention.publish.get() }
+        onlyIf { chart.publishing.enabled.get() }
 
         chartName.set(chart.chartName)
         chartVersion.set(chart.chartVersion)
