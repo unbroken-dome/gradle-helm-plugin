@@ -435,7 +435,7 @@ private abstract class AbstractHelmRelease(
     protected val project: Project
 ) : Named, HelmReleaseProperties,
     ConfigurableHelmInstallFromRepositoryOptions by HelmInstallFromRepositoryOptionsHolder(project.objects),
-    ConfigurableHelmValueOptions by HelmValueOptionsHolder(project.objects, project.layout) {
+    ConfigurableHelmValueOptions by HelmValueOptionsHolder(project.objects) {
 
     override fun getName(): String =
         name
@@ -506,6 +506,7 @@ private abstract class AbstractHelmRelease(
             .convention(false)
 
 
+    @Deprecated(message = "use release tags instead")
     @Suppress("OverridingDeprecatedMember")
     final override val dependsOn: SetProperty<String> =
         project.objects.setProperty()

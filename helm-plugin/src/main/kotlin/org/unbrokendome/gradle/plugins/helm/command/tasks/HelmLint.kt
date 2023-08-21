@@ -22,7 +22,7 @@ import org.unbrokendome.gradle.pluginutils.property
  */
 open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
 
-    private val valueOptions = HelmValueOptionsHolder(project.objects, project.layout)
+    private val valueOptions = HelmValueOptionsHolder(project.objects)
 
     /**
      * The directory that contains the sources for the Helm chart.

@@ -1,9 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.command.internal
 
-import groovy.lang.Closure
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
@@ -23,7 +21,7 @@ data class HelmValueOptionsHolder(
     override val valueFiles: ConfigurableFileCollection
 ) : ConfigurableHelmValueOptions {
 
-    constructor(objects: ObjectFactory, layout: ProjectLayout) : this(
+    constructor(objects: ObjectFactory) : this(
         values = objects.mapProperty(),
         fileValues = objects.mapProperty(),
         valueFiles = objects.fileCollection()
