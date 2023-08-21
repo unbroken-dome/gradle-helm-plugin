@@ -8,7 +8,6 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.gradle.util.GFileUtils
 import org.unbrokendome.gradle.plugins.helm.command.ConfigurableHelmValueOptions
 import org.unbrokendome.gradle.plugins.helm.command.HelmExecProviderSupport
 import org.unbrokendome.gradle.plugins.helm.command.internal.HelmValueOptionsApplier
@@ -120,7 +119,7 @@ open class HelmLint : AbstractHelmCommandTask(), ConfigurableHelmValueOptions {
         }
 
         outputMarkerFile.ifPresent {
-            GFileUtils.touch(it.asFile)
+            it.asFile.createNewFile()
         }
     }
 

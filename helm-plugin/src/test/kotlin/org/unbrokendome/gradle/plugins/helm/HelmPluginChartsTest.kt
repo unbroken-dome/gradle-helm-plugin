@@ -183,7 +183,7 @@ object HelmPluginChartsTest : Spek({
                     .containsTask<HelmUpdateDependencies>("helmUpdateMyChartChartDependencies")
                     .all {
                         prop(HelmUpdateDependencies::chartDir).dirValue()
-                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                            .isEqualTo(project.layout.buildDirectory.dir("helm/charts/my-chart").get().asFile)
                     }
             }
 
@@ -196,7 +196,7 @@ object HelmPluginChartsTest : Spek({
                         prop(HelmPackage::chartName).isPresent().isEqualTo("my-chart")
                         prop(HelmPackage::chartVersion).isPresent().isEqualTo("1.2.3")
                         prop(HelmPackage::sourceDir).dirValue()
-                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                            .isEqualTo(project.layout.buildDirectory.dir("helm/charts/my-chart").get().asFile)
                     }
             }
         }
@@ -224,7 +224,7 @@ object HelmPluginChartsTest : Spek({
                         .containsTask<HelmLint>("helmLintMyChartChartDefault")
                         .all {
                             prop(HelmLint::chartDir).dirValue()
-                                .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                                .isEqualTo(project.layout.buildDirectory.dir("helm/charts/my-chart").get().asFile)
                             prop(HelmLint::values).isPresentAndEmptyMap()
                             prop(HelmLint::fileValues).isPresentAndEmptyMap()
                             prop(HelmLint::valueFiles).isEmpty()
@@ -266,10 +266,10 @@ object HelmPluginChartsTest : Spek({
                     assertThat(project, name = "project").all {
                         containsTask<HelmLint>("helmLintMyChartChartConfig1")
                             .prop(HelmLint::chartDir).dirValue()
-                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                            .isEqualTo(project.layout.buildDirectory.dir("helm/charts/my-chart").get().asFile)
                         containsTask<HelmLint>("helmLintMyChartChartConfig2")
                             .prop(HelmLint::chartDir).dirValue()
-                            .isEqualTo(project.buildDir.resolve("helm/charts/my-chart"))
+                            .isEqualTo(project.layout.buildDirectory.dir("helm/charts/my-chart").get().asFile)
                     }
                 }
 

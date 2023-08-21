@@ -85,7 +85,6 @@ object HelmValueOptionsApplier : HelmOptionsApplier {
         when (value) {
             is Provider<*> -> resolveValue(value.orNull)
             is Callable<*> -> resolveValue(value.call())
-            is Closure<*> -> resolveValue(value.call())
             else -> value
         }
 }

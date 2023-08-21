@@ -113,7 +113,10 @@ internal class HelmExecProviderSupport(
         if (shouldExecInWorker()) {
             // Use a unique ID for this invocation, to name our stdout/stderr capture files
             val uniqueId = UUID.randomUUID().toString()
-            val stdoutFile = project.buildDir.resolve("tmp/helm/$uniqueId.out")
+
+            val stdoutFile = project.file(
+                project.layout.buildDirectory.map { it.file("tmp/helm/$uniqueId.out") }
+            )
 
             try {
                 execHelmInWorker(command, subcommand, action, stdoutFile)
