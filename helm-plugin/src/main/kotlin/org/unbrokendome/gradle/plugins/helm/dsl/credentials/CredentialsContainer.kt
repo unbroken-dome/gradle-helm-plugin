@@ -1,12 +1,8 @@
 package org.unbrokendome.gradle.plugins.helm.dsl.credentials
 
-import groovy.lang.Closure
-import groovy.lang.Closure.DELEGATE_FIRST
-import groovy.lang.DelegatesTo
 import org.gradle.api.Action
 import org.gradle.api.credentials.Credentials
 import org.gradle.api.provider.Provider
-import org.gradle.util.ConfigureUtil
 import kotlin.reflect.KClass
 
 
@@ -80,43 +76,6 @@ interface CredentialsContainer {
 
 
     /**
-     * Configures the credentials for this service using the supplied closure.
-     *
-     * If no credentials have been assigned to this repository, an empty set of credentials of the specified type will
-     * be assigned to this repository and given to the configuration action.
-     *
-     * If credentials have already been specified for this repository, they will be passed to the given
-     * configuration action.
-     *
-     * ```
-     * credentials(CertificateCredentials) {
-     *     certificateFile file("/path/to/certificate")
-     *     keyFile file("/path/to/key")
-     * }
-     * ```
-     *
-     * The following credential types are currently supported for the `type` argument:
-     *
-     * * [PasswordCredentials]
-     * * [CertificateCredentials]
-     *
-     * @param type the type of credentials
-     * @param configClosure a [Closure] to configure the credentials
-     *
-     * @throws IllegalArgumentException if `type` is not of a supported type
-     * @throws IllegalArgumentException if `type` is of a different type to the credentials previously
-     *         specified for this repository
-     */
-    @JvmDefault
-    fun <T : Credentials> credentials(
-        @DelegatesTo.Target type: Class<T>,
-        @DelegatesTo(strategy = DELEGATE_FIRST, genericTypeIndex = 0) configClosure: Closure<*>
-    ) {
-        credentials(type, ConfigureUtil.configureUsing(configClosure))
-    }
-
-
-    /**
      * Configures the username/password credentials for this service using the supplied action.
      *
      * If no credentials have been assigned to this repository, an empty set of username/password credentials is
@@ -135,32 +94,6 @@ interface CredentialsContainer {
      *         type [PasswordCredentials]
      */
     fun credentials(configAction: Action<in PasswordCredentials>)
-
-
-    /**
-     * Configures the username/password credentials for this service using the supplied closure.
-     *
-     * If no credentials have been assigned to this repository, an empty set of username/password credentials is
-     * assigned to this repository and passed to the action.
-     *
-     * ```
-     * credentials {
-     *     username = 'joe'
-     *     password = 'secret'
-     * }
-     * ```
-     *
-     * @param configClosure a [Closure] to configure the credentials
-     *
-     * @throws IllegalStateException when the credentials assigned to this service are not of
-     *         type [PasswordCredentials]
-     */
-    @JvmDefault
-    fun credentials(
-        @DelegatesTo(PasswordCredentials::class, strategy = DELEGATE_FIRST) configClosure: Closure<*>
-    ) {
-        credentials(ConfigureUtil.configureUsing(configClosure))
-    }
 
 
     /**

@@ -29,7 +29,6 @@ interface HelmExecSpec {
      *
      * @param args the command line argument(s) to be added
      */
-    @JvmDefault
     fun args(vararg args: Any?) {
         args(args.toList())
     }
@@ -45,7 +44,6 @@ interface HelmExecSpec {
      *
      * @param provider the provider of the command line argument(s) to be added
      */
-    @JvmDefault
     fun args(provider: Provider<out Any>) {
         provider.ifPresent { value ->
             if (value is Collection<*>) {
@@ -70,7 +68,6 @@ interface HelmExecSpec {
      * @param value whether the flag should be set or unset
      * @param defaultValue whether the flag is considered set or unset by default
      */
-    @JvmDefault
     fun flag(name: String, value: Boolean = true, defaultValue: Boolean = false) {
         if (value != defaultValue) {
             args(if (value) name else "$name=false")
@@ -95,7 +92,6 @@ interface HelmExecSpec {
      * @param provider provider of the flag value
      * @param defaultValue whether the flag is considered set or unset by default
      */
-    @JvmDefault
     fun flag(name: String, provider: Provider<Boolean>, defaultValue: Boolean = false) {
         provider.orNull
             ?.takeIf { it != defaultValue }
@@ -112,7 +108,6 @@ interface HelmExecSpec {
      * @param name the name of the option, including the leading dashes (e.g. `--home`)
      * @param value the value of the option
      */
-    @JvmDefault
     fun option(name: String, value: Any) {
         args(name, value)
     }
@@ -128,7 +123,6 @@ interface HelmExecSpec {
      * @param name the name of the option, including the leading dashes (e.g. `--home`)
      * @param provider the value of the option
      */
-    @JvmDefault
     fun option(name: String, provider: Provider<out Any>) {
         provider.ifPresent { value ->
             option(name, value)

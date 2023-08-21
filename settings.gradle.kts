@@ -11,6 +11,20 @@ pluginManagement {
             useVersion(embeddedKotlinVersion)
         }
     }
+
+    val dokkaVersion: String by settings
+
+    plugins {
+        id("org.jetbrains.dokka") version dokkaVersion apply false
+    }
+}
+
+
+dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
+    repositories {
+        mavenCentral()
+    }
 }
 
 

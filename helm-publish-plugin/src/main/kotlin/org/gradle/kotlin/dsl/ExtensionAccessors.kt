@@ -3,7 +3,15 @@ package org.gradle.kotlin.dsl
 
 import org.gradle.api.provider.Property
 import org.unbrokendome.gradle.plugins.helm.dsl.HelmChart
-import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
+import org.unbrokendome.gradle.plugins.helm.publishing.dsl.HelmChartPublishingExtension
+import org.unbrokendome.gradle.pluginutils.requiredExtension
+
+
+/**
+ * Gets the [HelmChartPublishingExtension] object for the given chart.
+ */
+val HelmChart.publishing: HelmChartPublishingExtension
+    get() = requiredExtension()
 
 
 /**
@@ -11,5 +19,9 @@ import org.unbrokendome.gradle.plugins.helm.publishing.dsl.publishConvention
  *
  * Defaults to `true`.
  */
+@Deprecated(
+    message = "Use publishing extension",
+    replaceWith = ReplaceWith("publishing.enabled")
+)
 val HelmChart.publish: Property<Boolean>
-    get() = publishConvention.publish
+    get() = publishing.enabled

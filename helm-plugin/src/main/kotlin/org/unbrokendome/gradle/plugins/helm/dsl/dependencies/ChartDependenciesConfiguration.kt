@@ -1,6 +1,7 @@
 package org.unbrokendome.gradle.plugins.helm.dsl.dependencies
 
 import org.gradle.api.artifacts.Configuration
+import org.unbrokendome.gradle.pluginutils.capitalize
 
 
 /**
@@ -11,4 +12,3 @@ import org.gradle.api.artifacts.Configuration
  */
 internal fun chartDependenciesConfigurationName(name: String) =
     "helm${name.capitalize()}Dependencies"
-

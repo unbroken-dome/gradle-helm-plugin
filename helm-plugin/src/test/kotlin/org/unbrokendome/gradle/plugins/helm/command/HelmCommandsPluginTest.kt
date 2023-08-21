@@ -26,9 +26,8 @@ object HelmCommandsPluginTest : Spek({
 
 
         it("project can be evaluated successfully") {
-            assertThat {
-                project.evaluate()
-            }.isSuccess()
+            val result = runCatching { project.evaluate() }
+            assertThat(result).isSuccess()
         }
 
 

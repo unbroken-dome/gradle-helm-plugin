@@ -34,9 +34,8 @@ object HelmReleasesPluginTest : Spek({
     describe("when applying the helm-releases plugin") {
 
         it("project can be evaluated successfully") {
-            assertThat {
-                project.evaluate()
-            }.isSuccess()
+            val result = runCatching { project.evaluate() }
+            assertThat(result).isSuccess()
         }
     }
 

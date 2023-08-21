@@ -11,11 +11,11 @@ dependencies {
 
     implementation(project(":helm-plugin"))
 
-    implementation("com.squareup.okhttp3:okhttp:4.9.0") {
+    implementation(libs.okhttp.core) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
-    implementation("com.squareup.okhttp3:okhttp-tls:4.9.0") {
+    implementation(libs.okhttp.tls) {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-common")
     }
@@ -32,15 +32,8 @@ gradlePlugin {
         create("helmPublishPlugin") {
             id = "org.unbroken-dome.helm-publish"
             implementationClass = "org.unbrokendome.gradle.plugins.helm.publishing.HelmPublishPlugin"
-        }
-    }
-}
-
-
-pluginBundle {
-    (plugins) {
-        "helmPublishPlugin" {
             displayName = "Helm Publish Plugin"
+            description = "A Gradle plugin for publishing Helm charts to repositories."
         }
     }
 }

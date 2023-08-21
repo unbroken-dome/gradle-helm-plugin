@@ -5,7 +5,6 @@ import org.gradle.api.Named
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.plugins.ExtensionContainer
@@ -83,7 +82,6 @@ interface HelmReleaseTarget : Named, ConfigurableHelmInstallationOptions, Config
      *
      * @param configureAction an [Action] to configure testing options for this release target
      */
-    @JvmDefault
     fun test(configureAction: Action<ConfigurableHelmReleaseTestOptions>) {
         configureAction.execute(this.test)
     }
@@ -104,10 +102,9 @@ private open class DefaultHelmReleaseTarget
     private val name: String,
     private val globalSelectTagsExpression: TagExpression,
     objects: ObjectFactory,
-    layout: ProjectLayout
 ) : HelmReleaseTarget, HelmReleaseTargetInternal,
     ConfigurableHelmInstallationOptions by HelmInstallationOptionsHolder(objects),
-    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects, layout) {
+    ConfigurableHelmValueOptions by HelmValueOptionsHolder(objects) {
 
     private var localSelectTagsExpression: TagExpression =
         TagExpression.alwaysMatch()

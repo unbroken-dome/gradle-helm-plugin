@@ -1,40 +1,35 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+
 plugins {
     kotlin("jvm") apply false
-    id("com.gradle.plugin-publish") version "0.21.0" apply false
-    id("org.jetbrains.dokka") version "1.4.32"
+    id("com.gradle.plugin-publish") version "1.2.1" apply false
+    id("org.jetbrains.dokka")
     id("org.asciidoctor.jvm.convert") version "3.2.0"
-}
-
-
-allprojects {
-    repositories {
-        mavenCentral()
-    }
 }
 
 
 subprojects {
 
-    plugins.withType<JavaGradlePluginPlugin> {
-        dependencies {
-            "compileOnly"(kotlin("stdlib-jdk8"))
-        }
+    plugins.withType<JavaPlugin> {
 
-        with(the<GradlePluginDevelopmentExtension>()) {
-            isAutomatedPublishing = true
-        }
-
-        with(the<JavaPluginExtension>()) {
+        configure<JavaPluginExtension> {
             withSourcesJar()
             withJavadocJar()
-
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
 
 
     plugins.withId("org.jetbrains.kotlin.jvm") {
+
+        configure<KotlinJvmProjectExtension> {
+
+            jvmToolchain(11)
+
+            compilerOptions {
+                freeCompilerArgs.add("-Xjvm-default=all")
+            }
+        }
+
 
         configurations.all {
             resolutionStrategy.eachDependency {
@@ -45,19 +40,17 @@ subprojects {
         }
 
         dependencies {
-            "testImplementation"(kotlin("stdlib-jdk8"))
+            "compileOnly"(kotlin("stdlib"))
+
+            "testImplementation"(kotlin("stdlib"))
             "testImplementation"(kotlin("reflect"))
 
-            "testImplementation"("com.willowtreeapps.assertk:assertk-jvm:0.23")
-            "testImplementation"("io.mockk:mockk:1.10.0")
-            "testImplementation"("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
-            "testRuntimeOnly"("org.spekframework.spek2:spek-runner-junit5:2.0.9")
+            "testImplementation"(libs.assertk)
+            "testImplementation"(libs.mockk)
+            "testImplementation"(libs.spek.dsl)
+            "testRuntimeOnly"(libs.spek.runner)
         }
 
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions.jvmTarget = "1.8"
-            kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=enable")
-        }
 
         tasks.withType<Test> {
             // always execute tests
@@ -83,8 +76,9 @@ subprojects {
 
     plugins.withId("org.jetbrains.dokka") {
 
+        val dokkaVersion: String by extra
         dependencies {
-            "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:1.4.32")
+            "dokkaJavadocPlugin"("org.jetbrains.dokka:kotlin-as-java-plugin:$dokkaVersion")
         }
 
         tasks.withType<Jar>().matching { it.name == "javadocJar" || it.name == "publishPluginJavaDocsJar" }
@@ -127,16 +121,19 @@ subprojects {
     }
 
 
-    plugins.withId("com.gradle.plugin-publish") {
+    plugins.withType<JavaGradlePluginPlugin>() {
 
         val githubUrl = project.extra["github.url"] as String
 
-        with(the<com.gradle.publish.PluginBundleExtension>()) {
+        @Suppress("UnstableApiUsage")
+        with(the<GradlePluginDevelopmentExtension>()) {
+            website.set(githubUrl)
+            vcsUrl.set(githubUrl)
+            isAutomatedPublishing = true
 
-            website = githubUrl
-            vcsUrl = githubUrl
-            description = "A suite of Gradle plugins for building, publishing and managing Helm charts."
-            tags = listOf("helm")
+            plugins.all {
+                tags.add("helm")
+            }
         }
     }
 }
