@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") apply false
     id("com.gradle.plugin-publish") version "1.2.1" apply false
     id("org.jetbrains.dokka")
-    id("org.asciidoctor.jvm.convert") version "3.2.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
 }
 
 

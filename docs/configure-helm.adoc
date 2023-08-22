@@ -96,7 +96,7 @@ The cache home, as indicated by `xdgCacheHome`, defaults to a directory under th
 in a multi-module build, all Helm projects will share the same cache by default. This speeds up builds, but may lead
 to problems in certain situations, for example if two projects register a different chart repository under the same
 name.
-+
+
 If necessary, you can always set the cache home to a project-local directory, for example:
 
 [source,groovy,role="primary"]
@@ -136,7 +136,7 @@ The following example shows how the download can be configured in the build scri
 helm {
     downloadClient {
         enabled = true
-        version = '3.4.1'
+        version = '3.12.3'
     }
 }
 ----
@@ -147,7 +147,7 @@ helm {
 helm {
     downloadClient {
         enabled.set(true)
-        version.set("3.4.1")
+        version.set("3.12.3")
     }
 }
 ----
@@ -159,7 +159,7 @@ The following example shows how the download can be configured using the gradle.
 .gradle.properties
 ----
 helm.client.download.enabled=true
-helm.client.download.version=3.4.1
+helm.client.download.version=3.12.3
 ----
 
 === Using with Multi-Project Builds
@@ -189,7 +189,7 @@ The following properties control the download of the Helm client:
 | `version`
 | `helm.client.download.version`
 | The version of the Helm client to be downloaded.
-| The latest version of Helm available at the time the plugin is published (currently `3.4.1`)
+| The latest version of Helm available at the time the plugin is published (currently `3.12.3`)
 
 |
 | `helm.client.download.baseUrl`

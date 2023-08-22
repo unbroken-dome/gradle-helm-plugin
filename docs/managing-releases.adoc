@@ -432,7 +432,7 @@ helm {
 }
 ----
 
-INFO: If you don't create your own release targets, the plugin will create a release target named `default` that
+NOTE: If you don't create your own release targets, the plugin will create a release target named `default` that
 uses all the default properties. As soon as you create other release targets, the `default` target will back away.
 
 Values (and related properties) can be added to a release target as well, and they will be used for _every_ release
@@ -805,7 +805,7 @@ command line to further narrow down the set of releases per-build.
 ./gradlew helmInstall -Phelm.release.target=local -Phelm.release.tags=application
 ----
 
-INFO: If both `helm.release.tags` and the active release target contain a select expression for tags, they will be
+NOTE: If both `helm.release.tags` and the active release target contain a select expression for tags, they will be
 both combined using "and". This means that a release will only be installed if it matches _both_ the `helm.release.tags`
 expression and the `selectTags` expression of the release target.
 

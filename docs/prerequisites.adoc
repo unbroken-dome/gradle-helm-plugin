@@ -16,5 +16,5 @@ supported by Helm 3, and also by the plugin. (The main difference between `v1` a
 chart dependencies in a file called `requirements.yaml`, whereas in `v2` the dependencies are declared
 directly in the `Chart.yaml` file.)
 +
-INFO: Delegating to the Helm CLI decouples the plugin release cycle from the Helm release cycle, but it also
+NOTE: Delegating to the Helm CLI decouples the plugin release cycle from the Helm release cycle, but it also
 means that some features offered by the plugin may not be available in the CLI and vice versa.
