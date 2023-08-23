@@ -196,6 +196,7 @@ object HelmReleasesPluginTest : Spek({
                 // Properties from HelmInstallationOptions
                 propertyMappingInfo(HelmRelease::atomic, HelmInstallOrUpgrade::atomic, true),
                 propertyMappingInfo(HelmRelease::devel, HelmInstallOrUpgrade::devel, true),
+                propertyMappingInfo(HelmRelease::skipCrds, HelmInstallOrUpgrade::skipCrds, true),
                 propertyMappingInfo(HelmRelease::verify, HelmInstallOrUpgrade::verify, true),
                 propertyMappingInfo(HelmRelease::version, HelmInstallOrUpgrade::version, "1.2.3"),
                 propertyMappingInfo(HelmRelease::wait, HelmInstallOrUpgrade::wait, true),

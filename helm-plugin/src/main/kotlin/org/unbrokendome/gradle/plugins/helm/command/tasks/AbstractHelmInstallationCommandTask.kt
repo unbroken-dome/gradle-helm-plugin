@@ -247,6 +247,17 @@ abstract class AbstractHelmInstallationCommandTask :
         project.objects.property()
 
 
+    /**
+     * If `true`, no CRDs will be installed. By default, CRDs are installed if not
+     * already present.
+     *
+     * Corresponds to the `--skip-crds` CLI parameter.
+     */
+    @get:Internal
+    final override val skipCrds: Property<Boolean> =
+        project.objects.property()
+
+
     init {
         inputs.files(
             fileValues.keySet().map { keys ->

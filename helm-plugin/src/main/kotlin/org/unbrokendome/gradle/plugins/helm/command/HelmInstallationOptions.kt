@@ -19,6 +19,8 @@ interface HelmInstallationOptions : HelmServerOperationOptions {
     val version: Provider<String>
 
     val createNamespace: Provider<Boolean>
+
+    val skipCrds: Provider<Boolean>
 }
 
 
@@ -80,4 +82,13 @@ interface ConfigurableHelmInstallationOptions : ConfigurableHelmServerOperationO
      * Corresponds to the `--create-namespace` CLI parameter.
      */
     override val createNamespace: Property<Boolean>
+
+
+    /**
+     * If `true`, no CRDs will be installed. By default, CRDs are installed if not
+     * already present.
+     *
+     * Corresponds to the `--skip-crds` CLI parameter.
+     */
+    override val skipCrds: Property<Boolean>
 }
