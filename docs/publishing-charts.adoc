@@ -424,7 +424,7 @@ helm {
 == Preventing a Chart from Being Published
 
 By default, all charts defined in the project will be published. You can prevent this for a specific
-chart by setting its `publish` property to `false`:
+chart by setting its `publishing.enabled` property to `false`:
 
 [source,groovy,role="primary"]
 .Groovy
@@ -434,7 +434,9 @@ helm.charts {
     // This chart will not be published
     unpublishedChart {
         // ...
-        publish = false
+        publishing {
+            enabled = false
+        }
     }
 }
 ----
@@ -447,7 +449,9 @@ helm.charts {
     // This chart will not be published
     create("unpublishedChart") {
         // ...
-        publish = false
+        publishing {
+            enabled.set(false)
+        }
     }
 }
 ----
