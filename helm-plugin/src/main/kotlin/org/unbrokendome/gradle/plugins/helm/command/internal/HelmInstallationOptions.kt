@@ -36,6 +36,9 @@ fun HelmInstallationOptions.withDefaults(
 
         override val createNamespace: Provider<Boolean>
             get() = this@withDefaults.createNamespace.withDefault(defaults.createNamespace, providers)
+
+        override val skipCrds: Provider<Boolean>
+            get() = this@withDefaults.skipCrds.withDefault(defaults.skipCrds, providers)
     }
 
 
@@ -48,6 +51,7 @@ fun ConfigurableHelmInstallationOptions.conventionsFrom(source: HelmInstallation
     waitForJobs.convention(source.waitForJobs)
     version.convention(source.version)
     createNamespace.convention(source.createNamespace)
+    skipCrds.convention(source.skipCrds)
 }
 
 
@@ -60,6 +64,7 @@ fun ConfigurableHelmInstallationOptions.setFrom(source: HelmInstallationOptions)
     waitForJobs.set(source.waitForJobs)
     version.set(source.version)
     createNamespace.set(source.createNamespace)
+    skipCrds.convention(source.skipCrds)
 }
 
 
@@ -71,7 +76,8 @@ data class HelmInstallationOptionsHolder(
     override val wait: Property<Boolean>,
     override val waitForJobs: Property<Boolean>,
     override val version: Property<String>,
-    override val createNamespace: Property<Boolean>
+    override val createNamespace: Property<Boolean>,
+    override val skipCrds: Property<Boolean>,
 ) : ConfigurableHelmInstallationOptions,
     ConfigurableHelmServerOperationOptions by serverOperationOptions {
 
@@ -84,7 +90,8 @@ data class HelmInstallationOptionsHolder(
         wait = objects.property(),
         waitForJobs = objects.property(),
         version = objects.property(),
-        createNamespace = objects.property()
+        createNamespace = objects.property(),
+        skipCrds = objects.property(),
     )
 }
 
@@ -107,6 +114,7 @@ object HelmInstallationOptionsApplier : HelmOptionsApplier {
                 flag("--wait-for-jobs", options.waitForJobs)
                 option("--version", options.version)
                 flag("--create-namespace", options.createNamespace)
+                flag("--skip-crds", options.skipCrds)
             }
         }
     }

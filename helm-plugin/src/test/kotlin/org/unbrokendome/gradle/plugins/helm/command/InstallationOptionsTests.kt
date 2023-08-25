@@ -113,4 +113,18 @@ class InstallationOptionsTests(vararg commands: String) : AbstractOptionsTests({
             }
         }
     }
+
+
+    variant("with skipCrds property") {
+
+        beforeEachTest {
+            options.skipCrds.set(true)
+        }
+
+        afterEachTest {
+            execMock.eachInvocation(Invocation::matchesCommand) {
+                expectFlag("--skip-crds")
+            }
+        }
+    }
 })
