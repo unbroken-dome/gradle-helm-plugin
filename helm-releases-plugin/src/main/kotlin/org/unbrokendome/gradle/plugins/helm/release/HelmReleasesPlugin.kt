@@ -128,6 +128,7 @@ class HelmReleasesPlugin : Plugin<Project> {
                 val atomic = booleanProviderFromProjectProperty("helm.atomic")
                 val dryRun = booleanProviderFromProjectProperty("helm.dryRun")
                 val noHooks = booleanProviderFromProjectProperty("helm.noHooks")
+                val skipCrds = booleanProviderFromProjectProperty("helm.skipCrds")
                 val remoteTimeout = durationProviderFromProjectProperty("helm.remoteTimeout")
                 val wait = booleanProviderFromProjectProperty("helm.wait")
                 val waitForJobs = booleanProviderFromProjectProperty("helm.waitForJobs")
@@ -138,6 +139,7 @@ class HelmReleasesPlugin : Plugin<Project> {
                     releaseTarget.dryRun.convention(dryRun)
                     releaseTarget.noHooks.convention(noHooks)
                     releaseTarget.remoteTimeout.convention(remoteTimeout)
+                    releaseTarget.skipCrds.convention(skipCrds)
                     releaseTarget.wait.convention(wait)
                     releaseTarget.waitForJobs.convention(waitForJobs)
                 }

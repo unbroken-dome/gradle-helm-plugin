@@ -77,6 +77,9 @@ class HelmCommandsPlugin
             task.atomic.convention(
                 project.booleanProviderFromProjectProperty("helm.atomic")
             )
+            task.skipCrds.convention(
+                project.booleanProviderFromProjectProperty("helm.skipCrds")
+            )
             task.wait.convention(
                 project.booleanProviderFromProjectProperty("helm.wait")
             )

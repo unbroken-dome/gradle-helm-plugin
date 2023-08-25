@@ -162,6 +162,9 @@ subdirectory `<chart-name>/<rendering-name>`.
 | `helm.release.tags`
 | Specify an expression to filter releases by tag. By default, all releases are matched.
 
+| `helm.skipCrds`
+| Use the `--skip-crds` flag when installing or upgrading.
+
 | `helm.wait`
 | Use the `--wait` flag when installing or upgrading.
 
