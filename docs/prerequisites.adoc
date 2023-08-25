@@ -2,8 +2,8 @@
 
 You need at least the following:
 
-* Gradle 5.2 or higher
-* JDK 8 or higher (for running Gradle)
+* Gradle 7.5 or higher
+* JDK 11 or higher (for running Gradle)
 
 * Helm CLI (3.+)
 +
