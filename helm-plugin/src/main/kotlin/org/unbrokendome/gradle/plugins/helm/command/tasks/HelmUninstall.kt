@@ -43,6 +43,17 @@ open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
         project.objects.property()
 
 
+    /**
+     * Selects the deletion cascading strategy for the dependents. Valid values are `"background"`, `"orphan"` or
+     * `"foreground"`. Defaults to `"background"` if not set.
+     *
+     * Corresponds to the `--cascade` CLI parameter.
+     */
+    @get:Internal
+    val cascade: Property<String> =
+        project.objects.property()
+
+
     init {
         onlyIf {
             if (!doesReleaseExist()) {
@@ -64,6 +75,7 @@ open class HelmUninstall : AbstractHelmServerOperationCommandTask() {
             flag("--dry-run", dryRun)
             flag("--keep-history", keepHistory)
             flag("--wait", wait)
+            option("--cascade", cascade)
         }
     }
 

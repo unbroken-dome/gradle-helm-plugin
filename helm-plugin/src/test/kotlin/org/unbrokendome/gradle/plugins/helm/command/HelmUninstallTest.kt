@@ -102,6 +102,18 @@ object HelmUninstallTest : ExecutionResultAwareSpek({
                 }
             }
 
+            it("should use cascade property") {
+                task.cascade.set("foreground")
+
+                task.execute()
+
+                commandExecMock.singleInvocation {
+                    expectCommand("uninstall")
+                    expectOption("--cascade", "foreground")
+                    expectArg("awesome-release")
+                }
+            }
+
             it("should use wait property") {
                 task.wait.set(true)
 

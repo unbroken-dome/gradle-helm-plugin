@@ -68,7 +68,7 @@ subprojects {
             if (maxParallelForks > 1) {
                 // Parallel tests seem to need a little more time to set up, so increase the test timeout to
                 // make sure that the first test in a forked process doesn't fail because of this
-                systemProperty("SPEK_TIMEOUT", 30000)
+                systemProperty("spek2.execution.test.timeout", 30000)
             }
         }
     }

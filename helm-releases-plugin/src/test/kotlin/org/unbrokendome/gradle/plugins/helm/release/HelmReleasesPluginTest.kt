@@ -250,6 +250,9 @@ object HelmReleasesPluginTest : Spek({
                 propertyMappingInfo(
                     HelmRelease::keepHistoryOnUninstall, HelmUninstall::keepHistory, true
                 ),
+                propertyMappingInfo(
+                    HelmRelease::cascadeOnUninstall, HelmUninstall::cascade, "foreground"
+                ),
                 propertyMappingInfo(HelmRelease::wait, HelmUninstall::wait, true)
             )
         }
