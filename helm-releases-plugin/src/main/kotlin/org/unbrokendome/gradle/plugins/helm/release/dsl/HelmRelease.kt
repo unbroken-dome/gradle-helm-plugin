@@ -139,6 +139,14 @@ interface HelmReleaseProperties : Named, ConfigurableHelmInstallFromRepositoryOp
      */
     val keepHistoryOnUninstall: Property<Boolean>
 
+    /**
+     * Selects the deletion cascading strategy for the dependents when the release is uninstalled. Valid values are
+     * `"background"`, `"orphan"` or `"foreground"`. Defaults to `"background"` if not set.
+     *
+     * Corresponds to the `--cascade` CLI parameter on the `helm uninstall` command.
+     */
+    val cascadeOnUninstall: Property<String>
+
 
     /**
      * Names of other releases that this release depends on.
@@ -506,6 +514,10 @@ private abstract class AbstractHelmRelease(
             .convention(false)
 
 
+    final override val cascadeOnUninstall: Property<String> =
+        project.objects.property<String>()
+
+
     @Deprecated(message = "use release tags instead")
     @Suppress("OverridingDeprecatedMember")
     final override val dependsOn: SetProperty<String> =
@@ -612,6 +624,7 @@ private open class DefaultHelmRelease
             targetSpecific.replace.set(this.replace)
             targetSpecific.historyMax.set(this.historyMax)
             targetSpecific.keepHistoryOnUninstall.set(this.keepHistoryOnUninstall)
+            targetSpecific.cascadeOnUninstall.set(this.cascadeOnUninstall)
             @Suppress("DEPRECATION")
             targetSpecific.dependsOn.addAll(this.dependsOn)
             targetSpecific.installDependsOn.addAll(this.installDependsOn)
