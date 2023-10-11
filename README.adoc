@@ -10,6 +10,17 @@ endif::[]
 :version: 2.0.0
 :pluginId: org.unbroken-dome.helm
 
+[WARNING]
+====
+**The gradle-helm-plugin has moved!**
+
+As I lack the time to maintain this project at a satisfying level, it has found a new official home at https://github.com/Citi/gradle-helm-plugin[Citi/gradle-helm-plugin].
+
+Please use the plugins https://plugins.gradle.org/plugin/com.citi.helm[`com.citi.helm`] etc instead from now on.
+
+Also, please file any issues or PRs in that repository. Thank you and happy helming!
+====
+
 image:https://img.shields.io/gradle-plugin-portal/v/{pluginId}?versionPrefix={version}[link=https://plugins.gradle.org/plugin/{pluginId}/{version}]
 
 This is a suite of Gradle plugins for building, publishing and managing https://www.helm.sh/[Helm] charts.
